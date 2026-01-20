@@ -1,6 +1,6 @@
 
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { ToolService } from '../../services/tool.service';
 import { SearchService } from '../../services/search.service';
 import { UserService, UserRole } from '../../services/user.service';
@@ -15,11 +15,8 @@ import { MapsComponent } from '../maps/maps.component';
 import { ArchivingComponent } from '../archiving/archiving.component';
 import { CollaborationComponent } from '../collaboration/collaboration.component';
 import { DocumentationComponent } from '../documentation/documentation.component';
-import { AdminComponent } from '../admin/admin.component';
 import { AutomationComponent } from '../automation/automation.component';
-import { SettingsComponent } from '../settings/settings.component';
-import { UserManagementComponent } from '../user-management/user-management.component';
-import { SystemInternalsComponent } from '../system-internals/system-internals.component';
+import { ErpComponent } from '../erp/erp.component';
 import { ToolDetailModalComponent } from '../tool-detail-modal/tool-detail-modal.component';
 import { ToolStateService } from '../../services/tool-state.service';
 
@@ -27,7 +24,8 @@ import { ToolStateService } from '../../services/tool-state.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
+    NgClass, 
     ToolCardComponent, 
     ToolCardListComponent,
     PlaceholderComponent,
@@ -38,11 +36,8 @@ import { ToolStateService } from '../../services/tool-state.service';
     ArchivingComponent,
     CollaborationComponent,
     DocumentationComponent,
-    AdminComponent,
     AutomationComponent,
-    SettingsComponent,
-    UserManagementComponent,
-    SystemInternalsComponent,
+    ErpComponent,
     ToolDetailModalComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -70,13 +65,10 @@ export class DashboardComponent {
   // --- STATS ---
   totalToolsCount = computed(() => this.allTools().length);
   activeToolsCount = computed(() => this.allTools().filter(t => t.isActive).length);
-  favoriteToolsCount = computed(() => this.allTools().filter(t => t.isFavorite).length);
   usersCount = signal(5); // Updated count
 
   private hasPermission(tool: Tool, userRole: UserRole | undefined): boolean {
     if (!userRole) return false;
-    // FIX: Corrected logic. Only 'super-admin' (root) bypasses specific tool permissions.
-    // This resolves the type error as 'super-admin' is a valid UserRole.
     if (userRole === 'super-admin') return true;
     return tool.allowedRoles.includes(userRole);
   }
@@ -87,12 +79,9 @@ export class DashboardComponent {
     const userRole = this.user()?.role;
     
     const roleFilteredTools = this.allTools().filter(tool => {
-        // For journalists, only show active tools they have permission for
-        // FIX: Replaced 'journalist' with the correct UserRole 'investigative-journalist'.
         if (userRole === 'investigative-journalist') {
             return tool.isActive && this.hasPermission(tool, userRole);
         }
-        // For admin/root/supervisor, show all tools they have permission for (active or not)
         return this.hasPermission(tool, userRole);
     });
 
@@ -102,7 +91,7 @@ export class DashboardComponent {
       tool.name.toLowerCase().includes(term) || 
       tool.englishName.toLowerCase().includes(term) ||
       tool.description.toLowerCase().includes(term) ||
-      tool.category.toLowerCase().includes(term) // Enhanced search by category
+      tool.category.toLowerCase().includes(term)
     );
   });
 
@@ -150,7 +139,6 @@ export class DashboardComponent {
   // --- Methods for running tools in tabs ---
   handleRunTool(tool: Tool) {
     this.toolStateService.runTool(tool.id);
-    // Also close the detail modal if it's open
     this.closeToolDetails();
   }
 

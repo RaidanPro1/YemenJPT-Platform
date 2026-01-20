@@ -35,6 +35,7 @@ The application is built on a modern, containerized architecture designed for si
 - **Frontend**: A zoneless **Angular** application, built and served efficiently by **Nginx**.
 - **Backend**: A lightweight **Node.js/Express** API server to handle logging, notifications, and future API needs.
 - **Database**: **PostgreSQL** serves as the robust, primary database for storing user data, tool configurations, and other application state.
+- **Reverse Proxy**: **Traefik** handles incoming traffic, automates SSL certificate generation via Let's Encrypt and Cloudflare, and routes requests to the appropriate service.
 - **Orchestration**: The entire stack is managed and orchestrated via **Docker Compose**, making it easy to deploy and scale.
 
 ## 🚀 3. Deployment Guide (Docker)
@@ -45,6 +46,7 @@ This guide provides simple, universal steps to deploy the YemenJPT core applicat
 
 1.  **Server**: Any machine (local or cloud) with **Docker** and **Docker Compose** installed.
 2.  **Git**: The `git` command-line tool for cloning the repository.
+3.  **Cloudflare Account**: A Cloudflare account managing your domain's DNS.
 
 ### 3.2. Installation Steps
 
@@ -60,9 +62,10 @@ This guide provides simple, universal steps to deploy the YemenJPT core applicat
     cp .env.example .env
     nano .env
     ```
-    -   Fill in all required database credentials. **Use a password manager to generate strong, unique passwords.**
-    -   (Optional) Add your Google Gemini `API_KEY` to enable the cloud AI provider.
-    -   (Optional) Add your `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ROOT_CHAT_ID` to enable system notifications.
+    -   **Domain & SSL**: Fill in your `DOMAIN`, `CF_EMAIL`, and `CF_TOKEN` to enable automatic HTTPS via Traefik and Cloudflare.
+    -   **Database**: Fill in all required `POSTGRES_...` credentials. **Use a password manager to generate strong, unique passwords.**
+    -   **(Optional) AI Services**: Add your Google Gemini `API_KEY` to enable the cloud AI provider.
+    -   **(Optional) Notifications**: Add your `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ROOT_CHAT_ID` to enable system notifications.
 
 3.  **Run the Deployment Script**
     This script will build the necessary Docker images from the source code and start all services.
@@ -73,9 +76,9 @@ This guide provides simple, universal steps to deploy the YemenJPT core applicat
 
 ### 3.3. Accessing the Application
 
--   After the script finishes, the application will be running and accessible at `http://localhost:8080`.
--   If you are running this on a cloud server, ensure that port 8080 is open in your firewall, and access it via `http://<your_server_ip>:8080`.
--   For production use, it is **strongly recommended** to run this application behind a reverse proxy (like Nginx, Caddy, or Traefik) to handle HTTPS/SSL certificates.
+-   After the script finishes, the services will start. Traefik will automatically obtain an SSL certificate from Let's Encrypt via Cloudflare.
+-   The application will be accessible at `https://your-domain.com` (as configured in your `.env` file).
+-   Ensure that ports 80 and 443 are open on your server's firewall.
 
 ## 🔧 4. Maintenance & Updates
 
@@ -85,7 +88,7 @@ This guide provides simple, universal steps to deploy the YemenJPT core applicat
     ./deploy.sh
     ```
     The script will rebuild only the components that have changed and restart the services.
--   **Backups**: All persistent data is stored in a Docker volume named `postgres_data`. You should implement a regular backup strategy for this volume. A simple method is to use a container that runs `pg_dump`.
+-   **Backups**: All persistent data is stored in Docker volumes (`postgres_data`, `traefik_data`). You should implement a regular backup strategy for these volumes.
 -   **Viewing Logs**: To see the real-time logs from all running services, use the command:
     ```bash
     docker compose logs -f
@@ -94,5 +97,3 @@ This guide provides simple, universal steps to deploy the YemenJPT core applicat
     ```bash
     docker compose down
     ```
-
----

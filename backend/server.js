@@ -4,11 +4,11 @@ const bodyParser = require('body-parser');
 const TelegramBot = require('node-telegram-bot-api');
 
 // --- Telegram Bot Setup ---
-// The token should come from environment variables, with a fallback for local testing.
 const token = process.env.TELEGRAM_BOT_TOKEN;
+const ROOT_CHAT_ID = process.env.TELEGRAM_ROOT_CHAT_ID;
 let bot;
 
-if (token) {
+if (token && ROOT_CHAT_ID) {
   bot = new TelegramBot(token, { polling: true });
   console.log('🤖 Telegram Bot initialized.');
 
@@ -16,26 +16,15 @@ if (token) {
     console.error(`Telegram Polling Error: ${error.code} - ${error.message}`);
   });
   
-  // A variable to store the root chat ID. Can be set via env var or dynamically.
-  let ROOT_CHAT_ID = process.env.TELEGRAM_ROOT_CHAT_ID || null;
-
+  // Optional: Respond to /start command for confirmation
   bot.onText(/\/start/, (msg) => {
-      // If the root chat ID is not set in the environment, set it dynamically on first /start
-      if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
-          ROOT_CHAT_ID = msg.chat.id;
-      }
-      bot.sendMessage(msg.chat.id, 
-          '🚀 **تم تفعيل نظام المراقبة الجذرية (Root System)**\n' +
-          'أهلاً بك. سأقوم الآن بمراقبة النظام وإرسال تنبيهات فورية لك.\n' +
-          'Your Chat ID: ' + msg.chat.id, 
-          { parse_mode: 'Markdown' }
-      );
-      if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
-          console.log(`Root Chat ID registered: ${ROOT_CHAT_ID}. Consider setting this as TELEGRAM_ROOT_CHAT_ID in your .env file for persistence.`);
-      }
+    if (String(msg.chat.id) === String(ROOT_CHAT_ID)) {
+        bot.sendMessage(msg.chat.id, '🚀 **نظام المراقبة متصل.**', { parse_mode: 'Markdown' });
+    }
   });
+
 } else {
-  console.warn('⚠️ TELEGRAM_BOT_TOKEN not found. Bot notifications will be disabled.');
+  console.warn('⚠️ TELEGRAM_BOT_TOKEN or TELEGRAM_ROOT_CHAT_ID not found in environment variables. Bot notifications will be disabled.');
 }
 
 
@@ -60,12 +49,6 @@ app.post('/api/notify', (req, res) => {
     }
 
     const { event, details, user, isRoot } = req.body;
-    const effectiveChatId = process.env.TELEGRAM_ROOT_CHAT_ID || ROOT_CHAT_ID;
-
-    if (!effectiveChatId) {
-        console.warn('Telegram notification received, but no ROOT_CHAT_ID is configured. Ask the root user to send /start to the bot.');
-        return res.status(200).json({ status: 'warning', message: 'Bot not initialized by root user.' });
-    }
 
     let icon = isRoot ? '🚨' : '🔔';
     let title = isRoot ? 'نشاط بصلاحيات جذرية (ROOT)' : 'نشاط مستخدم';
@@ -76,7 +59,7 @@ app.post('/api/notify', (req, res) => {
                     `📝 <b>التفاصيل:</b> ${details}\n` +
                     `⏰ <b>الوقت:</b> ${new Date().toLocaleTimeString('ar-YE')}`;
 
-    bot.sendMessage(effectiveChatId, message, { parse_mode: 'HTML' }).catch(err => {
+    bot.sendMessage(ROOT_CHAT_ID, message, { parse_mode: 'HTML' }).catch(err => {
         console.error("Failed to send Telegram message:", err.message);
     });
     

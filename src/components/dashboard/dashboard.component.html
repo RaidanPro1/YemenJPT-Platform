@@ -148,6 +148,9 @@
         @case('ushahidi') { <app-maps></app-maps> }
         @case('archivebox') { <app-archiving></app-archiving> }
         @case('mattermost') { <app-collaboration></app-collaboration> }
+        @case('n8n') { <app-automation></app-automation> }
+        @case('erpnext') { <app-erp></app-erp> }
+        @case('jupyterhub') { <app-documentation></app-documentation> }
         @default {
           @if (toolStateService.activeToolId(); as toolId) {
             <app-placeholder [pageTitle]="getToolById(toolId)?.name ?? 'أداة غير معروفة'"></app-placeholder>
