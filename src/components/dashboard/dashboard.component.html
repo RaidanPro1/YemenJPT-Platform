@@ -143,6 +143,7 @@
     <div class="flex-grow pt-1 min-h-0">
       @switch (toolStateService.activeToolId()) {
         @case('ai-assistant') { <app-ai-core></app-ai-core> }
+        @case('searxng') { <app-searxng></app-searxng> }
         @case('social-analyzer') { <app-social-media-analysis></app-social-media-analysis> }
         @case('changedetection') { <app-indilab></app-indilab> }
         @case('ushahidi') { <app-maps></app-maps> }

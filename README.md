@@ -64,8 +64,9 @@ This guide provides simple, automated steps to deploy the entire YemenJPT ecosys
     nano .env
     ```
     -   **Domain & Server IP**: Fill in your main `DOMAIN` and the public IP address of your server (`SERVER_IP`).
-    -   **Cloudflare Credentials**: Fill in your `CF_EMAIL`, `CF_ZONE_ID`, and `CF_TOKEN`. For instructions on creating an API token, see the Cloudflare documentation.
-    -   **Passwords**: Use a password manager to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, etc. **Do not use simple passwords.**
+    -   **Cloudflare Credentials**: Fill in your `CF_EMAIL`, `CF_ZONE_ID`, and `CF_TOKEN`.
+        -   **How to get a Cloudflare API Token**: In your Cloudflare dashboard, go to *My Profile > API Tokens > Create Token*. Use the "Edit zone DNS" template, select your specific zone under "Zone Resources," and create the token. Copy it immediately.
+    -   **Passwords**: Use a password manager (like the included Vaultwarden/Bitwarden) to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, etc. **Do not use simple passwords.**
     -   **(Optional) AI & Bot Keys**: Add your Google Gemini `API_KEY` and Telegram Bot credentials if you wish to use these features.
 
 3.  **Run the Installation Script**
@@ -74,7 +75,7 @@ This guide provides simple, automated steps to deploy the entire YemenJPT ecosys
     chmod +x install.sh
     sudo ./install.sh
     ```
-    The script will perform all necessary steps, including installing Docker, configuring DNS, creating directories, generating configurations, and launching all services. This may take several minutes on the first run.
+    **What to Expect:** The script will perform all necessary steps, including installing Docker, configuring DNS, creating directories, generating configurations, and launching all services. This process may take several minutes on the first run as it downloads all the necessary Docker images for the platform's tools.
 
 ### 3.3. Accessing the Application
 
@@ -99,3 +100,17 @@ This guide provides simple, automated steps to deploy the entire YemenJPT ecosys
     ```bash
     sudo docker compose down
     ```
+
+### 4.1. Troubleshooting
+
+-   **Problem: Services are not starting or are in a restart loop.**
+    -   **Solution:** Check the logs using `sudo docker compose -f /opt/presshouse/docker-compose.yml logs -f`. Look for error messages. Common issues include incorrect passwords in the `.env` file or port conflicts on the server.
+-   **Problem: SSL certificates are not being generated (sites show a privacy error).**
+    -   **Solution:** 
+        1. Ensure your `CF_TOKEN`, `CF_EMAIL`, and `CF_ZONE_ID` are correct in the `.env` file.
+        2. Verify that your domain's nameservers are pointing to Cloudflare.
+        3. Check the Traefik logs for specific ACME challenge errors: `sudo docker logs ph-gateway`. The logs will often indicate if the API token is invalid or has insufficient permissions.
+-   **Problem: I need to change a configuration value (e.g., a password).**
+    -   **Solution:** 
+        1. Edit the `.env` file in your original cloned repository directory.
+        2. Rerun the installation script: `sudo ./install.sh`. The script is idempotent and will regenerate configurations and restart services with the new values.

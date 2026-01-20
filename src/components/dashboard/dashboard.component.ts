@@ -1,4 +1,5 @@
 
+
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { ToolService } from '../../services/tool.service';
@@ -19,6 +20,7 @@ import { AutomationComponent } from '../automation/automation.component';
 import { ErpComponent } from '../erp/erp.component';
 import { ToolDetailModalComponent } from '../tool-detail-modal/tool-detail-modal.component';
 import { ToolStateService } from '../../services/tool-state.service';
+import { SearxngComponent } from '../searxng/searxng.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +40,8 @@ import { ToolStateService } from '../../services/tool-state.service';
     DocumentationComponent,
     AutomationComponent,
     ErpComponent,
-    ToolDetailModalComponent
+    ToolDetailModalComponent,
+    SearxngComponent
   ],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
