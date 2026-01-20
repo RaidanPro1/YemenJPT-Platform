@@ -1,0 +1,52 @@
+<div class="h-full flex flex-col space-y-8 animate-fade-in">
+  <!-- Header -->
+  <section>
+    <h1 class="text-3xl font-bold text-gray-900">مركز القيادة</h1>
+    <p class="text-gray-500 mt-1">
+      مراقبة صحة النظام، الأمان، وإدارة المستخدمين.
+    </p>
+  </section>
+
+  <!-- System Health -->
+  <section>
+    <h2 class="text-xl font-bold mb-4">صحة النظام</h2>
+    <app-system-stats></app-system-stats>
+  </section>
+
+  <!-- Security Log -->
+  <section>
+     <h2 class="text-xl font-bold mb-4">سجل الأمان (آخر الأحداث)</h2>
+     <div class="bg-base-100 rounded-xl shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-right text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="py-3 px-6">الوقت</th>
+                        <th scope="col" class="py-3 px-6">المستوى</th>
+                        <th scope="col" class="py-3 px-6">الحدث</th>
+                        <th scope="col" class="py-3 px-6">التفاصيل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (log of logs(); track log.id) {
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="py-3 px-6 font-mono text-xs">{{ log.timestamp }}</td>
+                            <td class="py-3 px-6">
+                                <span class="text-xs font-bold px-2 py-1 rounded-full" [ngClass]="{
+                                    'bg-red-100 text-red-800': log.level === 'Critical',
+                                    'bg-yellow-100 text-yellow-800': log.level === 'Warning',
+                                    'bg-blue-100 text-blue-800': log.level === 'Info'
+                                }">
+                                    {{ log.level }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6 font-semibold text-gray-800">{{ log.event }}</td>
+                            <td class="py-3 px-6">{{ log.details }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+     </div>
+  </section>
+</div>

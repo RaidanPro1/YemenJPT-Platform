@@ -1,0 +1,155 @@
+pageInfo:
+  title: YemenJPT Portal
+  description: بوابة الصحفي اليمني
+sections:
+  - name: 🦅 البوابة الرئيسية والتقصي
+    icon: fas fa-binoculars
+    items:
+      - title: الموقع الرسمي لبيت الصحافة
+        description: تعرف على مشاريعنا ورؤيتنا
+        url: "https://ph-ye.org"
+        icon: "fas fa-landmark"
+      - title: رصد التغييرات
+        description: مراقبة أي تغيير في صفحات الويب
+        url: "https://watch.ph-ye.org"
+        icon: hl-eye
+      - title: حالة الشبكة
+        description: مراقبة استمرارية عمل الخدمات
+        url: "https://status.ph-ye.org"
+        icon: hl-server
+      - title: البحث الآمن
+        description: محرك بحث ميتا لا يتتبعك
+        url: "https://search.ph-ye.org"
+        icon: hl-search
+      - title: أتمتة التقصي (SpiderFoot)
+        description: جمع وتحليل البيانات من مئات المصادر
+        url: "https://osint-auto.ph-ye.org"
+        icon: hl-spider
+      - title: تتبع الكريبتو (Arkham)
+        description: ArkhamMirror for blockchain intelligence
+        url: "https://crypto.ph-ye.org"
+        icon: "fab fa-bitcoin"
+
+  - name: 🔬 التحقق وكشف التزييف
+    icon: fas fa-check-double
+    items:
+      - title: Meedan Check
+        description: منصة تعاونية للتحقق من الحقائق
+        url: "https://check.ph-ye.org"
+        icon: hl-check-circle
+      - title: Loki
+        description: نظام لأتمتة التحقق من الادعاءات
+        url: "https://loki.ph-ye.org"
+        icon: hl-cogs
+      - title: Aletheia
+        description: أدوات لكشف التزييف العميق
+        url: "https://aletheia.ph-ye.org"
+        icon: hl-mask
+
+  - name: 💬 تحليل الإعلام الاجتماعي
+    icon: fas fa-comments
+    items:
+      - title: المحلل الاجتماعي
+        description: تحليل البصمة الرقمية عبر 1000+ منصة
+        url: "https://analyzer.ph-ye.org"
+        icon: hl-users
+      - title: جامع بيانات تيليجرام (مخصص)
+        description: أداة داخلية لجمع البيانات من تيليجرام
+        url: "https://ai.ph-ye.org/social-media"
+        icon: "fab fa-telegram"
+      - title: محلل تويتر (Snscrape)
+        description: أداة داخلية لتجميع وتحليل التغريدات
+        url: "https://ai.ph-ye.org/social-media"
+        icon: "fab fa-twitter"
+
+  - name: 🗺️ الخرائط والبيانات
+    icon: fas fa-globe-asia
+    items:
+      - title: تصور البيانات (Kepler.gl)
+        description: Visualize large-scale geographic datasets
+        url: "https://maps.ph-ye.org"
+        icon: hl-globe
+      - title: رصد الانتهاكات (Ushahidi)
+        description: منصة خرائط تفاعلية للرصد الجماعي
+        url: "https://map-report.ph-ye.org"
+        icon: hl-map-pin
+      - title: بنك المعلومات (NocoDB)
+        description: بناء قواعد بيانات للتحقيقات
+        url: "https://data.ph-ye.org"
+        icon: hl-database
+      - title: خادم GIS
+        description: نشر ومشاركة الخرائط والبيانات الجغرافية
+        url: "https://gis-server.ph-ye.org"
+        icon: hl-globe-alt
+
+  - name: 📝 النشر وإدارة المحتوى
+    icon: fas fa-feather-alt
+    items:
+      - title: منصة النشر (Ghost)
+        description: Modern, fast platform for publishing articles
+        url: "https://publish.ph-ye.org"
+        icon: "fab fa-ghost"
+      - title: إدارة المحتوى (TYPO3)
+        description: نظام النشر للموقع العام
+        url: "https://cms.ph-ye.org"
+        icon: hl-page
+      - title: الأرشيف الدائم (ArchiveBox)
+        description: حفظ نسخ دائمة من صفحات الويب
+        url: "https://archive.ph-ye.org"
+        icon: hl-archive-box
+      - title: الأرشيف التفاعلي (Webrecorder)
+        description: إنشاء نسخ تفاعلية من المواقع
+        url: "https://web-rec.ph-ye.org"
+        icon: hl-record-vinyl
+
+  - name: 🗄️ إدارة المؤسسة
+    icon: fas fa-building
+    items:
+      - title: ERPNext
+        description: نظام إدارة موارد المؤسسة للمالية والمشاريع والموارد البشرية
+        url: "https://erp.ph-ye.org"
+        icon: "https://raw.githubusercontent.com/frappe/design/master/assets/frappe_io/frappe-framework-logo-f.svg"
+
+  - name: 🛠️ أدوات العمل والإنتاجية
+    icon: fas fa-tools
+    items:
+      - title: منصة YemenJPT
+        description: بيئة العمل الاستقصائية الذكية
+        url: "https://ai.ph-ye.org"
+        icon: hl-brain
+      - title: كلمات المرور (Vaultwarden)
+        description: خزنة آمنة لإدارة كلمات المرور
+        url: "https://pass.ph-ye.org"
+        icon: hl-key
+      - title: بناء الأدوات (ToolJet)
+        description: بناء أدوات داخلية بدون برمجة معقدة
+        url: "https://tools.ph-ye.org"
+        icon: hl-tools
+      - title: البريد الإلكتروني (Webmail)
+        description: الوصول إلى بريدك المؤسسي
+        url: "https://webmail.ph-ye.org"
+        icon: hl-email
+
+  - name: ⚙️ الإدارة والأتمتة
+    icon: fas fa-cogs
+    items:
+      - title: إدارة الحاويات (Portainer)
+        description: لوحة تحكم إدارة خدمات النظام
+        url: "https://sys.ph-ye.org"
+        icon: hl-computer-tower
+      - title: مراقبة الأداء (Glances)
+        description: مراقبة استهلاك موارد الخادم
+        url: "https://glances.ph-ye.org"
+        icon: hl-line-chart
+      - title: الأتمتة (n8n)
+        description: بناء تدفقات عمل آلية
+        url: "https://auto.ph-ye.org"
+        icon: hl-lightning-bolt
+      - title: الكود (Gitea)
+        description: مستودع الكود الخاص للمشاريع
+        url: "https://git.ph-ye.org"
+        icon: hl-code
+      - title: التواصل الآمن (Chatwoot)
+        description: صندوق وارد موحد لإدارة المصادر
+        url: "https://chat.ph-ye.org"
+        icon: hl-comments

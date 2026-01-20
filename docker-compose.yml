@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # 1. Frontend Service (Angular + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yemenjpt-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80" # Map host port 8080 to container port 80
+    networks:
+      - yemenjpt-net
+    depends_on:
+      - backend
+
+  # 2. Backend Service (Node.js API)
+  backend:
+    build:
+      context: ./backend
+    container_name: yemenjpt-backend
+    restart: unless-stopped
+    environment:
+      # Connection string for the PostgreSQL database
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - API_KEY=${API_KEY} # Pass the Gemini API key
+    networks:
+      - yemenjpt-net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. Database Service (PostgreSQL)
+  db:
+    image: postgres:16-alpine
+    container_name: yemenjpt-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # This line initializes the database with your schema on the first run
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - yemenjpt-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  yemenjpt-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

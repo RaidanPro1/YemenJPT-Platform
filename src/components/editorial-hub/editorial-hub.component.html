@@ -1,0 +1,77 @@
+<div class="h-full flex flex-col space-y-8 animate-fade-in">
+  <!-- Header -->
+  <section>
+    <h1 class="text-3xl font-bold text-gray-900">مركز التحرير</h1>
+    <p class="text-gray-500 mt-1">
+      إدارة تدفق المحتوى من الفكرة إلى النشر.
+    </p>
+  </section>
+
+  <!-- Kanban Board -->
+  <section class="flex-grow min-h-0">
+    <h2 class="text-xl font-bold mb-4">سير عمل المقالات</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
+      <!-- Ideas -->
+      <div (dragover)="onDragOver($event, 'ideas')" (dragleave)="onDragLeave()" (drop)="onDrop($event, 'ideas')" class="flex flex-col rounded-lg transition-colors" [class.bg-blue-100/50]="dragOverStatus() === 'ideas'">
+        <h3 class="font-bold text-center p-2 bg-blue-200/80 rounded-t-lg text-blue-800 border-b-2 border-blue-300">💡 الأفكار ({{ articles().ideas.length }})</h3>
+        <div class="p-3 space-y-3 bg-blue-100/50 rounded-b-lg h-full overflow-y-auto">
+          @for (article of articles().ideas; track article.id) {
+            <div draggable="true" (dragstart)="onDragStart(article.id)" class="p-3 bg-base-100 rounded-lg shadow-sm cursor-grab active:cursor-grabbing">
+              <p class="font-semibold text-sm">{{ article.title }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ article.author }}</p>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- In Progress -->
+      <div (dragover)="onDragOver($event, 'inProgress')" (dragleave)="onDragLeave()" (drop)="onDrop($event, 'inProgress')" class="flex flex-col rounded-lg transition-colors" [class.bg-yellow-100/50]="dragOverStatus() === 'inProgress'">
+        <h3 class="font-bold text-center p-2 bg-yellow-200/80 rounded-t-lg text-yellow-800 border-b-2 border-yellow-300">✍️ قيد التنفيذ ({{ articles().inProgress.length }})</h3>
+        <div class="p-3 space-y-3 bg-yellow-100/50 rounded-b-lg h-full overflow-y-auto">
+          @for (article of articles().inProgress; track article.id) {
+            <div draggable="true" (dragstart)="onDragStart(article.id)" class="p-3 bg-base-100 rounded-lg shadow-sm cursor-grab active:cursor-grabbing">
+              <p class="font-semibold text-sm">{{ article.title }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ article.author }}</p>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Review -->
+      <div (dragover)="onDragOver($event, 'review')" (dragleave)="onDragLeave()" (drop)="onDrop($event, 'review')" class="flex flex-col rounded-lg transition-colors" [class.bg-purple-100/50]="dragOverStatus() === 'review'">
+        <h3 class="font-bold text-center p-2 bg-purple-200/80 rounded-t-lg text-purple-800 border-b-2 border-purple-300">👀 قيد المراجعة ({{ articles().review.length }})</h3>
+        <div class="p-3 space-y-3 bg-purple-100/50 rounded-b-lg h-full overflow-y-auto">
+           @for (article of articles().review; track article.id) {
+            <div draggable="true" (dragstart)="onDragStart(article.id)" class="p-3 bg-base-100 rounded-lg shadow-sm cursor-grab active:cursor-grabbing">
+              <p class="font-semibold text-sm">{{ article.title }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ article.author }}</p>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Published -->
+      <div (dragover)="onDragOver($event, 'published')" (dragleave)="onDragLeave()" (drop)="onDrop($event, 'published')" class="flex flex-col rounded-lg transition-colors" [class.bg-green-100/50]="dragOverStatus() === 'published'">
+        <h3 class="font-bold text-center p-2 bg-green-200/80 rounded-t-lg text-green-800 border-b-2 border-green-300">✅ تم النشر ({{ articles().published.length }})</h3>
+        <div class="p-3 space-y-3 bg-green-100/50 rounded-b-lg h-full overflow-y-auto">
+           @for (article of articles().published; track article.id) {
+            <div draggable="true" (dragstart)="onDragStart(article.id)" class="p-3 bg-base-100 rounded-lg shadow-sm cursor-grab active:cursor-grabbing opacity-70">
+              <p class="font-semibold text-sm">{{ article.title }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ article.author }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual CMS Placeholder -->
+   <section>
+    <h2 class="text-xl font-bold mb-4">إدارة محتوى الصفحة الرئيسية (CMS)</h2>
+    <div class="p-6 bg-base-200 rounded-lg text-center">
+        <h3 class="text-lg font-semibold">محرر الكتل المرئي</h3>
+        <p class="text-sm text-gray-500 my-2">هنا سيتم عرض محرر الكتل (مثل Editor.js) الذي يسمح لك بإعادة ترتيب وإضافة وحذف مكونات الصفحة الرئيسية بشكل مرئي.</p>
+        <button class="px-4 py-2 text-sm font-semibold text-white bg-ph-blue rounded-lg hover:bg-ph-blue-dark">
+            فتح محرر الصفحة الرئيسية
+        </button>
+    </div>
+  </section>
+
+</div>

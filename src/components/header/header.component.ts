@@ -1,0 +1,147 @@
+import { Component, ChangeDetectionStrategy, inject, output, input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SearchService } from '../../services/search.service';
+import { User, UserRole, getRoleDisplayName } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
+
+interface PortalLink {
+  key: string;
+  name: string;
+  icon: string;
+  allowedRoles: UserRole[];
+}
+
+interface PublicNavLink {
+  key: string;
+  name: string;
+}
+
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './header.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class HeaderComponent {
+  searchService = inject(SearchService);
+  notificationService = inject(NotificationService);
+  
+  isAuthenticated = input.required<boolean>();
+  user = input<User | null>();
+
+  toggleSidebar = output<void>();
+  logout = output<void>();
+  login = output<void>();
+  navigate = output<string>();
+
+  isDropdownOpen = signal(false);
+  isNotificationDropdownOpen = signal(false);
+  isPortalDropdownOpen = signal(false);
+  
+  portalLinks: PortalLink[] = [
+    { key: 'project-management', name: 'إدارة المشاريع', icon: 'briefcase', allowedRoles: ['editor-in-chief', 'super-admin'] },
+    { key: 'violations-observatory', name: 'مرصد الانتهاكات', icon: 'shield-exclamation', allowedRoles: ['investigative-journalist', 'editor-in-chief'] },
+    { key: 'training', name: 'بوابة التدريب', icon: 'academic-cap', allowedRoles: ['investigative-journalist', 'editor-in-chief'] },
+    { key: 'tech-support', name: 'دعم الصحفيين', icon: 'lifebuoy', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
+  ];
+
+  publicNavLinks: PublicNavLink[] = [
+    { key: 'home', name: 'الرئيسية' },
+    { key: 'about', name: 'من نحن' },
+    { key: 'news-public', name: 'الأخبار' },
+    { key: 'projects-public', name: 'المشاريع' },
+    { key: 'violations-observatory-public', name: 'مرصد الانتهاكات' },
+    { key: 'training-portal-public', name: 'بوابة التدريب' },
+    { key: 'tech-support-public', name: 'دعم الصحفيين' },
+  ];
+
+  // Use the centralized role display name function
+  getRoleDisplayName = getRoleDisplayName;
+
+  isRoleSufficient(allowedRoles: UserRole[]): boolean {
+    const currentRole = this.user()?.role;
+    if (!currentRole) return false;
+    return allowedRoles.includes(currentRole);
+  }
+
+  handleSearch(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.searchService.searchTerm.set(inputElement.value);
+  }
+
+  onToggleSidebar() {
+    this.toggleSidebar.emit();
+  }
+
+  onLogout() {
+    this.logout.emit();
+    this.isDropdownOpen.set(false);
+  }
+
+  onLogin() {
+    this.login.emit();
+  }
+
+  onNavigate(page: string) {
+    this.closeDropdown();
+    this.closeNotificationDropdown();
+    this.closePortalDropdown();
+    this.navigate.emit(page);
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen.update(value => !value);
+    if (this.isDropdownOpen()) {
+      this.isNotificationDropdownOpen.set(false);
+      this.isPortalDropdownOpen.set(false);
+    }
+  }
+
+  closeDropdown() {
+    this.isDropdownOpen.set(false);
+  }
+  
+  toggleNotificationDropdown() {
+    this.isNotificationDropdownOpen.update(value => !value);
+    if (this.isNotificationDropdownOpen()) {
+      this.isDropdownOpen.set(false);
+      this.isPortalDropdownOpen.set(false);
+    }
+  }
+
+  closeNotificationDropdown() {
+    this.isNotificationDropdownOpen.set(false);
+  }
+
+  togglePortalDropdown() {
+    this.isPortalDropdownOpen.update(value => !value);
+    if (this.isPortalDropdownOpen()) {
+      this.isDropdownOpen.set(false);
+      this.isNotificationDropdownOpen.set(false);
+    }
+  }
+
+  closePortalDropdown() {
+    this.isPortalDropdownOpen.set(false);
+  }
+
+  markAllNotificationsAsRead() {
+    this.notificationService.markAllAsRead();
+  }
+
+  timeAgo(date: Date): string {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return `قبل ${Math.floor(interval)} سنة`;
+    interval = seconds / 2592000;
+    if (interval > 1) return `قبل ${Math.floor(interval)} شهر`;
+    interval = seconds / 86400;
+    if (interval > 1) return `قبل ${Math.floor(interval)} يوم`;
+    interval = seconds / 3600;
+    if (interval > 1) return `قبل ${Math.floor(interval)} ساعة`;
+    interval = seconds / 60;
+    if (interval > 1) return `قبل ${Math.floor(interval)} دقيقة`;
+    return 'الآن';
+  }
+}

@@ -1,0 +1,83 @@
+<!-- Backdrop for mobile -->
+@if(isSidebarOpen()) {
+  <div (click)="onNavigate(activePage())" class="fixed inset-0 bg-black/30 z-20 lg:hidden"></div>
+}
+
+<aside 
+  class="fixed inset-y-0 right-0 z-30 w-64 flex-shrink-0 bg-base-100 flex flex-col border-s border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0"
+  [class.translate-x-0]="isSidebarOpen()"
+  [class.translate-x-full]="!isSidebarOpen()">
+  <!-- Logo -->
+  <div class="h-16 flex items-center justify-center px-4 border-b border-gray-200">
+    <img src="assets/logos/press-house-logo.png" alt="Press House Logo" class="h-10">
+    <div class="text-right mr-2">
+      <h1 class="text-lg font-bold text-ph-blue">بيت الصحافة</h1>
+      <p class="text-xs text-gray-500">منصة الصحفي اليمني</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 px-4 py-6 space-y-2">
+    @for (link of navLinks(); track link.key) {
+      <a href="javascript:void(0)" 
+         (click)="onNavigate(link.key)"
+         class="flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200" 
+         [class]="activePage() === link.key ? 'bg-ph-blue-light text-ph-blue font-bold' : 'hover:bg-gray-100'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ms-3">
+          @switch (link.icon) {
+            @case ('home') { <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /> }
+            @case ('cpu-chip') { <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 15v-1.5M12 4.5v-1.5m0 18v-1.5" /> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 18.75h3M10.5 5.25h3M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18Z" /> }
+            @case ('speaker-wave') { <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21a8.956 8.956 0 0 0 8.956-8.956 8.956 8.956 0 0 0-8.956-8.956m0 17.912a8.956 8.956 0 0 1-8.956-8.956 8.956 8.956 0 0 1 8.956-8.956m7.604 14.286a.75.75 0 0 0-1.06-1.06l-1.558 1.558-1.558-1.558a.75.75 0 0 0-1.06 1.06l1.558 1.558-1.558 1.558a.75.75 0 1 0 1.06 1.06l1.558-1.558 1.558 1.558a.75.75 0 1 0 1.06-1.06l-1.558-1.558 1.558-1.558Z M12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" /> }
+            @case ('user-group') { <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962c.57-1.023-.095-2.09-.832-2.848m-6.086 3.032c.57-1.022-.095-2.09-.832-2.847m0 2.847a11.952 11.952 0 0 1-2.148-5.761 11.952 11.952 0 0 1 2.148-5.762m0 11.522a11.952 11.952 0 0 0 6.086 3.032m-6.086-3.032.012-.007m-5.384 4.31a11.952 11.952 0 0 1-2.148-5.762m-2.148 5.762a11.952 11.952 0 0 0 6.086 3.032M14.25 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /> }
+            @case ('map') { <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-6.938l4.25-2.287a.75.75 0 0 1 1.002.868l-3.585 6.669a.75.75 0 0 1-1.218.153l-1.306-2.176a.75.75 0 0 0-1.218-.153l-1.559 2.598a.75.75 0 0 1-1.218.153l-2.529-4.215a.75.75 0 0 1 .393-1.285l4.25-2.287a.75.75 0 0 1 1.002.868Z" /> }
+            @case ('archive-box') { <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /> }
+            @case ('beaker') { <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c.238.19.475.384.706.582a13.48 13.48 0 0 1 5.101 4.182 10.95 10.95 0 0 1 2.304 6.332C17.752 21.087 15.09 24 12 24s-5.752-2.913-5.752-6.276a10.95 10.95 0 0 1 2.304-6.332 13.479 13.479 0 0 1 5.101-4.182c.231-.198.468-.392.706-.582Z" /> }
+            @case ('book-open') { <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /> }
+            @case ('building-office') { <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6h1.5m-1.5 3h1.5m-1.5 3h1.5M15 21v-3.375c0-.621-.504-1.125-1.125-1.125H10.125c-.621 0-1.125.504-1.125 1.125V21" /> }
+          }
+        </svg>
+        <span class="font-semibold">{{link.name}}</span>
+      </a>
+    }
+    <hr class="my-2 border-gray-200">
+     <p class="px-4 text-xs font-semibold text-gray-400 uppercase">البوابات</p>
+    @for (link of portalLinks(); track link.key) {
+      <a href="javascript:void(0)" 
+        (click)="onNavigate(link.key)"
+        class="flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200" 
+        [class]="activePage() === link.key ? 'bg-ph-blue-light text-ph-blue font-bold' : 'hover:bg-gray-100'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ms-3">
+          @switch (link.icon) {
+            @case ('window') { <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125A2.25 2.25 0 0 1 4.5 4.875h15A2.25 2.25 0 0 1 21.75 7.125v10.5A2.25 2.25 0 0 1 19.5 19.875h-15A2.25 2.25 0 0 1 2.25 17.625v-10.5ZM21.75 7.125c0-.621-.504-1.125-1.125-1.125H4.5c-.621 0-1.125.504-1.125 1.125M12 4.875v15M2.25 10.875h19.5" /> }
+            @case ('briefcase') { <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.075c0 1.313-.964 2.5-2.25 2.5h-10.5c-1.286 0-2.25-1.187-2.25-2.5V14.15M12 11.25h.008v.008H12v-.008Zm0 3h.008v.008H12v-.008Zm0 3h.008v.008H12v-.008Zm0 3h.008v.008H12v-.008Zm-3-6h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm6-6h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm-9-6h.008v.008H6v-.008Zm0 3h.008v.008H6v-.008Zm0 3h.008v.008H6v-.008Zm0 3h.008v.008H6v-.008Zm6-9h.008v.008H12v-.008Zm-3 0h.008v.008H9v-.008Zm6 0h.008v.008h-.008v-.008Zm-6 3h.008v.008H9v-.008Zm6 0h.008v.008h-.008v-.008Zm6-6h-4.5c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125h4.5c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125Z" /> }
+            @case ('shield-exclamation') { <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.007H12v-.007Z" /> }
+            @case ('academic-cap') { <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> }
+            @case ('lifebuoy') { <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> }
+          }
+        </svg>
+        <span class="font-semibold">{{link.name}}</span>
+      </a>
+    }
+    <hr class="my-2 border-gray-200">
+    @for (link of adminLinks(); track link.key) {
+      <a href="javascript:void(0)" 
+         (click)="onNavigate(link.key)"
+         class="flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200" 
+         [class]="activePage() === link.key ? 'bg-ph-blue-light text-ph-blue font-bold' : 'hover:bg-gray-100'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ms-3">
+          @switch (link.icon) {
+            @case ('shield-check') { <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286Zm0 13.036h.008v.008h-.008v-.008Z" /> }
+            @case ('bolt') { <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" /> }
+            @case ('users') { <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-4.683c.65-.935 1-2.104 1-3.328M3 4.5a5.25 5.25 0 0 1 10.5 0v.75a5.25 5.25 0 0 1-10.5 0v-.75Z" /> }
+            @case ('cog-6-tooth') { <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-1.003 1.11-1.226a11.989 11.989 0 0 1 2.59 0c.55.223 1.02.684 1.11 1.226.09.542-.055 1.14-.422 1.567l-.025.025a1.5 1.5 0 0 0-.232 1.06V8.25c0 .532.22 1.02.585 1.35l.025.025c.367.427.512 1.025.422 1.567-.09.542-.56 1.003-1.11 1.226a11.99 11.99 0 0 1-2.59 0c-.55-.223-1.02-.684-1.11-1.226-.09-.542.055-1.14.422-1.567l.025-.025a1.5 1.5 0 0 0 .232-1.06V8.25a1.5 1.5 0 0 0-.232-1.06l-.025-.025a1.722 1.722 0 0 1-.422-1.567ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /> }
+            @case ('wrench-screwdriver') { <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" /> }
+          }
+        </svg>
+        <span class="font-semibold">{{link.name}}</span>
+      </a>
+    }
+  </nav>
+
+  <!-- Spacer to push content up -->
+  <div class="mt-auto"></div>
+</aside>

@@ -1,0 +1,164 @@
+@if (!showTabs()) {
+  <div class="space-y-8 animate-fade-in">
+    <!-- Header -->
+    <div class="md:flex justify-between items-start">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">لوحة التحكم الرئيسية</h1>
+        <p class="text-gray-500 mt-1 max-w-2xl">
+          مرحباً بعودتك, {{ userService.currentUser()?.name }}. هنا مركز قيادة عملياتك الاستقصائية. استعرض ترسانتك من الأدوات الرقمية، وادخل إلى مساحات العمل، وقم بإدارة النظام من نقطة واحدة.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Stats Cards (Visible to all authenticated users) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-base-100 p-6 rounded-xl shadow flex items-center space-i-4">
+        <div class="bg-ph-blue-light p-3 rounded-full">
+          <svg class="w-6 h-6 text-ph-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-1.003 1.11-1.226a11.989 11.989 0 0 1 2.59 0c.55.223 1.02.684 1.11 1.226.09.542-.055 1.14-.422 1.567l-.025.025a1.5 1.5 0 0 0-.232 1.06V8.25c0 .532.22 1.02.585 1.35l.025.025c.367.427.512 1.025.422 1.567-.09.542-.56 1.003-1.11 1.226a11.99 11.99 0 0 1-2.59 0c-.55-.223-1.02-.684-1.11-1.226-.09-.542.055-1.14.422-1.567l.025-.025a1.5 1.5 0 0 0 .232-1.06V8.25a1.5 1.5 0 0 0-.232-1.06l-.025-.025a1.722 1.722 0 0 1-.422-1.567Z M12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /></svg>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">إجمالي الأدوات</p>
+          <p class="text-2xl font-bold text-gray-900">{{ totalToolsCount() }}</p>
+        </div>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow flex items-center space-i-4">
+        <div class="bg-green-100 p-3 rounded-full">
+          <svg class="w-6 h-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4" /></svg>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">أدوات نشطة</p>
+          <p class="text-2xl font-bold text-gray-900">{{ activeToolsCount() }}</p>
+        </div>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow flex items-center space-i-4">
+        <div class="bg-yellow-100 p-3 rounded-full">
+           <svg class="w-6 h-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.312l-4.12 3.535 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.12-3.535c-.887-.767-.415-2.219.749-2.312l5.404-.434 2.082-5.006Z" clip-rule="evenodd" /></svg>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">المفضلة</p>
+          <p class="text-2xl font-bold text-gray-900">{{ favoriteTools().length }}</p>
+        </div>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow flex items-center space-i-4">
+        <div class="bg-sky-100 p-3 rounded-full">
+          <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-4.683c.65-.935 1-2.104 1-3.328M3 4.5a5.25 5.25 0 0 1 10.5 0v.75a5.25 5.25 0 0 1-10.5 0v-.75Z" /></svg>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">المستخدمون</p>
+          <p class="text-2xl font-bold text-gray-900">{{ usersCount() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Tabs UI -->
+    <div class="border-b border-gray-200 flex justify-between items-center">
+        <nav class="-mb-px flex space-i-6" aria-label="Tabs">
+            <button (click)="setTab('all')" [class]="activeDashboardTab() === 'all' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
+                كل الأدوات
+            </button>
+            <button (click)="setTab('favorites')" [class]="activeDashboardTab() === 'favorites' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
+                المفضلة ({{ favoriteTools().length }})
+            </button>
+            <button (click)="setTab('categories')" [class]="activeDashboardTab() === 'categories' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
+                حسب الفئة
+            </button>
+        </nav>
+        <!-- View Toggler -->
+        <div class="flex items-center justify-center bg-gray-100 p-1 rounded-lg">
+          <button (click)="toggleViewMode()" [class]="viewMode() === 'grid' ? 'bg-white text-ph-blue shadow' : 'text-gray-500'" class="px-4 py-2 text-sm font-semibold rounded-md transition-all">شبكة</button>
+          <button (click)="toggleViewMode()" [class]="viewMode() === 'list' ? 'bg-white text-ph-blue shadow' : 'text-gray-500'" class="px-4 py-2 text-sm font-semibold rounded-md transition-all">قائمة</button>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="mt-6">
+      @if (activeDashboardTab() !== 'categories') {
+        @let tools = activeDashboardTab() === 'all' ? visibleTools() : favoriteTools();
+        <section>
+          @if (tools.length > 0) {
+            @if (viewMode() === 'grid') {
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @for (tool of tools; track tool.id) {
+                  <app-tool-card [tool]="tool" [userRole]="user()?.role ?? 'guest'" (toggleStatus)="handleToolToggle($event)" (toggleFavorite)="handleToggleFavorite($event)" (runTool)="handleRunTool($event)" (viewDetails)="showToolDetails($event)"></app-tool-card>
+                }
+              </div>
+            } @else {
+              <div class="space-y-2">
+                @for (tool of tools; track tool.id) {
+                  <app-tool-card-list [tool]="tool" [userRole]="user()?.role ?? 'guest'" (toggleStatus)="handleToolToggle($event)" (toggleFavorite)="handleToggleFavorite($event)" (runTool)="handleRunTool($event)" (viewDetails)="showToolDetails($event)"></app-tool-card-list>
+                }
+              </div>
+            }
+          } @else {
+            @if (activeDashboardTab() === 'favorites') {
+              <p class="text-center text-gray-500 py-8">ليس لديك أدوات مفضلة. انقر على أيقونة النجمة ⭐ لإضافة أداة.</p>
+            } @else {
+              <p class="text-center text-gray-500 py-8">لا توجد أدوات تطابق بحثك.</p>
+            }
+          }
+        </section>
+      } @else {
+        <section class="space-y-8">
+          @for (category of categories; track category) {
+            @if(categorizedTools()[category]?.length > 0) {
+              <section>
+                <h2 class="text-xl font-bold mb-4 text-gray-800">{{ category }}</h2>
+                @if (viewMode() === 'grid') {
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @for (tool of categorizedTools()[category]; track tool.id) {
+                      <app-tool-card [tool]="tool" [userRole]="user()?.role ?? 'guest'" (toggleStatus)="handleToolToggle($event)" (toggleFavorite)="handleToggleFavorite($event)" (runTool)="handleRunTool($event)" (viewDetails)="showToolDetails($event)"></app-tool-card>
+                    }
+                  </div>
+                } @else {
+                  <div class="space-y-2">
+                    @for (tool of categorizedTools()[category]; track tool.id) {
+                      <app-tool-card-list [tool]="tool" [userRole]="user()?.role ?? 'guest'" (toggleStatus)="handleToolToggle($event)" (toggleFavorite)="handleToggleFavorite($event)" (runTool)="handleRunTool($event)" (viewDetails)="showToolDetails($event)"></app-tool-card-list>
+                    }
+                  </div>
+                }
+              </section>
+            }
+          }
+        </section>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="h-full flex flex-col">
+    <!-- Tab Bar -->
+    <nav class="flex-shrink-0 border-b border-gray-200">
+      <ul class="flex items-center -mb-px">
+        @for(tool of toolStateService.openTools(); track tool.id) {
+          <li (click)="selectTab(tool.id)" class="cursor-pointer flex items-center gap-2 px-4 py-2 border-b-2 text-sm font-medium" [ngClass]="toolStateService.activeToolId() === tool.id ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'">
+            {{ tool.name }}
+            <button (click)="closeTab(tool.id, $event)" class="text-gray-400 hover:text-gray-600 rounded-full p-0.5 hover:bg-gray-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="flex-grow pt-1 min-h-0">
+      @switch (toolStateService.activeToolId()) {
+        @case('ai-assistant') { <app-ai-core></app-ai-core> }
+        @case('social-analyzer') { <app-social-media-analysis></app-social-media-analysis> }
+        @case('changedetection') { <app-indilab></app-indilab> }
+        @case('ushahidi') { <app-maps></app-maps> }
+        @case('archivebox') { <app-archiving></app-archiving> }
+        @case('mattermost') { <app-collaboration></app-collaboration> }
+        @default {
+          @if (toolStateService.activeToolId(); as toolId) {
+            <app-placeholder [pageTitle]="getToolById(toolId)?.name ?? 'أداة غير معروفة'"></app-placeholder>
+          }
+        }
+      }
+    </div>
+  </div>
+}
+
+<!-- Tool Detail Modal -->
+@if(selectedToolForDetail(); as tool) {
+  <app-tool-detail-modal [tool]="tool" (close)="closeToolDetails()" (runTool)="handleRunTool($event)"></app-tool-detail-modal>
+}

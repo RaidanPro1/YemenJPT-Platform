@@ -1,0 +1,118 @@
+<div class="space-y-8 animate-fade-in">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">مرصد الانتهاكات الصحفية</h1>
+    <p class="text-gray-500 mt-1">
+      سير عمل متكامل لتوثيق، تحليل، وعرض الانتهاكات بحق الصحفيين والمؤسسات الإعلامية في اليمن.
+    </p>
+  </div>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Map & Stats -->
+    <div class="lg:col-span-2 space-y-8">
+        <!-- Map Placeholder -->
+        <div class="bg-base-100 p-4 rounded-xl shadow flex items-center justify-center h-80">
+            <div class="text-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto mb-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-6.938l4.25-2.287a.75.75 0 0 1 1.002.868l-3.585 6.669a.75.75 0 0 1-1.218.153l-1.306-2.176a.75.75 0 0 0-1.218-.153l-1.559 2.598a.75.75 0 0 1-1.218.153l-2.529-4.215a.75.75 0 0 1 .393-1.285l4.25-2.287a.75.75 0 0 1 1.002.868Z" /></svg>
+                <p class="font-semibold">خريطة تفاعلية للانتهاكات</p>
+                <p class="text-xs">سيتم عرض البيانات الجغرافية هنا عبر Ushahidi/Kepler.gl</p>
+            </div>
+        </div>
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="bg-base-100 p-6 rounded-xl shadow">
+                <p class="text-sm text-gray-500">إجمالي الانتهاكات الموثقة</p>
+                <p class="text-3xl font-bold text-red-600">1,204</p>
+            </div>
+            <div class="bg-base-100 p-6 rounded-xl shadow">
+                <p class="text-sm text-gray-500">انتهاكات هذا الشهر</p>
+                <p class="text-3xl font-bold text-gray-900">15</p>
+            </div>
+            <div class="bg-base-100 p-6 rounded-xl shadow">
+                <p class="text-sm text-gray-500">أكثر المحافظات خطورة</p>
+                <p class="text-2xl font-bold text-gray-900">مأرب</p>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Incidents -->
+    <div class="bg-base-100 p-6 rounded-xl shadow">
+        <h2 class="text-xl font-bold mb-4">آخر الحوادث المبلغ عنها</h2>
+        <ul class="space-y-3">
+            <li class="flex items-start p-2 rounded-lg hover:bg-base-200">
+                <div class="w-3 h-3 bg-red-500 rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+                <div>
+                    <p class="text-sm font-semibold">اعتقال صحفي في صنعاء</p>
+                    <p class="text-xs text-gray-500">منذ 5 ساعات - قيد التحقق</p>
+                </div>
+            </li>
+             <li class="flex items-start p-2 rounded-lg hover:bg-base-200">
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+                <div>
+                    <p class="text-sm font-semibold">تهديدات لصحفية في عدن</p>
+                    <p class="text-xs text-gray-500">منذ 2 يوم - تم التوثيق</p>
+                </div>
+            </li>
+             <li class="flex items-start p-2 rounded-lg hover:bg-base-200">
+                <div class="w-3 h-3 bg-green-500 rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+                <div>
+                    <p class="text-sm font-semibold">حجب موقع إخباري</p>
+                    <p class="text-xs text-gray-500">منذ 4 أيام - مغلق</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+  </div>
+
+  <!-- Workflow Steps -->
+  <section>
+    <h2 class="text-xl font-bold mb-4">سير عمل الرصد والتوثيق</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+      <!-- Step 1: Receive Report -->
+      <div class="bg-base-100 p-4 rounded-lg shadow-sm border-t-4 border-ph-blue">
+        <div class="text-2xl mb-2">1️⃣</div>
+        <h3 class="font-semibold">استقبال البلاغات</h3>
+        <p class="text-xs text-gray-500 mt-1">
+          استقبل البلاغات من المراقبين والمصادر بشكل آمن عبر صندوق الوارد الموحد <span class="font-bold">Chatwoot</span>.
+        </p>
+      </div>
+      <!-- Step 2: Document & Map -->
+      <div class="bg-base-100 p-4 rounded-lg shadow-sm border-t-4 border-ph-blue">
+        <div class="text-2xl mb-2">2️⃣</div>
+        <h3 class="font-semibold">التوثيق وعرض الخرائط</h3>
+        <p class="text-xs text-gray-500 mt-1">
+          وثّق تفاصيل الانتهاك في <span class="font-bold">NocoDB</span> واعرض موقعه على الخريطة التفاعلية عبر <span class="font-bold">Ushahidi</span>.
+        </p>
+      </div>
+      <!-- Step 3: Analyze -->
+      <div class="bg-base-100 p-4 rounded-lg shadow-sm border-t-4 border-ph-blue">
+        <div class="text-2xl mb-2">3️⃣</div>
+        <h3 class="font-semibold">تحليل البيانات والتوجهات</h3>
+        <p class="text-xs text-gray-500 mt-1">
+          استخدم <span class="font-bold">Superset</span> لإنشاء لوحات معلومات تفاعلية وتحليل توجهات الانتهاكات.
+        </p>
+      </div>
+      <!-- Step 4: Issue Report -->
+      <div class="bg-base-100 p-4 rounded-lg shadow-sm border-t-4 border-ph-yellow">
+        <div class="text-2xl mb-2">4️⃣</div>
+        <h3 class="font-semibold">إصدار التقارير</h3>
+        <p class="text-xs text-gray-500 mt-1">
+          انشر التقارير الدورية والتحقيقات النهائية للجمهور عبر منصة النشر <span class="font-bold">Ghost</span>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section>
+    <h2 class="text-xl font-bold mb-4">أدوات المرصد</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (tool of portalTools(); track tool.id) {
+        <app-tool-card 
+          [tool]="tool" 
+          [userRole]="user()?.role ?? 'guest'"
+          (toggleStatus)="handleToolToggle($event)"
+          (toggleFavorite)="handleToggleFavorite($event)"
+          (runTool)="handleRunTool($event)"></app-tool-card>
+      }
+    </div>
+  </section>
+</div>

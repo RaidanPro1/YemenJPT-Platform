@@ -1,0 +1,103 @@
+<div class="space-y-8 animate-fade-in">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">بوابة إدارة المشاريع المؤسسية</h1>
+    <p class="text-gray-500 mt-1">
+      لوحة تحكم مركزية لمتابعة المشاريع، إدارة الموارد، وتحليل أداء المؤسسة.
+    </p>
+  </div>
+
+  <!-- KPI Section -->
+  <section>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-base-100 p-6 rounded-xl shadow">
+        <p class="text-sm text-gray-500">المشاريع النشطة</p>
+        <p class="text-3xl font-bold text-gray-900">5</p>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow">
+        <p class="text-sm text-gray-500">المهام المستحقة هذا الأسبوع</p>
+        <p class="text-3xl font-bold text-gray-900">12</p>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow">
+        <p class="text-sm text-gray-500">الميزانية المصروفة (Q3)</p>
+        <p class="text-3xl font-bold text-gray-900">75%</p>
+      </div>
+      <div class="bg-base-100 p-6 rounded-xl shadow">
+        <p class="text-sm text-gray-500">الموظفين المتاحين</p>
+        <p class="text-3xl font-bold text-gray-900">8</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Projects List -->
+    <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
+      <h2 class="text-xl font-bold mb-4">نظرة عامة على المشاريع</h2>
+      <div class="space-y-4">
+        <!-- Project Item -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <span class="text-base font-medium text-ph-blue">تحقيق انتهاكات 2024</span>
+            <span class="text-sm font-medium text-ph-blue">90%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-ph-blue h-2.5 rounded-full" style="width: 90%"></div>
+          </div>
+        </div>
+        <!-- Project Item -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <span class="text-base font-medium text-ph-blue">تحقيق فساد العقود الحكومية</span>
+            <span class="text-sm font-medium text-ph-blue">45%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-ph-blue h-2.5 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+         <!-- Project Item -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <span class="text-base font-medium text-gray-500">تدريب الصحفيين - الدفعة 3</span>
+            <span class="text-sm font-medium text-gray-500">100%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Activity Feed -->
+    <div class="bg-base-100 p-6 rounded-xl shadow">
+      <h2 class="text-xl font-bold mb-4">آخر النشاطات</h2>
+      <ul class="space-y-3">
+        <li class="flex items-start">
+          <div class="w-3 h-3 bg-ph-blue rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+          <p class="text-sm">أضاف <span class="font-semibold">أحمد خالد</span> مهمة جديدة إلى "تحقيق الانتهاكات".</p>
+        </li>
+        <li class="flex items-start">
+          <div class="w-3 h-3 bg-green-500 rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+          <p class="text-sm">اكتمل مشروع "تدريب الصحفيين - الدفعة 3".</p>
+        </li>
+        <li class="flex items-start">
+          <div class="w-3 h-3 bg-yellow-500 rounded-full mt-1.5 me-3 flex-shrink-0"></div>
+          <p class="text-sm">مهمة "مراجعة وثائق المناقصات" أصبحت متأخرة.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tools Section -->
+  <section>
+    <h2 class="text-xl font-bold mb-4">أدوات إدارة المشاريع</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (tool of portalTools(); track tool.id) {
+        <app-tool-card 
+          [tool]="tool" 
+          [userRole]="user()?.role ?? 'guest'"
+          (toggleStatus)="handleToolToggle($event)"
+          (toggleFavorite)="handleToggleFavorite($event)"
+          (runTool)="handleRunTool($event)"></app-tool-card>
+      }
+    </div>
+  </section>
+
+</div>
