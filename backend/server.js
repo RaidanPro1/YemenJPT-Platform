@@ -1,32 +1,42 @@
-const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const TelegramBot = require('node-telegram-bot-api');
 
 // --- Telegram Bot Setup ---
-// The token should come from environment variables.
-const token = process.env.TELEGRAM_BOT_TOKEN || '8034114294:AAEQuVu5Zq6EnefvTUaR1c4psrgaqAPY0KY'; 
-const bot = new TelegramBot(token, { polling: true });
+// The token should come from environment variables, with a fallback for local testing.
+const token = process.env.TELEGRAM_BOT_TOKEN;
+let bot;
 
-let ROOT_CHAT_ID = process.env.TELEGRAM_ROOT_CHAT_ID || null;
+if (token) {
+  bot = new TelegramBot(token, { polling: true });
+  console.log('🤖 Telegram Bot initialized.');
 
-bot.on('polling_error', (error) => {
-  console.error(`Telegram Polling Error: ${error.code} - ${error.message}`);
-});
+  bot.on('polling_error', (error) => {
+    console.error(`Telegram Polling Error: ${error.code} - ${error.message}`);
+  });
+  
+  // A variable to store the root chat ID. Can be set via env var or dynamically.
+  let ROOT_CHAT_ID = process.env.TELEGRAM_ROOT_CHAT_ID || null;
 
-bot.onText(/\/start/, (msg) => {
-    if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
-        ROOT_CHAT_ID = msg.chat.id;
-    }
-    bot.sendMessage(msg.chat.id, 
-        '🚀 **تم تفعيل نظام المراقبة الجذرية (Root System)**\n' +
-        'أهلاً بك. سأقوم الآن بمراقبة النظام وإرسال تنبيهات فورية لك.\n' +
-        'Your Chat ID: ' + msg.chat.id, 
-        { parse_mode: 'Markdown' }
-    );
-    if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
-        console.log(`Root Chat ID registered: ${ROOT_CHAT_ID}. Consider setting this as TELEGRAM_ROOT_CHAT_ID in your .env file.`);
-    }
-});
+  bot.onText(/\/start/, (msg) => {
+      // If the root chat ID is not set in the environment, set it dynamically on first /start
+      if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
+          ROOT_CHAT_ID = msg.chat.id;
+      }
+      bot.sendMessage(msg.chat.id, 
+          '🚀 **تم تفعيل نظام المراقبة الجذرية (Root System)**\n' +
+          'أهلاً بك. سأقوم الآن بمراقبة النظام وإرسال تنبيهات فورية لك.\n' +
+          'Your Chat ID: ' + msg.chat.id, 
+          { parse_mode: 'Markdown' }
+      );
+      if (!process.env.TELEGRAM_ROOT_CHAT_ID) {
+          console.log(`Root Chat ID registered: ${ROOT_CHAT_ID}. Consider setting this as TELEGRAM_ROOT_CHAT_ID in your .env file for persistence.`);
+      }
+  });
+} else {
+  console.warn('⚠️ TELEGRAM_BOT_TOKEN not found. Bot notifications will be disabled.');
+}
 
 
 // --- Express Server Setup ---
@@ -34,7 +44,7 @@ const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
 // --- API Endpoints ---
 
@@ -43,18 +53,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
 });
 
-// Placeholder for future API routes
-app.get('/api/tools', (req, res) => {
-    res.json([
-        { id: 'ai-assistant', name: 'AI Assistant' },
-        { id: 'searxng', name: 'SearXNG' }
-    ]);
-});
-
 // Notification endpoint for Telegram bot
 app.post('/api/notify', (req, res) => {
-    const { event, details, user, isRoot } = req.body;
+    if (!bot) {
+        return res.status(503).json({ status: 'error', message: 'Telegram Bot is not configured.' });
+    }
 
+    const { event, details, user, isRoot } = req.body;
     const effectiveChatId = process.env.TELEGRAM_ROOT_CHAT_ID || ROOT_CHAT_ID;
 
     if (!effectiveChatId) {
@@ -79,5 +84,5 @@ app.post('/api/notify', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`YemenJPT backend with bot listening at http://localhost:${port}`);
+  console.log(`✅ YemenJPT backend listening at http://localhost:${port}`);
 });
