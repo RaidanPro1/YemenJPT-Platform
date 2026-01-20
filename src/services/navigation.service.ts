@@ -17,17 +17,17 @@ export class NavigationService {
 
   private allLinks = signal<NavLink[]>([
     // Main Links
-    { key: 'workspace', name: 'مساحة عملي', icon: 'user-group', allowedRoles: ['investigative-journalist'], section: 'main' },
-    { key: 'editorial', name: 'مركز التحرير', icon: 'user-group', allowedRoles: ['editor-in-chief'], section: 'main' },
-    { key: 'command-center', name: 'مركز القيادة', icon: 'user-group', allowedRoles: ['super-admin'], section: 'main' },
+    { key: 'workspace', name: 'مساحة عملي', icon: 'clipboard-document-list', allowedRoles: ['investigative-journalist'], section: 'main' },
+    { key: 'editorial', name: 'مركز التحرير', icon: 'pencil-square', allowedRoles: ['editor-in-chief'], section: 'main' },
+    { key: 'command-center', name: 'مركز القيادة', icon: 'command-line', allowedRoles: ['super-admin'], section: 'main' },
     
-    { key: 'dashboard', name: 'استعراض الأدوات', icon: 'home', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
-    { key: 'ai-core', name: 'النواة المعرفية', icon: 'cpu-chip', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
-    { key: 'social-media', name: 'الإعلام الاجتماعي', icon: 'speaker-wave', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'dashboard', name: 'استعراض الأدوات', icon: 'squares-2x2', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'ai-core', name: 'النواة المعرفية', icon: 'sparkles', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'social-media', name: 'الإعلام الاجتماعي', icon: 'megaphone', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'indilab', name: 'مختبر المؤشرات', icon: 'beaker', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
-    { key: 'maps', name: 'الخرائط', icon: 'map', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'maps', name: 'الخرائط', icon: 'map-alt', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'archiving', name: 'الأرشيف', icon: 'archive-box', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
-    { key: 'collaboration', name: 'التعاون', icon: 'user-group', allowedRoles: ['investigative-journalist', 'editor-in-chief'], section: 'main' },
+    { key: 'collaboration', name: 'التعاون', icon: 'users', allowedRoles: ['investigative-journalist', 'editor-in-chief'], section: 'main' },
     { key: 'erp', name: 'إدارة المؤسسة', icon: 'building-office', allowedRoles: ['super-admin'], section: 'main' },
     { key: 'documentation', name: 'التوثيق', icon: 'book-open', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
 
@@ -40,9 +40,9 @@ export class NavigationService {
     // Admin Links
     { key: 'admin', name: 'التحكم الإداري', icon: 'shield-check', allowedRoles: ['editor-in-chief', 'super-admin'], section: 'admin' },
     { key: 'automation', name: 'الأتمتة المتقدمة', icon: 'bolt', allowedRoles: ['super-admin'], section: 'admin' },
-    { key: 'users', name: 'المستخدمون', icon: 'users', allowedRoles: ['super-admin'], section: 'admin' },
+    { key: 'users', name: 'المستخدمون', icon: 'user-plus', allowedRoles: ['super-admin'], section: 'admin' },
     { key: 'settings', name: 'الإعدادات', icon: 'cog-6-tooth', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'admin' },
-    { key: 'system-internals', name: 'بنية النظام', icon: 'wrench-screwdriver', allowedRoles: ['super-admin'], section: 'admin' },
+    { key: 'system-internals', name: 'بنية النظام', icon: 'server-stack', allowedRoles: ['super-admin'], section: 'admin' },
   ]);
 
   private visibleLinks = computed(() => {

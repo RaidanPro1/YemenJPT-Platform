@@ -1,4 +1,5 @@
 
+
 import { Injectable, signal, inject } from '@angular/core';
 import { Tool } from '../models/tool.model';
 import { LoggerService } from './logger.service';
@@ -19,7 +20,7 @@ export class ToolService {
       englishName: 'AI Assistant (Cloud/Local)',
       category: 'النواة المعرفية والتحليل الذكي',
       description: 'نموذج لغوي يمكنه العمل سحابياً أو محلياً للإجابة على الأسئلة، تلخيص النصوص، والمساعدة في صياغة التقارير. يمكن تشغيله بنماذج مختلفة مثل OpenAssistant عبر محرك Ollama المحلي.',
-      iconSvg: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72-3.72a1.054 1.054 0 00-1.49 0L12 14.47l-2.06-2.061a1.054 1.054 0 00-1.49 0L4.72 16.146C3.654 16.052 2.75 15.118 2.75 14v-4.286c0-.97.616-1.813 1.5-2.097m16.5 0c1.868.592 3.25 2.28 3.25 4.185v4.286c0 2.28-1.853 4.14-4.14 4.235l.01-.01-4.72-4.72a1.054 1.054 0 00-1.49 0L12 15.939l-2.06-2.061a1.054 1.054 0 00-1.49 0l-4.72 4.72.01.01C3.853 20.14 2 18.28 2 16v-4.286c0-1.905 1.382-3.593 3.25-4.185m12.75 0A9.753 9.753 0 0012 5.25c-1.472 0-2.842.368-4.085 1.011',
+      iconSvg: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09ZM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456Z',
       iconColor: 'text-ph-blue',
       isActive: true, isFavorite: true, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief'],
     },
@@ -29,7 +30,7 @@ export class ToolService {
       englishName: 'Audio Transcription',
       category: 'النواة المعرفية والتحليل الذكي',
       description: 'نظام فائق الدقة لتحويل التسجيلات الصوتية ومقاطع الفيديو إلى نصوص مكتوبة، مع دعم متخصص ومُحسَّن لمختلف اللهجات اليمنية.',
-      iconSvg: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m12 0v-1.5a6 6 0 00-12 0v1.5m12 0v-1.5a6 6 0 00-12 0v1.5m6 7.5a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 9a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z',
+      iconSvg: 'M3.75 12h.008v.008H3.75V12Zm2.25-3h.008v.008H6V9Zm2.25 3h.008v.008H8.25V12Zm2.25-3h.008v.008H10.5V9Zm2.25 3h.008v.008H12.75V12Zm2.25-3h.008v.008H15V9Zm2.25 3h.008v.008H17.25V12Zm2.25-3h.008v.008H19.5V9Z',
       iconColor: 'text-cyan-500',
       isActive: true, isFavorite: true, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief'],
     },
@@ -73,7 +74,7 @@ export class ToolService {
       englishName: 'SearXNG Metasearch',
       category: 'التقصي والاستخبارات مفتوحة المصدر',
       description: 'محرك بحث "ميتا" يجمع النتائج من جوجل ومصادر أخرى دون تتبعك أو تسجيل ما تبحث عنه، مما يوفر طبقة حماية أساسية لعمليات البحث الاستقصائي.',
-      iconSvg: 'm21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z',
+      iconSvg: 'M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243-4.243-4.243',
       iconColor: 'text-emerald-500',
       isActive: true, isFavorite: true, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief', 'public'],
     },
@@ -184,7 +185,7 @@ export class ToolService {
       englishName: 'Video Verification',
       category: 'التحقق من الوسائط وكشف التزييف',
       description: 'يُلقب بـ "السكين السويسري" للتحقق الرقمي. أداة قوية جداً لفحص الفيديوهات، استخراج الإطارات الرئيسية (Keyframes)، والبحث العكسي المتقدم.',
-      iconSvg: 'm15.75 10.5 4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z',
+      iconSvg: 'M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z',
       iconColor: 'text-red-500',
       isActive: true, isFavorite: true, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief'],
     },
@@ -225,7 +226,7 @@ export class ToolService {
       englishName: 'Deepfake Detector',
       category: 'التحقق من الوسائط وكشف التزييف',
       description: 'أداة متخصصة تستخدم الذكاء الاصطناعي لتحليل مقاطع الفيديو وكشف علامات التلاعب والتزييف العميق (Deepfake).',
-      iconSvg: 'M15.59 14.37a6 6 0 0 1-5.23 0 6 6 0 0 1-5.23 0 6 6 0 0 1 10.46 0Zm-4.8 1.95a4.5 4.5 0 0 0 4.08 0 4.5 4.5 0 0 0 4.08 0 4.5 4.5 0 0 0-8.16 0ZM9 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0Z M3 15.75a9 9 0 0 1 18 0v.16a2.09 2.09 0 0 1-2.09 2.09H5.09A2.09 2.09 0 0 1 3 15.91v-.16Z',
+      iconSvg: 'M7.5 3.75H6A2.25 2.25 0 0 0 3.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0 1 20.25 6v1.5m0 9V18A2.25 2.25 0 0 1 18 20.25h-1.5m-9 0H6A2.25 2.25 0 0 1 3.75 18v-1.5M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
       iconColor: 'text-rose-500',
       isActive: true, isFavorite: true, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief'],
     },
@@ -236,7 +237,7 @@ export class ToolService {
       englishName: 'Collaborative Verification',
       category: 'التحقق من الوسائط وكشف التزييف',
       description: 'منصة تعاونية ضخمة لإدارة البلاغات والتحقق الجماعي من الوسائط. مثال: خلال حدث كبير مثل النزاعات، يمكن لفريق من الصحفيين استخدام المنصة لتلقي مئات الصور والفيديوهات من المواطنين، وتوزيع مهام التحقق منها، وتتبع حالة كل معلومة (تم التحقق، مضلل، إلخ) بشكل مركزي.',
-      iconSvg: 'M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.006 3 11.55c0 2.43.91 4.683 2.41 6.336l-.618 2.169a.75.75 0 0 0 .966.966l2.17-2.17A8.959 8.959 0 0 0 12 20.25Z M9.75 11.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1-.75-.75Z',
+      iconSvg: 'M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 019 9v.375M10.125 2.25A3.375 3.375 0 0113.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 013.375 3.375M9 15l2.25 2.25L15 12',
       iconColor: 'text-sky-700',
       isActive: true, isFavorite: false, isVisiblePublicly: true, allowedRoles: ['super-admin', 'investigative-journalist', 'editor-in-chief'],
     },
