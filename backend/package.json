@@ -1,7 +1,8 @@
+
 {
   "name": "yemenjpt-backend",
   "version": "1.0.0",
-  "description": "Backend API server for the YemenJPT platform.",
+  "description": "Backend API and Bot server for the YemenJPT platform.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
