@@ -276,4 +276,58 @@ configure_firewall() {
 
 post_launch_checks() {
     echo -e "${BLUE}🔎 [9/10] Running post-launch checks...${NC}"
-    echo "   
+    echo "   -> Waiting 30 seconds for services to stabilize..."
+    sleep 30
+    echo "   -> Checking status of key containers:"
+    docker ps --filter "name=ph-" --format "table {{.Names}}\\t{{.Status}}"
+}
+
+print_summary() {
+    echo -e "${GREEN}======================================================================="
+    echo -e "✅ YemenJPT Platform Installation Completed Successfully!"
+    echo -e "=======================================================================${NC}"
+    echo "🔗 Main Platform Portal: https://portal.$DOMAIN"
+    echo "🔗 System Admin Panel:   https://sys.$DOMAIN (Create admin account on first visit)"
+    echo -e "${GREEN}-----------------------------------------------------------------------"
+    echo "⚠️ IMPORTANT FIRST STEPS:"
+    echo "   1. Visit each service URL from the portal to complete its first-time setup."
+    echo "   2. For services like Ghost, Gitea, etc., create your admin account on the first visit."
+    echo "   3. To pull local AI models (optional), run: 'docker exec ph-ollama ollama pull llama3'"
+    echo "=======================================================================${NC}"
+}
+
+# --- Main Execution ---
+main() {
+    if [ "$1" == "--generate-only" ]; then
+        echo -e "${GREEN}>>> Running in --generate-only mode for managed environments (e.g., CloudPanel)...${NC}"
+        check_env
+        create_directories
+        generate_configs
+        generate_compose_file
+        echo -e "${GREEN}======================================================================="
+        echo -e "✅ Configuration files generated successfully in ${BASE_DIR}!"
+        echo -e "=======================================================================${NC}"
+        echo "NEXT STEPS:"
+        echo "1. Review the generated '${BASE_DIR}/docker-compose.yml'."
+        echo "2. Ensure ports 80 and 443 are free on your server."
+        echo "   (If using CloudPanel, you may need to run: sudo systemctl stop nginx)"
+        echo "3. Navigate to the base directory: cd ${BASE_DIR}"
+        echo "4. Launch the platform: sudo docker compose up -d"
+        echo "=======================================================================${NC}"
+    else
+        # Original full installation flow
+        print_header
+        check_env
+        prepare_system
+        configure_dns
+        create_directories
+        generate_configs
+        generate_compose_file
+        launch_services
+        configure_firewall
+        post_launch_checks
+        print_summary
+    fi
+}
+
+main "$@"

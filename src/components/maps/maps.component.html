@@ -9,6 +9,9 @@
   <!-- Tabs -->
   <div class="border-b border-gray-200">
     <nav class="-mb-px flex space-i-6" aria-label="Tabs">
+      <button (click)="setTab('data-viz')" [class]="activeTab() === 'data-viz' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
+        تصور البيانات (D3)
+      </button>
       <button (click)="setTab('ushahidi')" [class]="activeTab() === 'ushahidi' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
         الرصد الميداني (Ushahidi)
       </button>
@@ -25,8 +28,11 @@
   </div>
 
   <!-- Tab Content -->
-  <div class="bg-base-100 p-4 rounded-xl shadow min-h-[400px]">
+  <div class="bg-base-100 p-4 rounded-xl shadow min-h-[60vh]">
     @switch (activeTab()) {
+      @case ('data-viz') {
+        <app-data-visualization></app-data-visualization>
+      }
       @case ('ushahidi') {
         <div class="flex flex-col items-center justify-center h-full text-center">
           <h2 class="text-2xl font-bold text-gray-800">خريطة الرصد الميداني</h2>
