@@ -48,7 +48,6 @@ import { TechSupportPublicComponent } from './components/tech-support-public/tec
 import { NewsPublicComponent } from './components/news-public/news-public.component';
 import { ProjectsPublicComponent } from './components/projects-public/projects-public.component';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
-import { DataVisualizationComponent } from './components/data-visualization/data-visualization.component';
 
 import { UserService, UserRole } from './services/user.service';
 import { SeoService } from './services/seo.service';
@@ -108,8 +107,7 @@ import { TrialService } from './services/trial.service';
     TechSupportPublicComponent,
     NewsPublicComponent,
     ProjectsPublicComponent,
-    LoginModalComponent,
-    DataVisualizationComponent
+    LoginModalComponent
   ],
 })
 export class AppComponent {
