@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =======================================================
-# 🇾🇪 YemenJPT Platform Deployment Script (V15.0)
+# 🇾🇪 YemenJPT Platform Deployment Script (V18.0)
 # =======================================================
 # This script builds and launches the core YemenJPT
 # application stack using Docker Compose. Use this
@@ -20,12 +20,11 @@ echo -e "${BLUE}>>> Starting YemenJPT Platform Deployment/Update...${NC}"
 
 # --- 1. Environment Check ---
 echo -e "⚙️ [1/3] Checking for .env configuration file..."
-if [ ! -f .env ]; then
-    echo -e "${RED}❌ ERROR: .env file not found. Please copy .env.example to .env and fill in your details before running this script.${NC}"
+if [ ! -f .env ] && [ ! -f /opt/presshouse/.env ]; then
+    echo -e "${RED}❌ ERROR: .env file not found. Please ensure it exists in the current directory or in /opt/presshouse.${NC}"
     exit 1
 fi
-echo -e "   ${GREEN}✅ .env file found.${NC}"
-export $(cat .env | sed 's/#.*//g' | xargs)
+export $(cat .env 2>/dev/null || cat /opt/presshouse/.env | sed 's/#.*//g' | xargs)
 
 # --- 2. Build and Launch Containers ---
 echo -e "🐳 [2/3] Building and launching services with Docker Compose from /opt/presshouse..."

@@ -8,7 +8,7 @@ ingress:
   - hostname: verifier.${DOMAIN}
     service: http://ph-portal-verifier:80
   - hostname: auth.${DOMAIN}
-    service: http://ph-identity:8080
+    service: http://keycloak:8080
   - hostname: crm.${DOMAIN}
     service: http://ph-crm:80
   
@@ -44,7 +44,7 @@ ingress:
 
   # Digital Chameleon Entrypoint
   - hostname: ai.${DOMAIN} # Main App URL
-    service: http://ph-internal-proxy:80
+    service: http://internal_proxy:80
 
   # Catch-all rule
   - service: http_status:404

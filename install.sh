@@ -55,6 +55,7 @@ prepare_system() {
         echo "   -> Dependency installation failed, trying with Docker's official script..."
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh get-docker.sh
+        rm get-docker.sh
         systemctl enable --now docker
     }
     echo "   ✅ System dependencies and Docker are installed."
@@ -78,6 +79,8 @@ create_directories() {
     mkdir -p "${BASE_DIR}/data/civicrm_files"
     mkdir -p "${BASE_DIR}/cloudflare"
     mkdir -p "${BASE_DIR}/internal_proxy"
+    mkdir -p "${BASE_DIR}/frontend/dist"
+    mkdir -p "${BASE_DIR}/decoy"
     echo "   ✅ All data directories created in ${BASE_DIR}."
 }
 
@@ -95,6 +98,11 @@ generate_configs() {
     cp "${REPO_DIR}/dashy-admin.yml" "${BASE_DIR}/dashy-admin.yml"
     cp "${REPO_DIR}/dashy-journalist.yml" "${BASE_DIR}/dashy-journalist.yml"
     cp "${REPO_DIR}/dashy-verifier.yml" "${BASE_DIR}/dashy-verifier.yml"
+
+    # Copy security scripts
+    cp "${REPO_DIR}/panic.sh" "${BASE_DIR}/panic.sh"
+    cp "${REPO_DIR}/secure.sh" "${BASE_DIR}/secure.sh"
+    chmod +x "${BASE_DIR}/panic.sh" "${BASE_DIR}/secure.sh"
     
     # Create default Nginx config for the internal proxy
     cat > "${BASE_DIR}/internal_proxy/nginx.conf" << EOL
@@ -109,8 +117,35 @@ http {
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto \$scheme;
         }
+        
+        location /api/ {
+            proxy_pass http://backend:3000/;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+        }
     }
 }
+EOL
+
+    # Create a placeholder index for the main app
+    cat > "${BASE_DIR}/frontend/dist/index.html" << EOL
+<!DOCTYPE html>
+<html>
+<head><title>YemenJPT</title></head>
+<body><h1>YemenJPT Frontend is loading...</h1></body>
+</html>
+EOL
+
+    # Create the decoy index file
+    cat > "${BASE_DIR}/decoy/index.html" << EOL
+<!DOCTYPE html>
+<html>
+<head><title>Under Maintenance</title></head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+  <h1>Service Temporarily Unavailable</h1>
+  <p>This service is currently undergoing maintenance. Please check back later.</p>
+</body>
+</html>
 EOL
 
     echo "   ✅ Configurations generated."
@@ -152,6 +187,7 @@ print_summary() {
     echo -e "${GREEN}-----------------------------------------------------------------------"
     echo "💡 To see live logs, run: 'cd ${BASE_DIR} && docker compose logs -f'"
     echo "💡 To stop all services, run: 'cd ${BASE_DIR} && docker compose down'"
+    echo "💡 To activate panic mode, run: '${BASE_DIR}/panic.sh'"
     echo "=======================================================================${NC}"
 }
 

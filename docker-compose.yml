@@ -25,7 +25,7 @@ services:
     container_name: ph-postgres
     restart: always
     environment:
-      - "POSTGRES_DB=yemenjpt_db"
+      - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     volumes:
@@ -258,3 +258,11 @@ services:
     container_name: ph-decoy-app
     restart: always
     volumes: ["./decoy:/usr/local/apache2/htdocs/"]
+
+  backend:
+    build: ./backend
+    container_name: ph-backend
+    restart: always
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ROOT_CHAT_ID=${TELEGRAM_ROOT_CHAT_ID}
