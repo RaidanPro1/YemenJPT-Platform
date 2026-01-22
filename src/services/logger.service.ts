@@ -1,4 +1,3 @@
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
@@ -6,7 +5,6 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
   providedIn: 'root',
 })
 export class LoggerService {
-  // FIX: Explicitly type injected service to prevent type inference to 'unknown'.
   private http: HttpClient = inject(HttpClient);
   // This URL is now relative to the domain, so it will be proxied by Nginx
   private botApiUrl = '/api/notify';

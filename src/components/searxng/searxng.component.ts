@@ -14,8 +14,8 @@ export class SearxngComponent {
   private sanitizer = inject(DomSanitizer);
   private notificationService = inject(NotificationService);
 
-  // The domain is hardcoded based on the deployment script's convention.
-  searxngUrl = signal<string>('https://search.ph-ye.org');
+  // The URL is now set to localhost for local development.
+  searxngUrl = signal<string>('http://localhost:8888');
   safeUrl: SafeResourceUrl;
   isLoading = signal(true);
   isMonitoring = signal(false);

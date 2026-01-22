@@ -1,176 +1,117 @@
-# 🇾🇪 YemenJPT Digital Platform (V15.0 - Automated Deployment)
+# 🇾🇪 YemenJPT Digital Platform (V15.0)
 
-**YemenJPT** is a self-hosted, integrated digital ecosystem designed specifically to empower journalists and media organizations in Yemen. The platform aims to enhance press freedom by providing a secure environment and a comprehensive suite of tools for Open Source Intelligence (OSINT), information verification, data analysis, and collaborative work.
+**YemenJPT (Yemen Journalist Pre-trained Transformer)** is a self-hosted, integrated digital ecosystem designed specifically to empower journalists and media organizations in Yemen. The platform aims to enhance press freedom by providing a secure, sovereign environment and a comprehensive suite of tools for Open Source Intelligence (OSINT), information verification, data analysis, and collaborative journalistic work.
 
-This document serves as the primary technical guide for deploying and managing the YemenJPT platform using the automated installation script.
+This document serves as the primary technical guide for deploying and managing the YemenJPT platform.
 
 ---
 
 ## ✨ 1. Vision & Core Features
 
-The platform is an all-in-one digital workspace providing critical capabilities for the modern investigative journalist and their supporting organization. It is built on the principle of data sovereignty, allowing the entire system to run on private infrastructure.
+The platform is an all-in-one digital workspace providing critical capabilities for the modern investigative journalist and their supporting organization. It is built on the principle of **data sovereignty**, allowing the entire system to run on private infrastructure, ensuring sensitive data never transits through third-party services.
 
 ### Core Platform Modules
 
-| Category                               | Tools & Features                                                                                                                              |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Investigation & OSINT**              | `SearXNG` (Secure Search), `Sherlock` (Username Search), `Snscrape` (Data Scraping), `Mediacloud` (Media Analysis), **`SpiderFoot`** (OSINT Automation), **`Social Analyzer`** (Digital Footprint), **`Harvester (AP)`** (Data Collection). |
-| **Media Verification & Forensics**     | `InVID` (Video), `ExifTool` (Metadata), `FotoForensics`, **`Mean Check`** (Collaborative Fact-Checking), **`Loki`** (Automated Verification), **`Aletheia`** & Deepfake Detectors. |
-| **Cognitive Core (YemenGPT)**          | **Dual AI Engine** (`Google Gemini` or local `Ollama`), `Whisper` (Transcription), `Haystack` (Document Q&A), **`Brainerd Dispatch AI`** & `Quaily` (Journalism AI), `Bitbat.ai` (Source Discovery), **Google Colab** integration.      |
-| **Financial & Data Journalism** | **`ArkhamMirror`** (Crypto Tracking), **`OpenDuka`** (Corporate Data). |
-| **Indicator Lab (IndiLab)**            | `ChangeDetection.io` (Change Monitoring), `ADSBexchange` (Flight Tracking), `NASA FIRMS` (Fire Monitoring).                                           |
-| **Organizational Management**          | **`ERPNext`** (Accounting, HR, CRM), for managing internal operations. |
-| **Productivity & Workflow**            | **`Vaultwarden`** (Passwords), **`ToolJet`** (Internal Tools), **`Chatwoot`** (Secure Inbox), **`NocoDB`** (Flexible Databases). |
-| **Geospatial Analysis**                | **`Ushahidi`** (Crowdsourced Reporting), **`Kepler.gl`** (Large-scale Data Viz), **`QGIS Server`** (Map Publishing). |
-| **Content Publishing (CMS)**           | **`Ghost`** (Modern Publishing), `TYPO3 13 LTS` (Enterprise CMS). |
-| **Archiving & Data Security**          | `ArchiveBox` (Web Archiving), **`Webrecorder`** (Interactive Archiving). |
-| **Collaboration & Automation**         | `Nextcloud` (Files), `Mattermost` (Chat), `Gitea` (Code), `JupyterHub` (Data Journalism), `n8n` (Automation).                                                    |
-| **System & Content Management**        | `Glances` (System Monitoring), `Dashy` (Unified Portal), `Uptime Kuma` (Service Status). |
+| Category | Tools & Features | Purpose for Journalists |
+|---|---|---|
+| **Cognitive Core (AI)** | Dual AI Engine (`Gemini`/`Ollama`), Audio Transcription, Document Q&A, Journalism AI Assistants. | Accelerates research, summarizes complex documents, transcribes interviews, and aids in content creation. |
+| **Investigation & OSINT** | `SearXNG` (Secure Search), `Sherlock` (Username Search), `SpiderFoot` (OSINT Automation), `Social Analyzer`. | Gathers intelligence from open sources securely and efficiently, mapping digital footprints of individuals and organizations. |
+| **Media Verification** | `InVID` (Video), `ExifTool` (Metadata), Deepfake Detectors, `Meedan Check` (Collaborative Fact-Checking). | Fights misinformation by providing a robust toolkit to verify the authenticity of images, videos, and claims. |
+| **Geospatial Analysis** | `Ushahidi` (Crowdsourced Reporting), `Kepler.gl` (Data Viz), `Earth Engine` (Satellite Imagery). | Visualizes geographic data to uncover patterns, track events on a map, and analyze environmental changes. |
+| **Collaboration & Workflow** | Multi-Project Workspaces, Kanban Boards, Secure Chat, Secure Password Management (`Vaultwarden`). | Streamlines teamwork on investigations, allowing for secure communication, task management, and file sharing. |
+| **Archiving & Monitoring** | `ArchiveBox` (Web Archiving), `ChangeDetection.io` (Web Monitoring). | Preserves digital evidence by creating permanent copies of web pages and alerting journalists to changes on key websites. |
+| **Organizational Management** | `ERPNext` (ERP System), Training & Support Portals. | Manages internal operations, from finance and HR to journalist training and technical/legal support requests. |
+| **Automation** | `n8n` (Workflow Automation) | Connects different tools to create powerful automated workflows, saving time on repetitive tasks. |
+| **Publishing** | `Ghost` (Modern Publishing), `TYPO3` (CMS) | Provides platforms to publish final investigative reports and manage the organization's public-facing website. |
 
+---
 
 ## 🏗️ 2. Core Application Architecture
 
-The application is built on a modern, containerized architecture designed for simplicity and portability.
+The application is built on a modern, containerized architecture designed for simplicity, security, and portability.
 
-- **Frontend**: A zoneless **Angular** application, served efficiently by **Nginx**.
-- **Backend**: A lightweight **Node.js/Express** API server to handle logging and notifications via a Telegram Bot.
-- **Database**: **PostgreSQL** & **MariaDB** serve as the robust, primary databases for the various platform services.
+- **Frontend**: A zoneless **Angular** application, providing a fast and responsive user experience, served efficiently by **Nginx**.
+- **Backend**: A lightweight **Node.js/Express** API server to handle system logging and notifications via a Telegram Bot.
+- **Databases**: **PostgreSQL** & **MariaDB** serve as the robust, primary databases for the various platform services.
 - **Reverse Proxy**: **Traefik** handles all incoming traffic, automates SSL certificate generation via Let's Encrypt and Cloudflare, and routes requests to the appropriate service based on subdomains.
-- **Orchestration**: The entire stack is managed and orchestrated via **Docker Compose**, making it easy to deploy and scale. All services are defined in a dynamic `docker-compose.yml` file generated by the installation script.
+- **Orchestration**: The entire stack is managed and orchestrated via **Docker Compose**, making it easy to deploy, update, and scale.
+
+---
 
 ## 🚀 3. Deployment Guide
 
-Choose the method that best fits your server environment.
+This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
 
-### Method 1: Automated Deployment on a Fresh Ubuntu Server (Recommended)
+### 3.1. Prerequisites
 
-This method is ideal for a new, dedicated server running **Ubuntu 24.04 LTS**. The provided script automates the entire setup.
+1.  **Server**: A fresh Ubuntu 24.04 LTS server with root access.
+2.  **Domain Name**: A domain you own (e.g., `ph-ye.org`).
+3.  **Cloudflare Account**: A free Cloudflare account managing your domain's DNS. You will need your account email, a Zone ID, and an API Token with `DNS:Edit` permissions for your zone.
+4.  **Git**: `git` command-line tool installed (`sudo apt install git`).
 
-#### 3.1. Prerequisites
-
-1.  **Server**: A fresh Ubuntu 24.04 LTS server (local or cloud) with root access.
-2.  **Domain Name**: A domain name that you own.
-3.  **Cloudflare Account**: A free Cloudflare account managing your domain's DNS. You will need your account email, a Zone ID, and an API Token.
-4.  **Git**: The `git` command-line tool.
-
-#### 3.2. Installation Steps
+### 3.2. Automated Installation Steps
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/YourUsername/YemenJPT-Platform.git
+    git clone https://github.com/RaidanPro1/YemenJPT-Platform.git
     cd YemenJPT-Platform
     ```
 
 2.  **Configure Environment File (`.env`)**
-    This is the most critical step. Copy the example file and fill out all required values using a text editor like `nano`.
+    This is the most critical step. Copy the example file and fill out all required values.
     ```bash
     cp .env.example .env
     nano .env
     ```
     -   **Domain & Server IP**: Fill in your main `DOMAIN` and the public IP address of your server (`SERVER_IP`).
     -   **Cloudflare Credentials**: Fill in your `CF_EMAIL`, `CF_ZONE_ID`, and `CF_TOKEN`.
-        -   **How to get a Cloudflare API Token**: In your Cloudflare dashboard, go to *My Profile > API Tokens > Create Token*. Use the "Edit zone DNS" template, select your specific zone under "Zone Resources," and create the token. Copy it immediately.
-    -   **Passwords**: Use a password manager (like the included Vaultwarden/Bitwarden) to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, etc. **Do not use simple passwords.**
+    -   **Passwords**: Use a password manager to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, etc. **Do not use simple passwords.**
     -   **(Optional) AI & Bot Keys**: Add your Google Gemini `API_KEY` and Telegram Bot credentials if you wish to use these features.
 
 3.  **Run the Installation Script**
-    Make the script executable and run it as root. This script will automate the entire setup process.
+    Make the script executable and run it as root. It will automate the entire setup process.
     ```bash
     chmod +x install.sh
     sudo ./install.sh
     ```
-    **What to Expect:** The script will perform all necessary steps, including installing Docker, configuring DNS, creating directories, generating configurations, and launching all services. This process may take several minutes on the first run as it downloads all the necessary Docker images for the platform's tools.
+    The script will install Docker, configure DNS records on Cloudflare, create directories, generate configurations, and launch all services. The first run may take several minutes to download all Docker images.
 
-### Method 2: Deployment on a Server with a Control Panel (e.g., CloudPanel)
+### 3.3. Accessing the Application
 
-This method is for deploying the platform on a server that is already managed by a control panel like CloudPanel. This guide assumes you have `root` or `sudo` access to the server's terminal.
-
-#### 3.1. Prerequisites
-
-1.  **Server**: A server with CloudPanel (or another control panel) and **Docker + Docker Compose** installed.
-    -   If Docker is not installed, run: `sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin`
-2.  **Domain Name**: Your domain name.
-3.  **DNS Configuration**: In your domain provider's DNS settings, create two **A records** pointing to your server's public IP address:
-    -   `your-domain.com` -> `123.45.67.89`
-    -   `*.your-domain.com` -> `123.45.67.89` (A wildcard record is essential for automatic subdomain management).
-4.  **Git**: The `git` command-line tool installed.
-
-#### 3.2. Installation Steps
-
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/YourUsername/YemenJPT-Platform.git
-    cd YemenJPT-Platform
-    ```
-
-2.  **Configure Environment File (`.env`)**
-    Copy the example file and fill out all required values. This step is critical.
-    ```bash
-    cp .env.example .env
-    nano .env
-    ```
-    -   Fill in your `DOMAIN`, `SERVER_IP`, Cloudflare credentials (`CF_...`), and generate strong passwords.
-
-3.  **Generate Configuration Files**
-    Run the installation script in a special "generate-only" mode. This will create all necessary directories and configuration files in `/opt/presshouse` without altering your server's system settings.
-    ```bash
-    chmod +x install.sh
-    sudo ./install.sh --generate-only
-    ```
-    The script will output the next steps to follow.
-
-4.  **Free Up Network Ports (Critical)**
-    This platform uses an internal reverse proxy (Traefik) to automatically manage its ~30+ subdomains and their SSL certificates. To function, it requires exclusive access to ports `80` (for HTTP) and `443` (for HTTPS).
-
-    CloudPanel's Nginx service also uses these ports. You must stop it before starting the platform.
-    ```bash
-    sudo systemctl stop nginx
-    ```
-    *Note: This will make other websites hosted via CloudPanel unavailable. This deployment method is best suited for a server dedicated to the YemenJPT platform.*
-
-5.  **Launch the Platform**
-    Navigate to the directory created by the script and launch all services using Docker Compose.
-    ```bash
-    cd /opt/presshouse
-    sudo docker compose up -d
-    ```
-    The first launch will take several minutes to download all the necessary container images.
-
-#### 3.3. Accessing the Application
-
--   After the script finishes, all services will be running. Traefik will automatically obtain SSL certificates for all subdomains.
+-   After the script finishes, all services will be running with valid SSL certificates.
 -   Your main application portal will be accessible at `https://portal.your-domain.com`.
--   All other services will be available on their respective subdomains (e.g., `https://erp.your-domain.com`, `https://search.your-domain.com`).
+-   The user-facing application is at `https://your-domain.com` or `https://ai.your-domain.com`.
 -   Refer to the final output of the `install.sh` script for a full list of URLs and initial login credentials.
+
+---
 
 ## 🔧 4. Maintenance & Updates
 
--   **Updating the Application**: To update the frontend or backend code, pull the latest changes from your Git repository and run the `deploy.sh` script. This will rebuild only the necessary containers.
+-   **Updating the Application**: To update the frontend or backend code, pull the latest changes from Git and run the `deploy.sh` script.
     ```bash
     git pull
     sudo ./deploy.sh
     ```
--   **Backups**: All persistent data is stored in Docker volumes within `/opt/presshouse`. You should implement a regular backup strategy for this entire directory.
--   **Viewing Logs**: To see the real-time logs from all running services, navigate to `/opt/presshouse` and run:
+-   **Backups**: All persistent data is stored in Docker volumes within `/opt/presshouse`. Implement a regular backup strategy for this entire directory.
+-   **Viewing Logs**: To see real-time logs from all running services:
     ```bash
-    sudo docker compose logs -f
+    cd /opt/presshouse && sudo docker compose logs -f
     ```
--   **Stopping the Application**: To stop all services, navigate to `/opt/presshouse` and run:
+-   **Stopping the Application**:
     ```bash
-    sudo docker compose down
+    cd /opt/presshouse && sudo docker compose down
     ```
 
-### 4.1. Troubleshooting
+---
+
+## 🔍 5. Troubleshooting
 
 -   **Problem: Services are not starting or are in a restart loop.**
-    -   **Solution:** Check the logs using `sudo docker compose -f /opt/presshouse/docker-compose.yml logs -f`. Look for error messages. Common issues include incorrect passwords in the `.env` file or port conflicts on the server.
--   **Problem: SSL certificates are not being generated (sites show a privacy error).**
-    -   **Solution:** 
-        1. Ensure your `CF_TOKEN`, `CF_EMAIL`, and `CF_ZONE_ID` are correct in the `.env` file.
-        2. Verify that your domain's nameservers are pointing to Cloudflare.
-        3. Check the Traefik logs for specific ACME challenge errors: `sudo docker logs ph-gateway`. The logs will often indicate if the API token is invalid or has insufficient permissions.
--   **Problem: I need to change a configuration value (e.g., a password).**
-    -   **Solution:** 
-        1. Edit the `.env` file in your original cloned repository directory.
-        2. Rerun the installation script with the `--generate-only` flag if you're using CloudPanel: `sudo ./install.sh --generate-only`.
-        3. Restart the services: `cd /opt/presshouse && sudo docker compose up -d`.
+    -   **Solution:** Check the logs (`sudo docker compose -f /opt/presshouse/docker-compose.yml logs -f`). Common issues include incorrect passwords in the `.env` file or port conflicts.
+-   **Problem: SSL certificates are not being generated.**
+    -   **Solution:**
+        1.  Ensure your `CF_TOKEN`, `CF_EMAIL`, and `CF_ZONE_ID` are correct in the `.env` file.
+        2.  Verify your domain's nameservers point to Cloudflare.
+        3.  Check the Traefik logs for ACME errors: `sudo docker logs ph-gateway`. The logs often indicate if the API token is invalid or has insufficient permissions.
+
+---

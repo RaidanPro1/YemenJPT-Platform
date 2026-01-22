@@ -49,11 +49,16 @@ import { NewsPublicComponent } from './components/news-public/news-public.compon
 import { ProjectsPublicComponent } from './components/projects-public/projects-public.component';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
 
+// New Admin components
+import { ThemeManagementComponent } from './components/theme-management/theme-management.component';
+import { NewsletterManagementComponent } from './components/newsletter-management/newsletter-management.component';
+
 import { UserService, UserRole } from './services/user.service';
 import { SeoService } from './services/seo.service';
 import { SettingsService } from './services/settings.service';
 import { LoggerService } from './services/logger.service';
 import { TrialService } from './services/trial.service';
+import { ThemeService } from './services/theme.service';
 
 
 @Component({
@@ -107,7 +112,10 @@ import { TrialService } from './services/trial.service';
     TechSupportPublicComponent,
     NewsPublicComponent,
     ProjectsPublicComponent,
-    LoginModalComponent
+    LoginModalComponent,
+    // Newly added admin components
+    ThemeManagementComponent,
+    NewsletterManagementComponent
   ],
 })
 export class AppComponent {
@@ -115,6 +123,7 @@ export class AppComponent {
   private settingsService = inject(SettingsService);
   private loggerService = inject(LoggerService);
   private renderer = inject(Renderer2);
+  private themeService = inject(ThemeService); // Initialize ThemeService
   userService = inject(UserService);
   trialService = inject(TrialService);
 

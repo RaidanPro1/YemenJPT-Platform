@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -11,11 +10,10 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErpComponent {
-  // FIX: Explicitly type injected service to prevent type inference to 'unknown'.
   private sanitizer: DomSanitizer = inject(DomSanitizer);
   
-  // The domain is hardcoded based on the deployment script's convention.
-  erpUrl = signal<string>('https://erp.ph-ye.org'); 
+  // The URL is now set to localhost for local development.
+  erpUrl = signal<string>('http://localhost:8000'); 
   safeUrl: SafeResourceUrl;
   isLoading = signal(true);
 

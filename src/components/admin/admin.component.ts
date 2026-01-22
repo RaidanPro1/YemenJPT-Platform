@@ -13,6 +13,8 @@ import { AutomationComponent } from '../automation/automation.component';
 import { ContentManagementComponent } from '../content-management/content-management.component';
 import { SocialBotManagementComponent } from '../social-bot-management/social-bot-management.component';
 import { UserService } from '../../services/user.service';
+import { ThemeManagementComponent } from '../theme-management/theme-management.component';
+import { NewsletterManagementComponent } from '../newsletter-management/newsletter-management.component';
 
 @Component({
   selector: 'app-admin',
@@ -29,7 +31,9 @@ import { UserService } from '../../services/user.service';
     GeminiCodeAssistComponent,
     AutomationComponent,
     ContentManagementComponent,
-    SocialBotManagementComponent
+    SocialBotManagementComponent,
+    ThemeManagementComponent,
+    NewsletterManagementComponent
   ],
   templateUrl: './admin.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

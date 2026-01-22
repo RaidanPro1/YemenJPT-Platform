@@ -110,6 +110,14 @@
         <div class="bg-base-100 p-6 rounded-xl shadow">
            <app-seo-management></app-seo-management>
         </div>
+        @if(isRoot()){
+          <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
+              <app-theme-management></app-theme-management>
+          </div>
+          <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
+              <app-newsletter-management></app-newsletter-management>
+          </div>
+        }
     </div>
   </section>
   

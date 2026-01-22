@@ -5,7 +5,6 @@ import { Meta, Title } from '@angular/platform-browser';
   providedIn: 'root'
 })
 export class SeoService {
-  // FIX: Explicitly type injected services to prevent type inference to 'unknown'.
   private titleService: Title = inject(Title);
   private metaService: Meta = inject(Meta);
 
