@@ -1,14 +1,14 @@
 # ======================================================================
-# 🇾🇪 YemenJPT & Press House Ecosystem - Docker Compose File (V18.0 - Intelligence Engineering Edition)
+# 🇾🇪 YemenJPT & Press House Ecosystem - Docker Compose File (V18.1 - Complete Stack Edition)
 # ======================================================================
 # هذا الملف يطبق استراتيجية "العقل الرقمي" مع قاعدة بيانات متجهات،
 # حلقة تعلم نشط، والتحكم الكامل للمستخدم الروت.
+# يتضمن هذا الإصدار جميع الخدمات المرجعية في لوحات المعلومات.
 # ======================================================================
 
 version: '3.8'
 
 services:
-
   # ----------------------------------------------------------------------
   # 1. GATEWAY & CORE INFRASTRUCTURE
   # ----------------------------------------------------------------------
@@ -25,9 +25,9 @@ services:
     container_name: ph-postgres
     restart: always
     environment:
-      - "POSTGRES_DB=${POSTGRES_DB}"
-      - "POSTGRES_USER=${POSTGRES_USER}"
-      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - "./data/postgres:/var/lib/postgresql/data"
 
@@ -36,24 +36,92 @@ services:
     container_name: ph-mariadb
     restart: always
     environment:
-      - "MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}"
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     volumes:
       - "./data/mariadb:/var/lib/mysql"
 
   # ----------------------------------------------------------------------
-  # 2. THE DIGITAL MIND - AI STACK
+  # 2. SYSTEM MANAGEMENT & MONITORING
+  # ----------------------------------------------------------------------
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: ph-portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/portainer:/data
+
+  glances:
+    image: nicolargo/glances:latest-full
+    container_name: ph-glances
+    restart: always
+    pid: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: ph-uptime-kuma
+    restart: always
+    volumes:
+      - ./data/uptime-kuma:/app/data
+
+  # ----------------------------------------------------------------------
+  # 3. IDENTITY, SECURITY & AUTOMATION
+  # ----------------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: ph-keycloak
+    restart: always
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=postgres
+      - KC_DB_URL_DATABASE=keycloak_db
+      - KC_DB_USERNAME=${POSTGRES_USER}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on: [postgres]
+
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: ph-vaultwarden
+    restart: always
+    volumes:
+      - ./data/vaultwarden:/data
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ph-n8n
+    restart: always
+    volumes:
+      - ./data/n8n:/home/node/.n8n
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: ph-gitea
+    restart: always
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=postgres:5432
+      - GITEA__database__NAME=gitea_db
+      - GITEA__database__USER=${POSTGRES_USER}
+      - GITEA__database__PASSWD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/gitea:/data
+    depends_on: [postgres]
+
+  # ----------------------------------------------------------------------
+  # 4. THE DIGITAL MIND - AI STACK
   # ----------------------------------------------------------------------
   ollama:
     image: ollama/ollama
     container_name: ph-ollama-engine
     restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
     volumes:
       - "./data/ollama:/root/.ollama"
 
@@ -104,20 +172,14 @@ services:
     environment:
       - LT_LOAD_ONLY=ar,en,fr
 
-  whisper-webui:
+  whisper-webui: # A community-packaged UI for Whisper
     image: anashel/whisper-webui:latest
     container_name: ph-whisper-ui
     restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
 
   # ----------------------------------------------------------------------
-  # 3. COMMUNICATION & WORKFLOW
+  # 5. COMMUNICATION & WORKFLOW
   # ----------------------------------------------------------------------
   mattermost:
     image: mattermost/mattermost-team-edition
@@ -147,8 +209,7 @@ services:
   webtop:
     image: lscr.io/linuxserver/webtop:latest
     container_name: ph-secure-browser
-    security_opt:
-      - seccomp:unconfined #optional
+    security_opt: [seccomp:unconfined]
     restart: always
     environment:
       - PUID=1000
@@ -158,7 +219,7 @@ services:
       - "./data/webtop_config:/config"
 
   # ----------------------------------------------------------------------
-  # 4. OSINT & VERIFICATION
+  # 6. OSINT, VERIFICATION & ARCHIVING
   # ----------------------------------------------------------------------
   searxng:
     image: searxng/searxng
@@ -171,12 +232,23 @@ services:
     container_name: ph-spiderfoot
     restart: always
     volumes: ["./data/spiderfoot:/var/lib/spiderfoot"]
+  
+  social-analyzer:
+    image: qeeqbox/social-analyzer:latest
+    container_name: ph-social-analyzer
+    restart: always
 
   changedetection:
     image: dgtlmoon/changedetection.io
     container_name: ph-changedetection
     restart: always
     volumes: ["./data/changedetection:/datastore"]
+
+  archivebox:
+    image: archivebox/archivebox:latest
+    container_name: ph-archivebox
+    restart: always
+    volumes: ["./data/archivebox:/data"]
 
   meedan-check:
     image: anashel/meedan-check:latest # Simplified image for deployment
@@ -187,8 +259,22 @@ services:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/meedan_db?sslmode=disable
   
   # ----------------------------------------------------------------------
-  # 5. CRM & ORGANIZATIONAL MANAGEMENT
+  # 7. CMS & CRM
   # ----------------------------------------------------------------------
+  typo3:
+    image: typo3/cms-base-distribution:11.5
+    container_name: ph-typo3
+    restart: always
+    environment:
+      - TYPO3_DB_HOST=mariadb
+      - TYPO3_DB_PORT=3306
+      - TYPO3_DB_NAME=${TYPO3_DB_NAME}
+      - TYPO3_DB_USER=${TYPO3_DB_USER}
+      - TYPO3_DB_PASSWORD=${TYPO3_DB_PASS}
+      - TYPO3_ADMIN_USER=${TYPO3_ADMIN_USER}
+      - TYPO3_ADMIN_PASSWORD=${UNIFIED_PASS}
+    depends_on: [mariadb]
+
   crm:
     image: mjvar/civicrm-docker-d9:5.41.0 # CiviCRM on Drupal 9
     container_name: ph-crm
@@ -201,46 +287,36 @@ services:
       - MYSQL_DATABASE=${CIVICRM_DB_NAME}
       - MYSQL_USER=${CIVICRM_DB_USER}
       - MYSQL_PASSWORD=${CIVICRM_DB_PASS}
-      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD} # Required for DB/user creation on first run
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD} # Required for DB/user creation
       - CIVICRM_SMTP_HOST=${SMTP_HOST}
-      - CIVICRM_SMTP_PORT=${SMTP_PORT}
       - CIVICRM_SMTP_USER=${SMTP_USER}
       - CIVICRM_SMTP_PASSWORD=${SMTP_PASS}
       - CIVICRM_MAIL_FROM_EMAIL=${SMTP_FROM_ADDRESS}
 
   # ----------------------------------------------------------------------
-  # 6. DASHBOARDS
+  # 8. DASHBOARDS & APPLICATION
   # ----------------------------------------------------------------------
   ph-portal-journalist:
     image: lissy93/dashy:latest
     container_name: ph-portal-journalist
-    volumes:
-      - ./dashy-journalist.yml:/app/public/conf.yml
+    volumes: ["./dashy-journalist.yml:/app/public/conf.yml"]
     restart: always
-    environment:
-      - DOMAIN=${DOMAIN}
+    environment: [DOMAIN=${DOMAIN}]
   
   ph-portal-admin:
     image: lissy93/dashy:latest
     container_name: ph-portal-admin
-    volumes:
-      - ./dashy-admin.yml:/app/public/conf.yml
+    volumes: ["./dashy-admin.yml:/app/public/conf.yml"]
     restart: always
-    environment:
-      - DOMAIN=${DOMAIN}
+    environment: [DOMAIN=${DOMAIN}, ADMIN_API_KEY=${ADMIN_API_KEY}]
 
   ph-portal-verifier:
     image: lissy93/dashy:latest
     container_name: ph-portal-verifier
-    volumes:
-      - ./dashy-verifier.yml:/app/public/conf.yml
+    volumes: ["./dashy-verifier.yml:/app/public/conf.yml"]
     restart: always
-    environment:
-      - DOMAIN=${DOMAIN}
+    environment: [DOMAIN=${DOMAIN}]
 
-  # ----------------------------------------------------------------------
-  # 7. APPLICATION & DECOY
-  # ----------------------------------------------------------------------
   internal_proxy:
     image: nginx:alpine
     container_name: ph-internal-proxy

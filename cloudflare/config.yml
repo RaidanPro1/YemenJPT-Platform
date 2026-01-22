@@ -1,30 +1,57 @@
-# Cloudflare Tunnel Configuration (V18.0)
+# Cloudflare Tunnel Configuration (V18.1 - Complete Stack Edition)
+# This file maps public hostnames to internal Docker services.
 ingress:
-  # Main Dashboards & Identity
-  - hostname: portal.${DOMAIN}
+  # ----------------------------------------------------------------------
+  # 1. Main Application & Dashboards
+  # ----------------------------------------------------------------------
+  - hostname: ai.${DOMAIN} # Main YemenJPT App (via internal proxy for panic mode)
+    service: http://internal_proxy:80
+  - hostname: portal.${DOMAIN} # Journalist Dashboard
     service: http://ph-portal-journalist:80
-  - hostname: sys.${DOMAIN}
+  - hostname: sys.${DOMAIN} # Admin Dashboard
     service: http://ph-portal-admin:80
-  - hostname: verifier.${DOMAIN}
+  - hostname: verifier.${DOMAIN} # Verifier Dashboard
     service: http://ph-portal-verifier:80
-  - hostname: auth.${DOMAIN}
-    service: http://keycloak:8080
-  - hostname: crm.${DOMAIN}
-    service: http://ph-crm:80
+
+  # ----------------------------------------------------------------------
+  # 2. System Management & Monitoring
+  # ----------------------------------------------------------------------
+  - hostname: portainer.${DOMAIN}
+    service: http://portainer:9000
+  - hostname: glances.${DOMAIN}
+    service: http://glances:61208
+  - hostname: status.${DOMAIN}
+    service: http://uptime-kuma:3001
   
-  # AI Services (The Digital Mind)
-  - hostname: ai-ui.${DOMAIN}
+  # ----------------------------------------------------------------------
+  # 3. Identity, Security & Automation
+  # ----------------------------------------------------------------------
+  - hostname: auth.${DOMAIN} # Keycloak Identity Provider
+    service: http://keycloak:8080
+  - hostname: pass.${DOMAIN} # Vaultwarden Password Manager
+    service: http://vaultwarden:80
+  - hostname: auto.${DOMAIN} # n8n Automation
+    service: http://n8n:5678
+  - hostname: git.${DOMAIN} # Gitea Code Repository
+    service: http://gitea:3000
+
+  # ----------------------------------------------------------------------
+  # 4. AI Stack (The Digital Mind)
+  # ----------------------------------------------------------------------
+  - hostname: ai-ui.${DOMAIN} # Open WebUI for local models
     service: http://ph-yemenjpt-ui:8080
   - hostname: feedback.${DOMAIN} # Langfuse UI for Active Learning
     service: http://ph-langfuse-ui:3000
-  - hostname: translate.${DOMAIN} # LibreTranslate for secure translation
+  - hostname: translate.${DOMAIN} # LibreTranslate
     service: http://ph-libretranslate:5000
-  - hostname: whisper.${DOMAIN} # Audio Transcription UI
+  - hostname: whisper.${DOMAIN} # Whisper Audio Transcription UI
     service: http://ph-whisper-ui:80
   - hostname: qdrant.${DOMAIN} # Qdrant Vector DB UI
     service: http://ph-vector-db:6333
   
-  # Communication & Workflow
+  # ----------------------------------------------------------------------
+  # 5. Communication & Workflow
+  # ----------------------------------------------------------------------
   - hostname: chat.${DOMAIN}
     service: http://ph-mattermost:8065
   - hostname: files.${DOMAIN}
@@ -32,19 +59,31 @@ ingress:
   - hostname: browser.${DOMAIN} # Secure Browser (Webtop)
     service: http://ph-secure-browser:3000
   
-  # OSINT & Verification Tools
+  # ----------------------------------------------------------------------
+  # 6. OSINT, Verification & Archiving
+  # ----------------------------------------------------------------------
   - hostname: search.${DOMAIN}
     service: http://ph-searxng:8080
   - hostname: spiderfoot.${DOMAIN}
     service: http://ph-spiderfoot:5001
+  - hostname: analyzer.${DOMAIN} # Social Analyzer
+    service: http://social-analyzer:8080
   - hostname: watch.${DOMAIN} # ChangeDetection.io
     service: http://ph-changedetection:5000
+  - hostname: archive.${DOMAIN} # ArchiveBox
+    service: http://archivebox:8000
   - hostname: check.${DOMAIN} # Meedan Check
     service: http://ph-meedan-check:3000
 
-  # Digital Chameleon Entrypoint
-  - hostname: ai.${DOMAIN} # Main App URL
-    service: http://internal_proxy:80
+  # ----------------------------------------------------------------------
+  # 7. CMS & CRM
+  # ----------------------------------------------------------------------
+  - hostname: cms.${DOMAIN} # TYPO3 Content Management System
+    service: http://typo3:80
+  - hostname: crm.${DOMAIN} # CiviCRM
+    service: http://ph-crm:80
 
-  # Catch-all rule
+  # ----------------------------------------------------------------------
+  # Catch-all rule (must be last)
+  # ----------------------------------------------------------------------
   - service: http_status:404

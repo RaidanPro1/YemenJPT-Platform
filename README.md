@@ -1,4 +1,4 @@
-# 🇾🇪 YemenJPT Digital Platform (V18.0 - Intelligence Engineering Edition)
+# 🇾🇪 YemenJPT Digital Platform (V18.1 - Complete Stack Edition)
 
 **YemenJPT (Yemen Journalist Pre-trained Transformer)** is a self-hosted, integrated digital ecosystem designed specifically to empower journalists and media organizations in Yemen. The platform enhances press freedom by providing a secure, sovereign environment and a comprehensive suite of tools for Open Source Intelligence (OSINT), information verification, data analysis, and collaborative journalistic work.
 
@@ -14,11 +14,12 @@ The platform is an all-in-one digital workspace providing critical capabilities 
 
 | Category                    | Tools & Features                                                                                        | Purpose for Journalists                                                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Cognitive Core (AI)**     | `Ollama`, `Open WebUI`, `Qdrant` (Vector DB), `Langfuse` (Feedback Loop), `LibreTranslate`, `Whisper WebUI` | Accelerates research, transcribes interviews, provides a feedback mechanism for AI improvement, and enables secure translation. |
-| **Investigation & OSINT**   | `SearXNG` (Secure Search), `SpiderFoot` (OSINT Automation), `ChangeDetection.io` (Web Monitoring)          | Gathers intelligence from open sources securely, automates reconnaissance, and tracks changes on key websites.      |
-| **Media Verification**      | `Meedan Check` (Collaborative Fact-Checking)                                                            | Fights misinformation by providing a robust toolkit to verify the authenticity of images, videos, and claims.     |
-| **Collaboration & Workflow**| `Mattermost` (Secure Chat), `Nextcloud` (File Hub), `Webtop` (Secure Browser)                            | Streamlines teamwork, allowing for secure communication, task management, and isolated browsing for risky sites. |
-| **Organizational Mgmt.**    | `CiviCRM` (CRM System), Dashy Portals                                                                   | Manages relationships with contacts and donors, and provides role-based dashboards for journalists, admins, and verifiers. |
+| **Cognitive Core (AI)**     | `Ollama`, `Open WebUI`, `Qdrant`, `Langfuse`, `LibreTranslate`, `Whisper WebUI` | Accelerates research, transcribes interviews, provides a feedback mechanism for AI improvement, and enables secure translation. |
+| **Investigation & OSINT**   | `SearXNG`, `SpiderFoot`, `ChangeDetection.io`, `ArchiveBox`, `Social-Analyzer`          | Gathers intelligence, automates reconnaissance, tracks website changes, and creates permanent web archives.      |
+| **Media Verification**      | `Meedan Check`                                                            | Fights misinformation by providing a robust toolkit to verify the authenticity of images, videos, and claims.     |
+| **Collaboration & Workflow**| `Mattermost`, `Nextcloud`, `Webtop`, `n8n` (Automation)                            | Streamlines teamwork, allowing for secure communication, task management, isolated browsing, and workflow automation. |
+| **System & Identity**       | `Keycloak` (SSO), `Vaultwarden` (Passwords), `Portainer`, `Glances`, `Uptime Kuma` | Manages user identity, secures passwords, and provides tools for system monitoring and container management. |
+| **Organizational Mgmt.**    | `CiviCRM`, `TYPO3` (CMS), `Gitea`, Dashy Portals                                                                   | Manages contacts, powers the public website, hosts code, and provides role-based dashboards for users. |
 | **Security**                | Cloudflare Tunnel, Internal Nginx Proxy (Digital Chameleon)                                             | Secures the entire platform without opening server ports and provides an emergency decoy mechanism.               |
 
 ---
@@ -27,13 +28,13 @@ The platform is an all-in-one digital workspace providing critical capabilities 
 
 The application is built on a modern, containerized architecture designed for security, portability, and ease of management.
 
--   **Gateway**: **Cloudflare Tunnel** acts as the single, secure entry point. It connects the internal services to the Cloudflare network without exposing any public ports on the server, mitigating a wide range of network-based attacks.
--   **Orchestration**: The entire stack is managed and orchestrated via **Docker Compose**, defining all services, volumes, and networks in a single, declarative file.
--   **Frontend**: A zoneless **Angular** application served by a lightweight **Nginx** container (`yemenjpt_app`).
--   **Backend**: A **Node.js/Express** API server (`backend`) for handling system logging and notifications (e.g., via Telegram).
+-   **Gateway**: **Cloudflare Tunnel** acts as the single, secure entry point. It connects the internal services to the Cloudflare network without exposing any public ports on the server.
+-   **Orchestration**: The entire stack is managed via **Docker Compose**, defining all services, volumes, and networks in a single, declarative file.
+-   **Application**: An **Angular** frontend (`yemenjpt_app`) and a **Node.js** backend (`backend`) provide the main user interface and API layer.
 -   **Databases**: **PostgreSQL** and **MariaDB** serve as robust, persistent data stores for the various platform services.
--   **Internal Proxy & Decoy**: A dedicated **Nginx** container (`internal_proxy`) sits behind the Cloudflare Tunnel. This proxy is the key component of the "Digital Chameleon" panic mode, allowing it to dynamically switch traffic between the real frontend (`yemenjpt_app`) and a harmless decoy site (`decoy_app`).
--   **Dashboards**: **Dashy** is used to create role-specific portals (`ph-portal-journalist`, `ph-portal-admin`, `ph-portal-verifier`), providing a unified and customized user experience.
+-   **Identity**: **Keycloak** acts as a central Identity and Access Management (IAM) provider for Single Sign-On (SSO).
+-   **Internal Proxy & Decoy**: A dedicated **Nginx** container (`internal_proxy`) is the key component of the "Digital Chameleon" panic mode, allowing it to dynamically switch traffic between the real frontend and a harmless decoy site.
+-   **Dashboards**: **Dashy** is used to create role-specific portals, providing a unified user experience.
 
 ---
 
@@ -63,10 +64,8 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
     nano .env
     ```
     -   **`DOMAIN`**: Your main domain (e.g., `ph-ye.org`).
-    -   **`CLOUDFLARE_TUNNEL_TOKEN`**: The token for your Cloudflare Tunnel. This is obtained from the Cloudflare Zero Trust dashboard.
-    -   **Passwords**: Use a password manager to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, and `CIVICRM_DB_PASS`. **Do not use simple or reused passwords.**
-    -   **(Optional) `API_KEY`**: Your Google Gemini API key if you plan to use the cloud AI provider.
-    -   **(Optional) `TELEGRAM_BOT_TOKEN` / `TELEGRAM_ROOT_CHAT_ID`**: Credentials for the Telegram bot used for system notifications.
+    -   **`CLOUDFLARE_TUNNEL_TOKEN`**: The token for your Cloudflare Tunnel.
+    -   **Passwords**: Use a password manager to generate strong, unique passwords for `UNIFIED_PASS`, `MARIADB_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `TYPO3_DB_PASS`, and `CIVICRM_DB_PASS`.
 
 3.  **Run the Installation Script**
     Make the script executable and run it as root. It will automate the entire setup process.
@@ -77,28 +76,31 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
     The script will:
     -   Install Docker and Docker Compose.
     -   Create all necessary data directories under `/opt/presshouse`.
-    -   Copy all configuration files (`docker-compose.yml`, `.env`, dashboards, proxy configs) to `/opt/presshouse`.
+    -   Copy all configuration files to `/opt/presshouse`.
     -   Copy the `panic.sh` and `secure.sh` scripts and make them executable.
     -   Launch all services via Docker Compose.
     -   Configure the firewall (UFW) to only allow SSH traffic.
 
 ### 3.3. Accessing the Application
 
-After the script finishes, all services will be running securely behind the Cloudflare Tunnel.
+After the script finishes, all services will be running securely.
 -   **Main Application**: `https://ai.your-domain.com`
 -   **Journalist Portal**: `https://portal.your-domain.com`
 -   **Admin Portal**: `https://sys.your-domain.com`
 -   **AI Interface**: `https://ai-ui.your-domain.com`
 -   **Team Chat**: `https://chat.your-domain.com`
 -   **Secure Files**: `https://files.your-domain.com`
-
-Refer to the final output of the `install.sh` script for a full list of URLs.
+-   **Identity Provider**: `https://auth.your-domain.com`
+-   **Public CMS**: `https://cms.your-domain.com`
+-   **Container Manager**: `https://portainer.your-domain.com`
+-   **System Monitoring**: `https://glances.your-domain.com`
+-   **Service Status**: `https://status.your-domain.com`
 
 ---
 
 ## 🛡️ 4. Security: Digital Chameleon (Panic Mode)
 
-The "Digital Chameleon" feature allows an administrator to instantly switch the main entry point of the application (`ai.your-domain.com`) to a simple, static decoy page. This is useful in an emergency to hide the platform's interface.
+The "Digital Chameleon" feature allows an administrator to instantly switch the main entry point of the application (`ai.your-domain.com`) to a simple, static decoy page.
 
 -   **To Activate Panic Mode**:
     ```bash

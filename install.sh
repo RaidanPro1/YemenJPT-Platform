@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================
-# 🇾🇪 YemenJPT & Press House Ecosystem (V18.0 - Intelligence Engineering Edition)
+# 🇾🇪 YemenJPT & Press House Ecosystem (V18.1 - Complete Stack Edition)
 # ============================================================
 
 set -e # Exit immediately if a command exits with a non-zero status.
@@ -17,7 +17,7 @@ REPO_DIR=$(cd "$(dirname "$0")" && pwd)
 BASE_DIR="/opt/presshouse"
 
 print_header() {
-    echo -e "${GREEN}>>> Initializing YemenJPT Platform Automated Installation (V18.0)...${NC}"
+    echo -e "${GREEN}>>> Initializing YemenJPT Platform Automated Installation (V18.1)...${NC}"
     echo ""
 }
 
@@ -75,8 +75,13 @@ create_directories() {
     mkdir -p "${BASE_DIR}/data/searxng"
     mkdir -p "${BASE_DIR}/data/spiderfoot"
     mkdir -p "${BASE_DIR}/data/changedetection"
-    mkdir -p "${BASE_DIR}/data/ghost"
+    mkdir -p "${BASE_DIR}/data/archivebox"
     mkdir -p "${BASE_DIR}/data/civicrm_files"
+    mkdir -p "${BASE_DIR}/data/portainer"
+    mkdir -p "${BASE_DIR}/data/uptime-kuma"
+    mkdir -p "${BASE_DIR}/data/vaultwarden"
+    mkdir -p "${BASE_DIR}/data/n8n"
+    mkdir -p "${BASE_DIR}/data/gitea"
     mkdir -p "${BASE_DIR}/cloudflare"
     mkdir -p "${BASE_DIR}/internal_proxy"
     mkdir -p "${BASE_DIR}/frontend/dist"
@@ -174,15 +179,23 @@ print_summary() {
     echo "All services are running securely behind a Cloudflare Tunnel."
     echo "No ports are open on this server except for SSH."
     echo ""
+    echo "--- User-Facing Portals ---"
     echo "🔗 Main App:           https://ai.${DOMAIN}"
     echo "🔗 Journalist Portal:  https://portal.${DOMAIN}"
     echo "🔗 Admin Portal:       https://sys.${DOMAIN}"
     echo "🔗 Verifier Portal:    https://verifier.${DOMAIN}"
     echo ""
-    echo "🔗 AI Web UI:          https://ai-ui.${DOMAIN}"
-    echo "🔗 Identity Provider:  https://auth.${DOMAIN}"
+    echo "--- Core Services ---"
+    echo "🔗 AI Interface:       https://ai-ui.${DOMAIN}"
     echo "🔗 Team Chat:          https://chat.${DOMAIN}"
     echo "🔗 Secure Files:       https://files.${DOMAIN}"
+    echo "🔗 Identity Provider:  https://auth.${DOMAIN}"
+    echo "🔗 Public CMS:         https://cms.${DOMAIN}"
+    echo ""
+    echo "--- Admin & Management ---"
+    echo "🔗 Container Manager:  https://portainer.${DOMAIN}"
+    echo "🔗 System Monitoring:  https://glances.${DOMAIN}"
+    echo "🔗 Service Status:     https://status.${DOMAIN}"
     echo ""
     echo -e "${GREEN}-----------------------------------------------------------------------"
     echo "💡 To see live logs, run: 'cd ${BASE_DIR} && docker compose logs -f'"
