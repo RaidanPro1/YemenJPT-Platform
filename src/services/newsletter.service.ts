@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { LoggerService } from './logger.service';
 
 export interface Subscriber {
   email: string;
@@ -10,6 +11,7 @@ export interface Subscriber {
 })
 export class NewsletterService {
   subscribers = signal<Subscriber[]>([]);
+  private logger = inject(LoggerService);
 
   constructor() {
     // Load subscribers from localStorage for simulation
@@ -34,6 +36,14 @@ export class NewsletterService {
 
     this.subscribers.update(subs => [...subs, { email, subscribedAt: new Date() }]);
     localStorage.setItem('newsletter-subscribers', JSON.stringify(this.subscribers()));
+    
+    this.logger.logEvent(
+        'اشتراك جديد في النشرة البريدية',
+        `تم تسجيل اشتراك جديد بالبريد الإلكتروني: ${email}`,
+        'System',
+        false
+    );
+
     return { success: true, message: 'شكراً لاشتراكك!' };
   }
   

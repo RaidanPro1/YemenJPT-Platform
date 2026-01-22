@@ -1,0 +1,50 @@
+# Cloudflare Tunnel Configuration (V18.0)
+ingress:
+  # Main Dashboards & Identity
+  - hostname: portal.${DOMAIN}
+    service: http://ph-portal-journalist:80
+  - hostname: sys.${DOMAIN}
+    service: http://ph-portal-admin:80
+  - hostname: verifier.${DOMAIN}
+    service: http://ph-portal-verifier:80
+  - hostname: auth.${DOMAIN}
+    service: http://ph-identity:8080
+  - hostname: crm.${DOMAIN}
+    service: http://ph-crm:80
+  
+  # AI Services (The Digital Mind)
+  - hostname: ai-ui.${DOMAIN}
+    service: http://ph-yemenjpt-ui:8080
+  - hostname: feedback.${DOMAIN} # Langfuse UI for Active Learning
+    service: http://ph-langfuse-ui:3000
+  - hostname: translate.${DOMAIN} # LibreTranslate for secure translation
+    service: http://ph-libretranslate:5000
+  - hostname: whisper.${DOMAIN} # Audio Transcription UI
+    service: http://ph-whisper-ui:80
+  - hostname: qdrant.${DOMAIN} # Qdrant Vector DB UI
+    service: http://ph-vector-db:6333
+  
+  # Communication & Workflow
+  - hostname: chat.${DOMAIN}
+    service: http://ph-mattermost:8065
+  - hostname: files.${DOMAIN}
+    service: http://ph-nextcloud:80
+  - hostname: browser.${DOMAIN} # Secure Browser (Webtop)
+    service: http://ph-secure-browser:3000
+  
+  # OSINT & Verification Tools
+  - hostname: search.${DOMAIN}
+    service: http://ph-searxng:8080
+  - hostname: spiderfoot.${DOMAIN}
+    service: http://ph-spiderfoot:5001
+  - hostname: watch.${DOMAIN} # ChangeDetection.io
+    service: http://ph-changedetection:5000
+  - hostname: check.${DOMAIN} # Meedan Check
+    service: http://ph-meedan-check:3000
+
+  # Digital Chameleon Entrypoint
+  - hostname: ai.${DOMAIN} # Main App URL
+    service: http://ph-internal-proxy:80
+
+  # Catch-all rule
+  - service: http_status:404

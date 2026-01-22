@@ -1,4 +1,4 @@
-# 🇾🇪 YemenJPT Digital Platform (V15.0)
+# 🇾🇪 YemenJPT Digital Platform (V16.0 - IAM/RBAC Edition)
 
 **YemenJPT (Yemen Journalist Pre-trained Transformer)** is a self-hosted, integrated digital ecosystem designed specifically to empower journalists and media organizations in Yemen. The platform aims to enhance press freedom by providing a secure, sovereign environment and a comprehensive suite of tools for Open Source Intelligence (OSINT), information verification, data analysis, and collaborative journalistic work.
 
@@ -20,7 +20,7 @@ The platform is an all-in-one digital workspace providing critical capabilities 
 | **Geospatial Analysis** | `Ushahidi` (Crowdsourced Reporting), `Kepler.gl` (Data Viz), `Earth Engine` (Satellite Imagery). | Visualizes geographic data to uncover patterns, track events on a map, and analyze environmental changes. |
 | **Collaboration & Workflow** | Multi-Project Workspaces, Kanban Boards, Secure Chat, Secure Password Management (`Vaultwarden`). | Streamlines teamwork on investigations, allowing for secure communication, task management, and file sharing. |
 | **Archiving & Monitoring** | `ArchiveBox` (Web Archiving), `ChangeDetection.io` (Web Monitoring). | Preserves digital evidence by creating permanent copies of web pages and alerting journalists to changes on key websites. |
-| **Organizational Management** | `ERPNext` (ERP System), Training & Support Portals. | Manages internal operations, from finance and HR to journalist training and technical/legal support requests. |
+| **Organizational Management** | `CiviCRM` (CRM System), Training & Support Portals. | Manages relationships with journalists, contacts, and donors. |
 | **Automation** | `n8n` (Workflow Automation) | Connects different tools to create powerful automated workflows, saving time on repetitive tasks. |
 | **Publishing** | `Ghost` (Modern Publishing), `TYPO3` (CMS) | Provides platforms to publish final investigative reports and manage the organization's public-facing website. |
 
@@ -32,8 +32,9 @@ The application is built on a modern, containerized architecture designed for si
 
 - **Frontend**: A zoneless **Angular** application, providing a fast and responsive user experience, served efficiently by **Nginx**.
 - **Backend**: A lightweight **Node.js/Express** API server to handle system logging and notifications via a Telegram Bot.
+- **Identity & Access**: **Keycloak** provides Single Sign-On (SSO) and centralized user management for all services.
 - **Databases**: **PostgreSQL** & **MariaDB** serve as the robust, primary databases for the various platform services.
-- **Reverse Proxy**: **Traefik** handles all incoming traffic, automates SSL certificate generation via Let's Encrypt and Cloudflare, and routes requests to the appropriate service based on subdomains.
+- **Reverse Proxy**: **Traefik** handles all incoming traffic, automates SSL certificate generation, and routes requests to the appropriate service based on subdomains.
 - **Orchestration**: The entire stack is managed and orchestrated via **Docker Compose**, making it easy to deploy, update, and scale.
 
 ---
@@ -79,9 +80,11 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
 ### 3.3. Accessing the Application
 
 -   After the script finishes, all services will be running with valid SSL certificates.
--   Your main application portal will be accessible at `https://portal.your-domain.com`.
--   The user-facing application is at `https://your-domain.com` or `https://ai.your-domain.com`.
--   Refer to the final output of the `install.sh` script for a full list of URLs and initial login credentials.
+-   **Journalist Portal:** `https://portal.your-domain.com`
+-   **Admin Portal (Command Center):** `https://sys.your-domain.com`
+-   **Identity Provider (User Management):** `https://auth.your-domain.com`
+-   The main user-facing application is at `https://ai.your-domain.com`.
+-   Refer to the final output of the `install.sh` script for a full list of URLs and initial login credentials (e.g., Keycloak admin user/pass).
 
 ---
 
@@ -113,5 +116,3 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
         1.  Ensure your `CF_TOKEN`, `CF_EMAIL`, and `CF_ZONE_ID` are correct in the `.env` file.
         2.  Verify your domain's nameservers point to Cloudflare.
         3.  Check the Traefik logs for ACME errors: `sudo docker logs ph-gateway`. The logs often indicate if the API token is invalid or has insufficient permissions.
-
----

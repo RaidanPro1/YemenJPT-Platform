@@ -1,6 +1,7 @@
-
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoggerService } from '../../services/logger.service';
+import { UserService } from '../../services/user.service';
 
 interface AiFeedback {
   id: number;
@@ -19,6 +20,9 @@ interface AiFeedback {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AiFeedbackManagementComponent {
+  private logger = inject(LoggerService);
+  private userService = inject(UserService);
+
   feedbackEntries = signal<AiFeedback[]>([
     { 
       id: 1, 
@@ -39,7 +43,19 @@ export class AiFeedbackManagementComponent {
   ]);
 
   archiveFeedback(id: number) {
+    const entry = this.feedbackEntries().find(e => e.id === id);
+    if (!entry) return;
+
     this.feedbackEntries.update(entries => entries.filter(e => e.id !== id));
+    
+    const currentUser = this.userService.currentUser();
+    this.logger.logEvent(
+        'أرشفة تقييم AI',
+        `تمت أرشفة تقييم (${entry.rating}) من المستخدم "${entry.user}" بخصوص السؤال: "${entry.prompt.substring(0, 30)}..."`,
+        currentUser?.name,
+        currentUser?.role === 'super-admin'
+    );
+
     // In a real app, this would mark the feedback as archived or send it to a training pipeline.
     console.log(`Archiving feedback ID: ${id}`);
   }

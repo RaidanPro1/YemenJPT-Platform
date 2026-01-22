@@ -1,31 +1,5 @@
-
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-/**
- * --- Pseudo-code for Block Editor Logic (as requested) ---
- *
- * 1. INITIALIZATION:
- *    - Import Editor.js and its tools (e.g., Header, Paragraph, List).
- *    - In the component, create a new EditorJS instance.
- *    - `const editor = new EditorJS({ holder: 'editor-js-container', tools: { ... }, data: initialData });`
- *    - `initialData` would be a JSON object fetched from the backend representing the saved page content.
- *
- * 2. SAVING CONTENT:
- *    - Create a "Save" button that triggers `editor.save()`.
- *    - This method returns a Promise that resolves with a clean JSON object:
- *      `{ time: ..., blocks: [ { id: ..., type: 'header', data: { text: 'Title', level: 1 } }, ... ], version: ... }`
- *    - Send this JSON object to a backend API endpoint (e.g., `POST /api/pages/home`).
- *    - The backend stores this JSON in a database field (e.g., a `jsonb` column in PostgreSQL).
- *
- * 3. RENDERING CONTENT (for the public site):
- *    - The public-facing site (e.g., Next.js or a different Angular app) fetches the saved JSON from the backend.
- *    - It then iterates through the `blocks` array.
- *    - For each block, it renders the appropriate HTML tag based on the `type`.
- *      - `if (block.type === 'header') return <h{block.data.level}>{block.data.text}</h{...}>`
- *      - `if (block.type === 'paragraph') return <p>{block.data.text}</p>`
- *    - This approach separates content from presentation, making the CMS very flexible.
- */
 
 interface Article {
   id: number;
@@ -35,6 +9,20 @@ interface Article {
 }
 
 type ArticleStatus = 'ideas' | 'inProgress' | 'review' | 'published';
+
+interface NewsroomService {
+  name: string;
+  status: 'Online' | 'Degraded' | 'Offline';
+  url: string;
+}
+
+interface TeamActivity {
+  member: string;
+  avatar: string;
+  task: string;
+  status: 'review' | 'inProgress';
+}
+
 
 @Component({
   selector: 'app-editorial-hub',
@@ -57,8 +45,27 @@ export class EditorialHubComponent {
     ],
     published: [
        { id: 4, title: 'خبر: افتتاح مشروع مياه جديد في تعز', author: 'قسم الأخبار', submittedAt: '' },
+       { id: 5, title: 'بيان إدانة لاستهداف الصحفيين في مأرب', author: 'بيت الصحافة', submittedAt: '' },
     ]
   });
+
+  // Computed stats for the dashboard
+  articlesInReviewCount = computed(() => this.articles().review.length);
+  publishedThisWeekCount = computed(() => this.articles().published.length); // Simplified for demo
+  ideasCount = computed(() => this.articles().ideas.length);
+
+  newsroomServices = signal<NewsroomService[]>([
+    { name: 'منصة النشر (Ghost)', status: 'Online', url: 'http://localhost:2368/ghost' },
+    { name: 'نظام الإدارة (TYPO3)', status: 'Online', url: 'http://localhost:8080/typo3' },
+    { name: 'منصة التعاون (Chat)', status: 'Degraded', url: 'https://chat.ph-ye.org' },
+    { name: 'إدارة المهام (Superdesk)', status: 'Online', url: '#' },
+  ]);
+
+  teamActivity = signal<TeamActivity[]>([
+    { member: 'أحمد خالد', avatar: 'https://i.pravatar.cc/150?u=ahmed', task: 'تحقيق شبكات التهريب', status: 'inProgress' },
+    { member: 'فاطمة علي', avatar: 'https://i.pravatar.cc/150?u=fatima', task: 'تقرير حالة التعليم', status: 'review' },
+    { member: 'خالد عبدالله', avatar: 'https://i.pravatar.cc/150?u=khaled', task: 'مراجعة وثائق المناقصات', status: 'inProgress' },
+  ]);
 
   draggedArticleId = signal<number | null>(null);
   dragOverStatus = signal<ArticleStatus | null>(null);

@@ -36,7 +36,12 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div>
-        <h2 class="text-xl font-bold mb-4">حالة الخدمات الرئيسية</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">حالة الخدمات الرئيسية</h2>
+          <button (click)="runHealthCheck()" [disabled]="isChecking()" class="px-3 py-1 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400">
+            @if(isChecking()){ <span>جارِ الفحص...</span> } @else { <span>فحص صحة الخدمات</span> }
+          </button>
+        </div>
         <div class="bg-base-200 p-4 rounded-xl">
           <ul class="divide-y divide-gray-300">
             @for (service of services; track service.name) {

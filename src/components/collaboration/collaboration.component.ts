@@ -5,6 +5,8 @@ import { NotificationService } from '../../services/notification.service';
 import { SettingsService } from '../../services/settings.service';
 import { WebrtcCallComponent } from '../webrtc-call/webrtc-call.component';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { LoggerService } from '../../services/logger.service';
+import { UserService } from '../../services/user.service';
 
 // --- Interfaces for a more structured data model ---
 interface TeamMember {
@@ -13,11 +15,14 @@ interface TeamMember {
   avatar: string;
 }
 
+type TaskDifficulty = 'Easy' | 'Medium' | 'Hard';
+
 interface Task {
   id: string;
   title: string;
   assignee: TeamMember;
   priority: 'High' | 'Medium' | 'Low';
+  difficulty: TaskDifficulty;
   dueDate: string;
 }
 
@@ -59,6 +64,8 @@ export class CollaborationComponent {
   private notificationService = inject(NotificationService);
   private settingsService = inject(SettingsService);
   private confirmationService = inject(ConfirmationService);
+  private logger = inject(LoggerService);
+  private userService = inject(UserService);
 
   // Feature Flags
   isDataExportEnabled = this.settingsService.isDataExportEnabled;
@@ -77,6 +84,7 @@ export class CollaborationComponent {
   newTaskTitle = signal('');
   newTaskAssigneeId = signal<number>(0);
   newTaskPriority = signal<'High' | 'Medium' | 'Low'>('Medium');
+  newTaskDifficulty = signal<TaskDifficulty>('Medium');
   newTaskStatus = signal<TaskStatus>('todo');
 
   // Discussion state
@@ -139,14 +147,14 @@ export class CollaborationComponent {
         team: [teamMembers[0], teamMembers[1], teamMembers[2]],
         tasks: {
           todo: [
-            { id: 'p1-t1', title: 'جمع شهادات أولية من شهود عيان', assignee: teamMembers[1], priority: 'High', dueDate: this.getFutureDate(1) },
-            { id: 'p1-t2', title: 'تحليل صور الأقمار الصناعية لمنطقة الاستهداف', assignee: teamMembers[2], priority: 'High', dueDate: this.getFutureDate(2) },
+            { id: 'p1-t1', title: 'جمع شهادات أولية من شهود عيان', assignee: teamMembers[1], priority: 'High', difficulty: 'Hard', dueDate: this.getFutureDate(1) },
+            { id: 'p1-t2', title: 'تحليل صور الأقمار الصناعية لمنطقة الاستهداف', assignee: teamMembers[2], priority: 'High', difficulty: 'Hard', dueDate: this.getFutureDate(2) },
           ],
           inProgress: [
-            { id: 'p1-t4', title: 'مقابلة المصدر "س" عبر قناة آمنة', assignee: teamMembers[0], priority: 'High', dueDate: this.getFutureDate(0) },
+            { id: 'p1-t4', title: 'مقابلة المصدر "س" عبر قناة آمنة', assignee: teamMembers[0], priority: 'High', difficulty: 'Medium', dueDate: this.getFutureDate(0) },
           ],
           done: [
-            { id: 'p1-t7', title: 'تحديد الموقع الجغرافي للفيديو المنتشر', assignee: teamMembers[2], priority: 'High', dueDate: this.getFutureDate(-2) },
+            { id: 'p1-t7', title: 'تحديد الموقع الجغرافي للفيديو المنتشر', assignee: teamMembers[2], priority: 'Medium', difficulty: 'Easy', dueDate: this.getFutureDate(-2) },
           ]
         },
         files: [
@@ -163,8 +171,8 @@ export class CollaborationComponent {
         name: 'تحقيق فساد العقود الحكومية',
         team: [teamMembers[0], teamMembers[3]],
         tasks: {
-          todo: [{ id: 'p2-t1', title: 'مراجعة وثائق المناقصات المسربة', assignee: teamMembers[3], priority: 'High', dueDate: this.getFutureDate(4) }],
-          inProgress: [{ id: 'p2-t2', title: 'تحديد الشركات الوهمية المتورطة', assignee: teamMembers[0], priority: 'Medium', dueDate: this.getFutureDate(1) }],
+          todo: [{ id: 'p2-t1', title: 'مراجعة وثائق المناقصات المسربة', assignee: teamMembers[3], priority: 'High', difficulty: 'Medium', dueDate: this.getFutureDate(4) }],
+          inProgress: [{ id: 'p2-t2', title: 'تحديد الشركات الوهمية المتورطة', assignee: teamMembers[0], priority: 'Medium', difficulty: 'Hard', dueDate: this.getFutureDate(1) }],
           done: []
         },
         files: [
@@ -225,6 +233,15 @@ export class CollaborationComponent {
 
     this.projects.update(projects => [...projects, newProject]);
     this.selectedProjectId.set(newProject.id);
+    
+    const currentUser = this.userService.currentUser();
+    this.logger.logEvent(
+      'إنشاء مشروع جديد',
+      `قام المستخدم بإنشاء مشروع جديد باسم: "${this.newProjectName()}".`,
+      currentUser?.name,
+      currentUser?.role === 'super-admin'
+    );
+
     this.closeModals();
   }
   
@@ -241,6 +258,16 @@ export class CollaborationComponent {
          return p;
        });
      });
+     
+     const currentUser = this.userService.currentUser();
+     const project = this.selectedProject();
+     this.logger.logEvent(
+        'دعوة عضو جديد',
+        `تم دعوة المستخدم صاحب البريد "${email}" لمشروع "${project?.name}".`,
+        currentUser?.name,
+        currentUser?.role === 'super-admin'
+     );
+
      this.closeModals();
   }
 
@@ -262,6 +289,7 @@ export class CollaborationComponent {
       title: this.newTaskTitle(),
       assignee: assignee,
       priority: this.newTaskPriority(),
+      difficulty: this.newTaskDifficulty(),
       dueDate: this.getFutureDate(3) // Default due date 3 days from now
     };
     
@@ -278,6 +306,14 @@ export class CollaborationComponent {
     this.notificationService.addNotification(
       `مهمة جديدة لك: "${newTask.title}" في مشروع "${project.name}"`, 
       'task'
+    );
+
+    const currentUser = this.userService.currentUser();
+    this.logger.logEvent(
+      'إضافة مهمة جديدة',
+      `تمت إضافة مهمة "${newTask.title}" إلى مشروع "${project.name}" وأسندت إلى "${assignee.name}".`,
+      currentUser?.name,
+      currentUser?.role === 'super-admin'
     );
     
     this.closeModals();
@@ -304,6 +340,14 @@ export class CollaborationComponent {
         }
         return p;
       }));
+
+      const currentUser = this.userService.currentUser();
+      this.logger.logEvent(
+        'حذف مهمة',
+        `تم حذف المهمة "${task.title}" من مشروع "${project.name}".`,
+        currentUser?.name,
+        currentUser?.role === 'super-admin'
+      );
     }
   }
 
@@ -403,6 +447,14 @@ export class CollaborationComponent {
         }
         return p;
     }));
+
+    const currentUser = this.userService.currentUser();
+    this.logger.logEvent(
+      'تغيير حالة مهمة',
+      `تم نقل المهمة "${draggedTask.title}" من "${oldStatus}" إلى "${newStatus}" في مشروع "${project.name}".`,
+      currentUser?.name,
+      currentUser?.role === 'super-admin'
+    );
 
     this.draggedTaskId.set(null);
     this.dragOverStatus.set(null);

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User, UserRole, UserStatus, ROLES, getRoleDisplayName, UserService } from '../../services/user.service';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { LoggerService } from '../../services/logger.service';
 
 @Component({
   selector: 'app-user-management',
@@ -14,14 +15,11 @@ import { ConfirmationService } from '../../services/confirmation.service';
 export class UserManagementComponent {
   private confirmationService = inject(ConfirmationService);
   private userService = inject(UserService);
+  private logger = inject(LoggerService);
   navigate = output<string>();
 
   users = signal<User[]>([
-    { id: 1, name: 'Raidan Al-Huraibi', email: 'raidan@ph-ye.org', role: 'super-admin', avatar: 'assets/team/mohammed-alharibi.jpg', status: 'active', joinedDate: '2024-01-10' },
-    { id: 2, name: 'Mazen Fares', email: 'mazen@ph-ye.org', role: 'editor-in-chief', avatar: 'assets/team/mazen-fares.jpg', status: 'active', joinedDate: '2024-02-11' },
-    { id: 3, name: 'Ahmed Khalid', email: 'ahmed@example.com', role: 'investigative-journalist', avatar: 'https://i.pravatar.cc/150?u=ahmed', status: 'active', joinedDate: '2024-02-20' },
-    { id: 4, name: 'Fatima Ali', email: 'fatima@example.com', role: 'investigative-journalist', avatar: 'https://i.pravatar.cc/150?u=fatima', status: 'active', joinedDate: '2024-03-05' },
-    { id: 5, name: 'Khaled Abdullah', email: 'khaled@example.com', role: 'investigative-journalist', avatar: 'https://i.pravatar.cc/150?u=khaled', status: 'suspended', joinedDate: '2024-03-15' },
+    { id: 1, name: 'مستخدم الجذر', email: 'root@ph-ye.org', role: 'super-admin', avatar: 'assets/team/mohammed-alharibi.jpg', status: 'active', joinedDate: '2024-01-01' },
   ]);
 
   private roles: UserRole[] = ROLES;
@@ -103,6 +101,7 @@ export class UserManagementComponent {
 
   async saveUser(user: User | null) {
     if (!user || !user.name || !user.email) return;
+    const adminUser = this.userService.currentUser();
 
     if (this.isEditMode()) {
       const originalUser = this.users().find(u => u.id === user.id);
@@ -112,12 +111,25 @@ export class UserManagementComponent {
           `هل أنت متأكد من تغيير دور المستخدم "${user.name}" من "${getRoleDisplayName(originalUser.role)}" إلى "${getRoleDisplayName(user.role)}"?`
         );
         if (!confirmed) return;
+        
+        this.logger.logEvent(
+          'تحديث صلاحيات مستخدم',
+          `تم تغيير دور المستخدم "${user.name}" من "${getRoleDisplayName(originalUser.role)}" إلى "${getRoleDisplayName(user.role)}".`,
+          adminUser?.name,
+          adminUser?.role === 'super-admin'
+        );
       }
       // Update existing user
       this.users.update(users => users.map(u => u.id === user.id ? user : u));
     } else {
       // Add new user
       this.users.update(users => [user, ...users]);
+      this.logger.logEvent(
+          'إضافة مستخدم جديد',
+          `تم إنشاء حساب جديد للمستخدم "${user.name}" بدور "${getRoleDisplayName(user.role)}".`,
+          adminUser?.name,
+          adminUser?.role === 'super-admin'
+      );
     }
     this.closeModal();
   }
@@ -133,6 +145,13 @@ export class UserManagementComponent {
     
     if (confirmed) {
       this.users.update(users => users.filter(u => u.id !== userId));
+      const adminUser = this.userService.currentUser();
+      this.logger.logEvent(
+          'حذف مستخدم',
+          `تم حذف حساب المستخدم "${user.name}".`,
+          adminUser?.name,
+          adminUser?.role === 'super-admin'
+      );
     }
   }
 

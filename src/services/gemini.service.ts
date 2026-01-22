@@ -87,10 +87,11 @@ export class GeminiService {
 
     try {
       const contents: Content[] = [...history, { role: 'user', parts: [{ text: newMessage }] }];
+      // FIX: The 'tools' property must be nested inside a 'config' object.
       const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents,
-        tools
+        config: tools ? { tools } : undefined,
       });
       return response;
     } catch (e) {

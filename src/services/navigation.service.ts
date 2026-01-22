@@ -22,19 +22,20 @@ export class NavigationService {
     { key: 'command-center', name: 'مركز القيادة', icon: 'command-line', allowedRoles: ['super-admin'], section: 'main' },
     
     { key: 'dashboard', name: 'استعراض الأدوات', icon: 'squares-2x2', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'newsroom', name: 'غرفة الأخبار', icon: 'newspaper', allowedRoles: ['editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'ai-core', name: 'النواة المعرفية', icon: 'sparkles', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'social-media', name: 'الإعلام الاجتماعي', icon: 'megaphone', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'indilab', name: 'مختبر المؤشرات', icon: 'beaker', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'maps', name: 'الخرائط', icon: 'map-alt', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
     { key: 'archiving', name: 'الأرشيف', icon: 'archive-box', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
-    { key: 'collaboration', name: 'التعاون', icon: 'users', allowedRoles: ['investigative-journalist', 'editor-in-chief'], section: 'main' },
-    { key: 'erp', name: 'إدارة المؤسسة', icon: 'building-office', allowedRoles: ['super-admin'], section: 'main' },
+    { key: 'collaboration', name: 'التعاون', icon: 'users', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
+    { key: 'crm', name: 'إدارة العلاقات (CRM)', icon: 'building-office', allowedRoles: ['super-admin'], section: 'main' },
     { key: 'documentation', name: 'التوثيق', icon: 'book-open', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'main' },
 
     // Portal Links
     { key: 'project-management', name: 'إدارة المشاريع', icon: 'briefcase', allowedRoles: ['editor-in-chief', 'super-admin'], section: 'portal' },
-    { key: 'violations-observatory', name: 'مرصد الانتهاكات', icon: 'shield-exclamation', allowedRoles: ['investigative-journalist', 'editor-in-chief'], section: 'portal' },
-    { key: 'training', name: 'بوابة التدريب', icon: 'academic-cap', allowedRoles: ['investigative-journalist', 'editor-in-chief'], section: 'portal' },
+    { key: 'violations-observatory', name: 'مرصد الانتهاكات', icon: 'shield-exclamation', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'portal' },
+    { key: 'training', name: 'بوابة التدريب', icon: 'academic-cap', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'portal' },
     { key: 'tech-support', name: 'دعم الصحفيين', icon: 'lifebuoy', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'], section: 'portal' },
 
     // Admin Links

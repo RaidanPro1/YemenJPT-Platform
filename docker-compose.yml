@@ -1,0 +1,260 @@
+# ======================================================================
+# 🇾🇪 YemenJPT & Press House Ecosystem - Docker Compose File (V18.0 - Intelligence Engineering Edition)
+# ======================================================================
+# هذا الملف يطبق استراتيجية "العقل الرقمي" مع قاعدة بيانات متجهات،
+# حلقة تعلم نشط، والتحكم الكامل للمستخدم الروت.
+# ======================================================================
+
+version: '3.8'
+
+services:
+
+  # ----------------------------------------------------------------------
+  # 1. GATEWAY & CORE INFRASTRUCTURE
+  # ----------------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ph-gateway-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ph-postgres
+    restart: always
+    environment:
+      - "POSTGRES_DB=yemenjpt_db"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+    volumes:
+      - "./data/postgres:/var/lib/postgresql/data"
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: ph-mariadb
+    restart: always
+    environment:
+      - "MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}"
+    volumes:
+      - "./data/mariadb:/var/lib/mysql"
+
+  # ----------------------------------------------------------------------
+  # 2. THE DIGITAL MIND - AI STACK
+  # ----------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama
+    container_name: ph-ollama-engine
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - "./data/ollama:/root/.ollama"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ph-yemenjpt-ui
+    restart: always
+    depends_on: [ollama]
+    environment:
+      - 'OLLAMA_BASE_URL=http://ollama:11434'
+    volumes:
+      - "./data/open-webui:/app/backend/data"
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ph-vector-db
+    restart: always
+    volumes:
+      - "./data/qdrant:/qdrant/storage"
+
+  langfuse-server:
+    image: ghcr.io/langfuse/langfuse:latest
+    container_name: ph-langfuse-server
+    restart: always
+    depends_on: [postgres]
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/langfuse_db
+      - NODE_ENV=production
+      - SALT=${UNIFIED_PASS}
+      - LANGFUSE_SECRET_KEY=${UNIFIED_PASS}
+    command: "start"
+
+  langfuse-ui:
+    image: ghcr.io/langfuse/langfuse-ui:latest
+    container_name: ph-langfuse-ui
+    restart: always
+    depends_on: [langfuse-server]
+    environment:
+      - LANGFUSE_PUBLIC_HOST=https://feedback.${DOMAIN}
+      - NEXT_PUBLIC_LANGFUSE_PUBLIC_HOST=https://feedback.${DOMAIN}
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: ph-libretranslate
+    restart: always
+    volumes:
+      - "./data/libretranslate:/app/local/"
+    environment:
+      - LT_LOAD_ONLY=ar,en,fr
+
+  whisper-webui:
+    image: anashel/whisper-webui:latest
+    container_name: ph-whisper-ui
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ----------------------------------------------------------------------
+  # 3. COMMUNICATION & WORKFLOW
+  # ----------------------------------------------------------------------
+  mattermost:
+    image: mattermost/mattermost-team-edition
+    container_name: ph-mattermost
+    restart: always
+    volumes:
+      - "./data/mattermost/config:/mattermost/config"
+      - "./data/mattermost/data:/mattermost/data"
+      - "./data/mattermost/logs:/mattermost/logs"
+    environment:
+      - MM_SQLSETTINGS_DATASOURCE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mattermost_db?sslmode=disable
+    depends_on: [postgres]
+
+  nextcloud:
+    image: nextcloud:apache
+    container_name: ph-nextcloud
+    restart: always
+    volumes:
+      - "./data/nextcloud:/var/www/html"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=nextcloud_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on: [postgres]
+
+  webtop:
+    image: lscr.io/linuxserver/webtop:latest
+    container_name: ph-secure-browser
+    security_opt:
+      - seccomp:unconfined #optional
+    restart: always
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Aden
+    volumes:
+      - "./data/webtop_config:/config"
+
+  # ----------------------------------------------------------------------
+  # 4. OSINT & VERIFICATION
+  # ----------------------------------------------------------------------
+  searxng:
+    image: searxng/searxng
+    container_name: ph-searxng
+    restart: always
+    volumes: ["./data/searxng:/etc/searxng"]
+
+  spiderfoot:
+    image: smicallef/spiderfoot:latest
+    container_name: ph-spiderfoot
+    restart: always
+    volumes: ["./data/spiderfoot:/var/lib/spiderfoot"]
+
+  changedetection:
+    image: dgtlmoon/changedetection.io
+    container_name: ph-changedetection
+    restart: always
+    volumes: ["./data/changedetection:/datastore"]
+
+  meedan-check:
+    image: anashel/meedan-check:latest # Simplified image for deployment
+    container_name: ph-meedan-check
+    restart: always
+    depends_on: [postgres]
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/meedan_db?sslmode=disable
+  
+  # ----------------------------------------------------------------------
+  # 5. CRM & ORGANIZATIONAL MANAGEMENT
+  # ----------------------------------------------------------------------
+  crm:
+    image: mjvar/civicrm-docker-d9:5.41.0 # CiviCRM on Drupal 9
+    container_name: ph-crm
+    restart: always
+    depends_on: [mariadb]
+    volumes:
+      - "./data/civicrm_files:/var/www/html/web/sites/default/files"
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_DATABASE=${CIVICRM_DB_NAME}
+      - MYSQL_USER=${CIVICRM_DB_USER}
+      - MYSQL_PASSWORD=${CIVICRM_DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD} # Required for DB/user creation on first run
+      - CIVICRM_SMTP_HOST=${SMTP_HOST}
+      - CIVICRM_SMTP_PORT=${SMTP_PORT}
+      - CIVICRM_SMTP_USER=${SMTP_USER}
+      - CIVICRM_SMTP_PASSWORD=${SMTP_PASS}
+      - CIVICRM_MAIL_FROM_EMAIL=${SMTP_FROM_ADDRESS}
+
+  # ----------------------------------------------------------------------
+  # 6. DASHBOARDS
+  # ----------------------------------------------------------------------
+  ph-portal-journalist:
+    image: lissy93/dashy:latest
+    container_name: ph-portal-journalist
+    volumes:
+      - ./dashy-journalist.yml:/app/public/conf.yml
+    restart: always
+    environment:
+      - DOMAIN=${DOMAIN}
+  
+  ph-portal-admin:
+    image: lissy93/dashy:latest
+    container_name: ph-portal-admin
+    volumes:
+      - ./dashy-admin.yml:/app/public/conf.yml
+    restart: always
+    environment:
+      - DOMAIN=${DOMAIN}
+
+  ph-portal-verifier:
+    image: lissy93/dashy:latest
+    container_name: ph-portal-verifier
+    volumes:
+      - ./dashy-verifier.yml:/app/public/conf.yml
+    restart: always
+    environment:
+      - DOMAIN=${DOMAIN}
+
+  # ----------------------------------------------------------------------
+  # 7. APPLICATION & DECOY
+  # ----------------------------------------------------------------------
+  internal_proxy:
+    image: nginx:alpine
+    container_name: ph-internal-proxy
+    restart: always
+    volumes: ["./internal_proxy/nginx.conf:/etc/nginx/nginx.conf:ro"]
+
+  yemenjpt_app:
+    image: nginx:alpine
+    container_name: ph-main-app
+    restart: always
+    volumes: ["./frontend/dist:/usr/share/nginx/html"]
+    
+  decoy_app:
+    image: httpd:alpine
+    container_name: ph-decoy-app
+    restart: always
+    volumes: ["./decoy:/usr/local/apache2/htdocs/"]

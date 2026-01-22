@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, effect, Renderer2, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, effect, Renderer2, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -34,12 +34,15 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { AutomationComponent } from './components/automation/automation.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SystemInternalsComponent } from './components/system-internals/system-internals.component';
-import { ErpComponent } from './components/erp/erp.component';
+import { CrmComponent } from './components/crm/crm.component';
 import { SocialMediaAnalysisComponent } from './components/social-media-analysis/social-media-analysis.component';
 import { ProjectManagementPortalComponent } from './components/project-management-portal/project-management-portal.component';
 import { ViolationsObservatoryComponent } from './components/violations-observatory/violations-observatory.component';
 import { TrainingPortalComponent } from './components/training-portal/training-portal.component';
 import { TechSupportPortalComponent } from './components/tech-support-portal/tech-support-portal.component';
+import { NewsroomComponent } from './components/newsroom/newsroom.component';
+import { GeminiCodeAssistComponent } from './components/gemini-code-assist/gemini-code-assist.component';
+import { WebrtcCallComponent } from './components/webrtc-call/webrtc-call.component';
 
 // New public portal pages
 import { ViolationsObservatoryPublicComponent } from './components/violations-observatory-public/violations-observatory-public.component';
@@ -100,12 +103,15 @@ import { ThemeService } from './services/theme.service';
     AutomationComponent,
     ProfileComponent,
     SystemInternalsComponent,
-    ErpComponent,
+    CrmComponent,
     SocialMediaAnalysisComponent,
     ProjectManagementPortalComponent,
     ViolationsObservatoryComponent,
     TrainingPortalComponent,
     TechSupportPortalComponent,
+    NewsroomComponent,
+    GeminiCodeAssistComponent,
+    WebrtcCallComponent,
     // New Public Portal Pages
     ViolationsObservatoryPublicComponent,
     TrainingPortalPublicComponent,
@@ -130,6 +136,9 @@ export class AppComponent {
   currentPage = signal<string>('home'); // Default to home page
   isSidebarOpen = signal<boolean>(false);
   showOnboarding = signal<boolean>(false);
+  
+  showGeminiAssist = signal(false);
+  isSuperAdmin = computed(() => this.userService.currentUser()?.role === 'super-admin');
 
   constructor() {
     // Effect to update SEO tags when they change in the service
@@ -198,6 +207,10 @@ export class AppComponent {
 
   toggleSidebar() {
     this.isSidebarOpen.update(value => !value);
+  }
+  
+  toggleGeminiAssist() {
+    this.showGeminiAssist.update(v => !v);
   }
 
   handleLogin() {

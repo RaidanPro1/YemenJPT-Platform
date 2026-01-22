@@ -8,7 +8,6 @@ import { SeoManagementComponent } from '../seo-management/seo-management.compone
 import { ApiKeyManagementComponent } from '../api-key-management/api-key-management.component';
 import { AiFeedbackManagementComponent } from '../ai-feedback-management/ai-feedback-management.component';
 import { SecurityManagementComponent } from '../security-management/security-management.component';
-import { GeminiCodeAssistComponent } from '../gemini-code-assist/gemini-code-assist.component';
 import { AutomationComponent } from '../automation/automation.component';
 import { ContentManagementComponent } from '../content-management/content-management.component';
 import { SocialBotManagementComponent } from '../social-bot-management/social-bot-management.component';
@@ -28,7 +27,6 @@ import { NewsletterManagementComponent } from '../newsletter-management/newslett
     ApiKeyManagementComponent,
     AiFeedbackManagementComponent,
     SecurityManagementComponent,
-    GeminiCodeAssistComponent,
     AutomationComponent,
     ContentManagementComponent,
     SocialBotManagementComponent,

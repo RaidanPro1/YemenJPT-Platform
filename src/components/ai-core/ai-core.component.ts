@@ -63,7 +63,7 @@ export class AiCoreComponent {
   isSummarizing = signal<boolean>(false);
 
   // Whisper tool state
-  dialects = ['اللهجة الصنعانية', 'اللهجة التعزية', 'اللهجة العدنية', 'اللهجة الحضرمية'];
+  dialects = ['اللهجة الصنعانية', 'اللهجة التعزية', 'اللهجة العدنية', 'اللهجة الحضرمية', 'اللهجة الإبية', 'اللهجة التهامية (الحديدة)'];
   selectedDialect = signal<string>('اللهجة الصنعانية');
   outputFormats: TranscriptionFormat[] = ['Text', 'SRT', 'VTT'];
   transcriptionFormat: TranscriptionFormat = 'Text';
@@ -73,6 +73,12 @@ export class AiCoreComponent {
   copySuccess = signal<boolean>(false);
   showYoutubeInput = signal(false);
   youtubeUrl = signal('');
+
+  // New preprocessing options
+  enableNoiseReduction = signal(true);
+  enableNormalization = signal(true);
+  enableDiarization = signal(false); // Speaker separation
+  transcriptionStatusText = signal('');
 
   // Computed signal to generate tool schema for Gemini
   geminiTools = computed((): GeminiTool[] | undefined => {
@@ -149,38 +155,57 @@ export class AiCoreComponent {
 
     try {
       const response = await this.geminiService.getChatResponse(history, userMessageText, this.geminiTools());
-      
-      const functionCalls = response.functionCalls();
-      if (functionCalls && functionCalls.length > 0) {
-        for (const call of functionCalls) {
-          if (call.name === 'run_tool') {
+      let hasContent = false;
+
+      // Handle function calls by checking the response parts
+      const functionCallParts = response.candidates?.[0]?.content?.parts?.filter(p => !!p.functionCall);
+      if (functionCallParts && functionCallParts.length > 0) {
+        hasContent = true;
+        for (const part of functionCallParts) {
+          const call = part.functionCall;
+          if (call && call.name === 'run_tool') {
             const { toolId } = call.args;
-            const toolToRun = this.toolService.tools().find(t => t.id === toolId);
-            
-            if (toolToRun) {
-              this.toolStateService.runTool(toolId);
-              const toolRunMessage: Message = { 
-                id: Date.now(), 
-                text: `جاري فتح أداة: ${toolToRun.name}...`, 
-                from: 'ai' 
-              };
-              this.messages.update(m => [...m, toolRunMessage]);
-            } else {
-               const toolNotFoundMessage: Message = { 
-                id: Date.now(), 
-                text: `عذراً، لم أتمكن من العثور على أداة بالمعرف "${toolId}".`, 
-                from: 'ai' 
-              };
-              this.messages.update(m => [...m, toolNotFoundMessage]);
+            // FIX: Add type guard to ensure toolId is a string before using it.
+            if (typeof toolId === 'string') {
+              const toolToRun = this.toolService.tools().find(t => t.id === toolId);
+              
+              if (toolToRun) {
+                this.toolStateService.runTool(toolId);
+                const toolRunMessage: Message = { 
+                  id: Date.now(), 
+                  text: `جاري فتح أداة: ${toolToRun.name}...`, 
+                  from: 'ai' 
+                };
+                this.messages.update(m => [...m, toolRunMessage]);
+              } else {
+                 const toolNotFoundMessage: Message = { 
+                  id: Date.now(), 
+                  text: `عذراً، لم أتمكن من العثور على أداة بالمعرف "${toolId}".`, 
+                  from: 'ai' 
+                };
+                this.messages.update(m => [...m, toolNotFoundMessage]);
+              }
             }
           }
         }
       }
 
+      // Handle text response using the convenience .text getter
       const text = response.text;
       if (text) {
+        hasContent = true;
         const aiMessage: Message = { id: Date.now(), text, from: 'ai' };
         this.messages.update(m => [...m, aiMessage]);
+      }
+
+      // Handle cases where response is empty or blocked
+      if (!hasContent) {
+          const emptyResponseMessage: Message = { 
+              id: Date.now(), 
+              text: 'لم يتمكن المساعد من إنشاء رد. قد يكون الطلب غير واضح أو أن المحتوى تم حجبه.', 
+              from: 'ai' 
+          };
+          this.messages.update(m => [...m, emptyResponseMessage]);
       }
 
     } catch (error) {
@@ -244,27 +269,47 @@ export class AiCoreComponent {
     }
   }
   
-  startTranscription() {
+  async startTranscription() {
     if (!this.selectedFile() && !this.youtubeUrl()) return;
     this.isTranscribing.set(true);
     this.transcriptionResult.set('');
     
-    setTimeout(() => {
-      const selectedDialectValue = this.selectedDialect();
-      const baseText = `هذا هو النص الذي تم تفريغه من ${this.selectedFile() ? 'الملف الصوتي' : 'فيديو يوتيوب'}. تم التحليل باستخدام نموذج مخصص لـ"${selectedDialectValue}" لضمان أفضل النتائج.`;
-      switch(this.transcriptionFormat) {
-        case 'SRT':
-          this.transcriptionResult.set(`1\n00:00:01,000 --> 00:00:08,000\n${baseText}`);
+    const steps = [];
+    if (this.enableNoiseReduction()) steps.push('تطبيق تقليل الضوضاء...');
+    if (this.enableNormalization()) steps.push('تطبيع مستوى الصوت...');
+    if (this.enableDiarization()) steps.push('تحليل وتحديد المتحدثين...');
+    steps.push('بدء عملية التفريغ الصوتي...');
+    steps.push('تنسيق المخرجات...');
+
+    for (let i = 0; i < steps.length; i++) {
+        this.transcriptionStatusText.set(`الخطوة ${i + 1}/${steps.length}: ${steps[i]}`);
+        await new Promise(res => setTimeout(res, 1000 + Math.random() * 500)); // Simulate variable step time
+    }
+
+    const selectedDialectValue = this.selectedDialect();
+    let baseText = `هذا هو النص الذي تم تفريغه من ${this.selectedFile() ? 'الملف الصوتي' : 'فيديو يوتيوب'}. تم التحليل باستخدام نموذج مخصص لـ"${selectedDialectValue}" لضمان أفضل النتائج.`;
+    
+    if (this.enableNoiseReduction()) {
+      baseText += " تم تطبيق تقليل الضوضاء لتحسين الوضوح.";
+    }
+    
+    if (this.enableDiarization()) {
+        baseText = `[المتحدث 1]: ${baseText}\n\n[المتحدث 2]: هذا جزء آخر من الحوار تم تحديده بواسطة خاصية تحديد المتحدثين.`;
+    }
+
+    switch(this.transcriptionFormat) {
+      case 'SRT':
+        this.transcriptionResult.set(`1\n00:00:01,000 --> 00:00:08,000\n${baseText.replace(/\n\n/g, '\n')}`);
+        break;
+      case 'VTT':
+          this.transcriptionResult.set(`WEBVTT\n\n00:01.000 --> 00:08.000\n${baseText}`);
           break;
-        case 'VTT':
-           this.transcriptionResult.set(`WEBVTT\n\n00:01.000 --> 00:08.000\n${baseText}`);
-           break;
-        default:
-          this.transcriptionResult.set(baseText);
-          break;
-      }
-      this.isTranscribing.set(false);
-    }, 3000);
+      default:
+        this.transcriptionResult.set(baseText);
+        break;
+    }
+    this.isTranscribing.set(false);
+    this.transcriptionStatusText.set('');
   }
 
   copyResult() {

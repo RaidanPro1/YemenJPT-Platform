@@ -11,7 +11,8 @@ import { NotificationService } from '../../services/notification.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearxngComponent {
-  private sanitizer = inject(DomSanitizer);
+  // FIX: Explicitly typed `sanitizer` to resolve an issue where it was being inferred as `unknown`.
+  private sanitizer: DomSanitizer = inject(DomSanitizer);
   private notificationService = inject(NotificationService);
 
   // The URL is now set to localhost for local development.

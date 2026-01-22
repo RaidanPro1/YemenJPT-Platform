@@ -1,5 +1,3 @@
-
-
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { ToolService } from '../../services/tool.service';
@@ -17,10 +15,23 @@ import { ArchivingComponent } from '../archiving/archiving.component';
 import { CollaborationComponent } from '../collaboration/collaboration.component';
 import { DocumentationComponent } from '../documentation/documentation.component';
 import { AutomationComponent } from '../automation/automation.component';
-import { ErpComponent } from '../erp/erp.component';
+import { CrmComponent } from '../crm/crm.component';
 import { ToolDetailModalComponent } from '../tool-detail-modal/tool-detail-modal.component';
 import { ToolStateService } from '../../services/tool-state.service';
 import { SearxngComponent } from '../searxng/searxng.component';
+
+interface Activity {
+  user: string;
+  action: string;
+  tool: string;
+  time: string;
+  avatar: string;
+}
+
+interface ServiceStatus {
+  name: string;
+  status: 'Online' | 'Degraded' | 'Offline';
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -39,7 +50,7 @@ import { SearxngComponent } from '../searxng/searxng.component';
     CollaborationComponent,
     DocumentationComponent,
     AutomationComponent,
-    ErpComponent,
+    CrmComponent,
     ToolDetailModalComponent,
     SearxngComponent
   ],
@@ -55,20 +66,34 @@ export class DashboardComponent {
   user = this.userService.currentUser;
   private allTools = this.toolService.tools;
   private searchTerm = this.searchService.searchTerm;
-
-  viewMode = signal<'grid' | 'list'>('grid');
-  activeDashboardTab = signal<'all' | 'favorites' | 'categories'>('all');
   
-  // --- Tab Management is now handled by ToolStateService ---
-  showTabs = computed(() => this.toolStateService.openTools().length > 0);
+  // --- NEW STATE for new widgets ---
+  quickActions = signal<Tool[]>([]);
+  systemStatus = signal<ServiceStatus[]>([]);
+  recentActivity = signal<Activity[]>([]);
 
-  // --- Detail Modal State ---
+  showTabs = computed(() => this.toolStateService.openTools().length > 0);
   selectedToolForDetail = signal<Tool | null>(null);
 
-  // --- STATS ---
-  totalToolsCount = computed(() => this.allTools().length);
-  activeToolsCount = computed(() => this.allTools().filter(t => t.isActive).length);
-  usersCount = signal(5); // Updated count
+  constructor() {
+    this.systemStatus.set([
+      { name: 'البوابة الرئيسية (Gateway)', status: 'Online' },
+      { name: 'النواة المعرفية (AI Core)', status: 'Online' },
+      { name: 'قاعدة البيانات (Postgres)', status: 'Online' },
+      { name: 'خدمة الأرشفة (Archive)', status: 'Offline' },
+    ]);
+
+    this.recentActivity.set([
+      { user: 'أحمد خالد', action: 'أرشفة رابط', tool: 'ArchiveBox', time: 'منذ 5 دقائق', avatar: 'https://i.pravatar.cc/150?u=ahmed' },
+      { user: 'فاطمة علي', action: 'بدء تحليل', tool: 'SpiderFoot', time: 'منذ 20 دقيقة', avatar: 'https://i.pravatar.cc/150?u=fatima' },
+      { user: 'أنت', action: 'بحث آمن', tool: 'SearXNG', time: 'منذ ساعة', avatar: 'assets/team/mohammed-alharibi.jpg' },
+    ]);
+
+    const quickActionIds = ['ai-assistant', 'searxng', 'invid-weverify'];
+    this.quickActions.set(
+      this.allTools().filter(t => quickActionIds.includes(t.id))
+    );
+  }
 
   private hasPermission(tool: Tool, userRole: UserRole | undefined): boolean {
     if (!userRole) return false;
@@ -76,7 +101,6 @@ export class DashboardComponent {
     return tool.allowedRoles.includes(userRole);
   }
 
-  // Display tools based on user role and search term
   visibleTools = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const userRole = this.user()?.role;
@@ -114,14 +138,6 @@ export class DashboardComponent {
     return Object.keys(this.categorizedTools()).sort((a, b) => a.localeCompare(b));
   }
   
-  setTab(tab: 'all' | 'favorites' | 'categories') {
-    this.activeDashboardTab.set(tab);
-  }
-
-  toggleViewMode() {
-    this.viewMode.update(current => current === 'grid' ? 'list' : 'grid');
-  }
-
   handleToolToggle(toolId: string) {
     this.toolService.toggleToolStatus(toolId);
   }
@@ -130,7 +146,6 @@ export class DashboardComponent {
     this.toolService.toggleFavoriteStatus(toolId);
   }
 
-  // --- Detail Modal Methods ---
   showToolDetails(tool: Tool) {
     this.selectedToolForDetail.set(tool);
   }
@@ -139,7 +154,6 @@ export class DashboardComponent {
     this.selectedToolForDetail.set(null);
   }
   
-  // --- Methods for running tools in tabs ---
   handleRunTool(tool: Tool) {
     this.toolStateService.runTool(tool.id);
     this.closeToolDetails();

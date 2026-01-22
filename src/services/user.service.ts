@@ -35,23 +35,24 @@ export function getRoleDisplayName(role: UserRole): string {
 
 const pagePermissions: Record<string, UserRole[]> = {
     'dashboard': ['super-admin', 'editor-in-chief', 'investigative-journalist'],
-    'ai-core': ['investigative-journalist'],
-    'social-media': ['investigative-journalist'],
-    'collaboration': ['investigative-journalist', 'editor-in-chief'],
+    'newsroom': ['super-admin', 'editor-in-chief'],
+    'ai-core': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
+    'social-media': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
+    'collaboration': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
     'admin': ['super-admin', 'editor-in-chief'],
-    'indilab': ['investigative-journalist'],
-    'maps': ['investigative-journalist'],
-    'archiving': ['investigative-journalist'],
+    'indilab': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
+    'maps': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
+    'archiving': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
     'users': ['super-admin'],
     'documentation': ['super-admin', 'editor-in-chief', 'investigative-journalist'],
     'settings': ['super-admin', 'editor-in-chief', 'investigative-journalist'],
     'automation': ['super-admin'],
     'profile': ['super-admin', 'editor-in-chief', 'investigative-journalist'],
     'system-internals': ['super-admin'],
-    'erp': ['super-admin'],
+    'crm': ['super-admin'],
     'project-management': ['super-admin', 'editor-in-chief'],
-    'violations-observatory': ['investigative-journalist', 'editor-in-chief'],
-    'training': ['investigative-journalist', 'editor-in-chief'],
+    'violations-observatory': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
+    'training': ['investigative-journalist', 'editor-in-chief', 'super-admin'],
     'tech-support': ['super-admin', 'editor-in-chief', 'investigative-journalist'],
 };
 
@@ -67,13 +68,11 @@ export class UserService {
   
   // All possible users for simulation
   private users: User[] = [
-     { id: 1, name: 'Raidan Al-Huraibi', email: 'raidan@ph-ye.org', role: 'super-admin', avatar: 'assets/team/mohammed-alharibi.jpg', status: 'active', joinedDate: '2024-01-10' },
-     { id: 2, name: 'Mazen Fares', email: 'mazen@ph-ye.org', role: 'editor-in-chief', avatar: 'assets/team/mazen-fares.jpg', status: 'active', joinedDate: '2024-02-11' },
-     { id: 3, name: 'Ahmed Khalid', email: 'ahmed@example.com', role: 'investigative-journalist', avatar: 'https://i.pravatar.cc/150?u=ahmed', status: 'active', joinedDate: '2024-02-20' }
+     { id: 1, name: 'مستخدم الجذر', email: 'root@ph-ye.org', role: 'super-admin', avatar: 'assets/team/mohammed-alharibi.jpg', status: 'active', joinedDate: '2024-01-01' },
   ];
 
-  login(role: UserRole = 'investigative-journalist') {
-    const user = this.users.find(u => u.role === role) ?? this.users[2];
+  login(role: UserRole = 'super-admin') {
+    const user = this.users.find(u => u.role === role) ?? this.users[0];
     
     this.currentUser.set(user);
     this.isAuthenticated.set(true);
@@ -87,6 +86,15 @@ export class UserService {
   }
 
   logout() {
+    const loggedOutUser = this.currentUser();
+    if (loggedOutUser) {
+        this.logger.logEvent(
+            'تسجيل خروج',
+            `قام المستخدم بتسجيل الخروج.`,
+            loggedOutUser.name,
+            loggedOutUser.role === 'super-admin'
+        );
+    }
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
   }
