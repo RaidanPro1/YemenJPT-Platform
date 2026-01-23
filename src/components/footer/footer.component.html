@@ -1,66 +1,19 @@
 <footer class="bg-ph-blue-900 text-gray-300">
-  <div class="container mx-auto px-4 py-12">
-    <!-- Top Section with Newsletter -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-8 border-b border-gray-700">
-      <div class="lg:col-span-1">
-        <h3 class="font-bold text-white text-lg">اشترك في قائمتنا البريدية</h3>
-        <p class="text-sm mt-2 text-gray-400">كن على اطلاع بآخر أخبارنا، تقاريرنا، والدورات التدريبية القادمة.</p>
-      </div>
-      <div class="lg:col-span-2">
-        <form #newsletterForm="ngForm" (ngSubmit)="subscribe()">
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input 
-              type="email" 
-              name="email"
-              [(ngModel)]="subscriberEmail"
-              placeholder="أدخل بريدك الإلكتروني" 
-              required
-              class="w-full px-4 py-3 rounded-md bg-ph-blue-700 border border-ph-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-ph-yellow">
-            <button 
-              type="submit" 
-              [disabled]="newsletterForm.invalid"
-              class="px-6 py-3 font-bold text-ph-blue-900 rounded-md bg-ph-yellow hover:bg-ph-yellow-dark shadow-md hover:shadow-lg transform hover:-translate-y-px transition-all disabled:bg-gray-400 disabled:cursor-not-allowed">
-              اشتراك
-            </button>
-          </div>
-        </form>
-         @if (subscriptionStatus().type !== 'idle') {
-          <p class="mt-2 text-sm" [class]="subscriptionStatus().type === 'success' ? 'text-green-400' : 'text-red-400'">
-            {{ subscriptionStatus().message }}
-          </p>
-        }
-      </div>
-    </div>
+  <div class="container mx-auto px-4 pt-16 pb-8">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-    <!-- Middle Section with Links -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 py-8">
-      <div>
-        <h3 class="font-bold text-white mb-4">من نحن</h3>
-        <nav class="flex flex-col space-y-2">
-          <a (click)="onNavigate('about')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">عن بيت الصحافة</a>
-          <a (click)="onNavigate('projects-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">مشاريعنا</a>
-          <a (click)="onNavigate('news-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">الأخبار والتقارير</a>
-        </nav>
-      </div>
-      <div>
-        <h3 class="font-bold text-white mb-4">بواباتنا</h3>
-        <nav class="flex flex-col space-y-2">
-          <a (click)="onNavigate('violations-observatory-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">مرصد الانتهاكات</a>
-          <a (click)="onNavigate('training-portal-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">بوابة التدريب</a>
-          <a (click)="onNavigate('tech-support-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">دعم الصحفيين</a>
-        </nav>
-      </div>
-      <div>
-        <h3 class="font-bold text-white mb-4">قانوني</h3>
-        <nav class="flex flex-col space-y-2">
-          <a (click)="onNavigate('privacy-policy')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">سياسة الخصوصية</a>
-          <a (click)="onNavigate('terms-of-service')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">شروط الخدمة</a>
-          <a (click)="onNavigate('disclaimer')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">إخلاء المسؤولية</a>
-        </nav>
-      </div>
-       <div>
-        <h3 class="font-bold text-white mb-4">تواصل معنا</h3>
-        <div class="flex items-center justify-start gap-4">
+      <!-- About & Socials -->
+      <div class="lg:col-span-4">
+        <div class="flex items-center mb-4">
+          <img src="assets/logos/press-house-logo-light.png" alt="Press House Logo" class="h-12">
+          <div class="mr-3">
+            <h2 class="text-xl font-bold text-white">بيت الصحافة</h2>
+            <p class="text-sm text-gray-400">Yemen Press House</p>
+          </div>
+        </div>
+        <p class="text-sm text-gray-400 leading-relaxed">{{ aboutContent().mission }}</p>
+        <div class="flex items-center gap-4 mt-6">
             <a href="https://twitter.com/PresssHosue" target="_blank" class="text-gray-400 hover:text-white" title="@PresssHosue on X/Twitter">
               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
@@ -72,12 +25,65 @@
             </a>
         </div>
       </div>
-    </div>
 
+      <!-- Links & Newsletter -->
+      <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="font-bold text-white mb-4">من نحن</h3>
+          <nav class="flex flex-col space-y-2">
+            <a (click)="onNavigate('about')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">عن بيت الصحافة</a>
+            <a (click)="onNavigate('projects-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">مشاريعنا</a>
+            <a (click)="onNavigate('news-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">الأخبار والتقارير</a>
+          </nav>
+        </div>
+        <div>
+          <h3 class="font-bold text-white mb-4">بواباتنا</h3>
+          <nav class="flex flex-col space-y-2">
+            <a (click)="onNavigate('violations-observatory-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">مرصد الانتهاكات</a>
+            <a (click)="onNavigate('training-portal-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">بوابة التدريب</a>
+            <a (click)="onNavigate('tech-support-public')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">دعم الصحفيين</a>
+          </nav>
+        </div>
+        <div>
+          <h3 class="font-bold text-white mb-4">قانوني</h3>
+          <nav class="flex flex-col space-y-2">
+            <a (click)="onNavigate('privacy-policy')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">سياسة الخصوصية</a>
+            <a (click)="onNavigate('terms-of-service')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">شروط الخدمة</a>
+            <a (click)="onNavigate('disclaimer')" href="javascript:void(0)" class="text-gray-400 hover:text-white hover:underline">إخلاء المسؤولية</a>
+          </nav>
+        </div>
+        <div class="col-span-2 md:col-span-1">
+          <h3 class="font-bold text-white mb-4">اشترك في قائمتنا البريدية</h3>
+           <form #newsletterForm="ngForm" (ngSubmit)="subscribe()">
+            <div class="flex flex-col gap-2">
+              <input 
+                type="email" 
+                name="email"
+                [(ngModel)]="subscriberEmail"
+                placeholder="أدخل بريدك الإلكتروني" 
+                required
+                class="w-full px-4 py-2 rounded-md bg-ph-blue-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-ph-yellow text-sm">
+              <button 
+                type="submit" 
+                [disabled]="newsletterForm.invalid"
+                class="px-4 py-2 font-bold text-ph-blue-900 rounded-md bg-ph-yellow hover:bg-ph-yellow-dark transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed text-sm">
+                اشتراك
+              </button>
+            </div>
+          </form>
+           @if (subscriptionStatus().type !== 'idle') {
+            <p class="mt-2 text-xs" [class]="subscriptionStatus().type === 'success' ? 'text-green-400' : 'text-red-400'">
+              {{ subscriptionStatus().message }}
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+    
     <!-- Bottom Section -->
-    <div class="pt-8 text-center text-sm text-gray-500">
+    <div class="pt-8 mt-8 border-t border-gray-700 text-center text-sm text-gray-500">
       <p>
-        © 2025 جميع الحقوق محفوظة لـ<a href="javascript:void(0)" class="font-semibold text-gray-400 hover:text-white">بيت الصحافة - اليمن</a>.
+        © 2025 جميع الحقوق محفوظة لـ<a (click)="onNavigate('home')" href="javascript:void(0)" class="font-semibold text-gray-400 hover:text-white"> بيت الصحافة - اليمن</a>.
       </p>
        <p class="text-xs text-gray-600 mt-2">
           Powered by <a href="javascript:void(0)" class="font-semibold hover:text-white">RaidanPro</a>

@@ -1,58 +1,10 @@
 @if (userService.isAuthenticated()) {
-  <div class="relative min-h-screen lg:flex">
-    <!-- Sidebar -->
-    <app-sidebar 
-      [activePage]="currentPage()"
-      [isSidebarOpen]="isSidebarOpen()"
-      (navigate)="handleNavigation($event)"></app-sidebar>
-
-    <!-- Main content -->
-    <div class="flex flex-col flex-1 lg:mr-64 min-h-screen">
-      <!-- Header -->
-      <app-header 
-        [isAuthenticated]="true"
-        [user]="userService.currentUser()"
-        (toggleSidebar)="toggleSidebar()"
-        (logout)="handleLogout()"
-        (navigate)="handleNavigation($event)"></app-header>
-      
-      <!-- Page Content -->
-      <main class="p-4 md:p-8 flex-1">
-        @switch (currentPage()) {
-          @case ('dashboard') { <app-dashboard></app-dashboard> }
-          @case ('workspace') { <app-journalist-workspace></app-journalist-workspace> }
-          @case ('editorial') { <app-editorial-hub></app-editorial-hub> }
-          @case ('command-center') { <app-command-center></app-command-center> }
-          @case ('newsroom') { <app-newsroom></app-newsroom> }
-          @case ('ai-core') { <app-ai-core></app-ai-core> }
-          @case ('social-media') { <app-social-media-analysis></app-social-media-analysis> }
-          @case ('collaboration') { <app-collaboration></app-collaboration> }
-          @case ('admin') { <app-admin></app-admin> }
-          @case ('indilab') { <app-indilab></app-indilab> }
-          @case ('maps') { <app-maps></app-maps> }
-          @case ('archiving') { <app-archiving></app-archiving> }
-          @case ('users') { <app-user-management (navigate)="handleNavigation($event)"></app-user-management> }
-          @case ('documentation') { <app-documentation></app-documentation> }
-          @case ('settings') { <app-settings></app-settings> }
-          @case ('automation') { <app-automation></app-automation> }
-          @case ('profile') { <app-profile></app-profile> }
-          @case ('system-internals') { <app-system-internals></app-system-internals> }
-          @case ('crm') { <app-crm></app-crm> }
-          @case ('privacy-policy') { <app-privacy-policy (navigate)="handleNavigation($event)"></app-privacy-policy> }
-          @case ('terms-of-service') { <app-terms-of-service (navigate)="handleNavigation($event)"></app-terms-of-service> }
-          @case ('cookie-policy') { <app-cookie-policy></app-cookie-policy> }
-          @case ('disclaimer') { <app-disclaimer></app-disclaimer> }
-          @case ('project-management') { <app-project-management-portal></app-project-management-portal> }
-          @case ('violations-observatory') { <app-violations-observatory></app-violations-observatory> }
-          @case ('training') { <app-training-portal></app-training-portal> }
-          @case ('tech-support') { <app-tech-support-portal></app-tech-support-portal> }
-          @default { <app-placeholder [pageTitle]="currentPage()"></app-placeholder> }
-        }
-      </main>
-      
-      <app-footer (navigate)="handleNavigation($event)"></app-footer>
-    </div>
-  </div>
+  <app-dashboard-layout 
+    [user]="userService.currentUser()" 
+    [currentPage]="currentPage()" 
+    (navigate)="handleNavigation($event)" 
+    (logout)="handleLogout()">
+  </app-dashboard-layout>
 } @else {
   <div class="min-h-screen flex flex-col">
     <app-header 
@@ -63,6 +15,7 @@
       @switch (currentPage()) {
         @case ('home') { <app-home (login)="handleLogin()" (navigate)="handleNavigation($event)"></app-home> }
         @case ('about') { <app-about-us></app-about-us> }
+        @case ('platform-overview') { <app-platform-overview (login)="handleLogin()"></app-platform-overview> }
         @case ('privacy-policy') { <app-privacy-policy (navigate)="handleNavigation($event)"></app-privacy-policy> }
         @case ('terms-of-service') { <app-terms-of-service (navigate)="handleNavigation($event)"></app-terms-of-service> }
         @case ('cookie-policy') { <app-cookie-policy></app-cookie-policy> }

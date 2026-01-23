@@ -1,156 +1,184 @@
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, signal, OnDestroy, afterNextRender, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SystemStatsComponent } from '../system-stats/system-stats.component';
-import { LoggerService } from '../../services/logger.service';
-import { UserService } from '../../services/user.service';
-import { ConfirmationService } from '../../services/confirmation.service';
-import { SettingsService } from '../../services/settings.service';
+import { UserService, UserRole } from '../../services/user.service';
 
-// Import all management components
-import { ToolManagementComponent } from '../tool-management/tool-management.component';
-import { UserManagementComponent } from '../user-management/user-management.component';
-import { SeoManagementComponent } from '../seo-management/seo-management.component';
-import { ApiKeyManagementComponent } from '../api-key-management/api-key-management.component';
-import { AiFeedbackManagementComponent } from '../ai-feedback-management/ai-feedback-management.component';
-import { SecurityManagementComponent } from '../security-management/security-management.component';
-import { AutomationComponent } from '../automation/automation.component';
-import { ContentManagementComponent } from '../content-management/content-management.component';
-import { SocialBotManagementComponent } from '../social-bot-management/social-bot-management.component';
-import { ThemeManagementComponent } from '../theme-management/theme-management.component';
-import { NewsletterManagementComponent } from '../newsletter-management/newsletter-management.component';
+// --- Data Models for the Control Panel ---
 
-interface SecurityLog {
-    id: number;
-    timestamp: string;
-    level: 'Info' | 'Warning' | 'Critical';
-    event: string;
-    details: string;
+interface SystemMetric {
+  name: string;
+  value: number;
+  unit: string;
+  color: string;
 }
 
-interface QuickLink {
-    name: string;
-    description: string;
-    icon: string;
-    url: string;
+interface Service {
+  name: string;
+  status: 'Online' | 'Degraded' | 'Offline' | 'Restarting';
 }
 
-type AdminTab = 'overview' | 'platform' | 'content' | 'ai' | 'infra';
+interface Investigation {
+  id: number;
+  title: string;
+  lead: string;
+  status: 'Active' | 'Review' | 'Closed';
+  lastActivity: string;
+}
+
+interface TeamMember {
+  name: string;
+  title: string;
+  imageUrl: string;
+  status: 'Online' | 'Away' | 'Offline';
+}
+
+type CommandCenterView = 'overview' | 'security' | 'ai_analytics' | 'tasks';
+
+interface CommandCenterLink {
+  key: CommandCenterView;
+  name: string;
+  icon: string; // SVG path
+  allowedRoles: UserRole[];
+}
 
 @Component({
   selector: 'app-command-center',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    SystemStatsComponent,
-    ToolManagementComponent,
-    UserManagementComponent,
-    SeoManagementComponent,
-    ApiKeyManagementComponent,
-    AiFeedbackManagementComponent,
-    SecurityManagementComponent,
-    AutomationComponent,
-    ContentManagementComponent,
-    SocialBotManagementComponent,
-    ThemeManagementComponent,
-    NewsletterManagementComponent
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './command-center.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommandCenterComponent {
-    private logger = inject(LoggerService);
-    private userService = inject(UserService);
-    private confirmationService = inject(ConfirmationService);
-    settingsService = inject(SettingsService);
+export class CommandCenterComponent implements OnDestroy {
+  private userService = inject(UserService);
 
-    activeTab = signal<AdminTab>('overview');
+  // --- State Signals for the Control Panel ---
+  systemMetrics = signal<SystemMetric[]>([
+    { name: 'المعالج', value: 34, unit: '%', color: 'bg-green-500' },
+    { name: 'الذاكرة', value: 58, unit: '%', color: 'bg-yellow-500' },
+    { name: 'التخزين', value: 71, unit: '%', color: 'bg-orange-500' },
+  ]);
 
-    logs = signal<SecurityLog[]>([
-        { id: 1, timestamp: '10:35:12', level: 'Info', event: 'User Login', details: 'User "Ahmed" logged in successfully.'},
-        { id: 2, timestamp: '10:33:05', level: 'Warning', event: 'Failed Login', details: 'Failed login attempt for user "admin" from IP 192.168.1.10.'},
-        { id: 3, timestamp: '10:20:41', level: 'Critical', event: 'Service Down', details: 'Archive Service (archivebox) is unresponsive.'},
-        { id: 4, timestamp: '09:55:18', level: 'Info', event: 'Tool Disabled', details: 'Tool "Amass" was disabled by "Raidan Al-Huraibi".'},
-    ]);
-    
-    infrastructureLinks: QuickLink[] = [
-        { name: 'إدارة الحاويات', description: 'Manage all Docker containers', icon: 'docker', url: 'https://sys.ph-ye.org'},
-        { name: 'مراقبة الأداء', description: 'Live server performance stats', icon: 'line-chart', url: 'https://glances.ph-ye.org'},
-        { name: 'حالة الخدمات', description: 'Uptime monitoring for all services', icon: 'heartbeat', url: 'https://status.ph-ye.org'},
-        { name: 'إدارة الهوية', description: 'Manage users, roles, and SSO', icon: 'users-cog', url: 'https://auth.ph-ye.org'},
-    ];
-
-    intelligenceLinks: QuickLink[] = [
-        { name: 'حلقة التعلم (AI)', description: 'Review and correct AI interactions', icon: 'edit', url: 'https://feedback.ph-ye.org'},
-        { name: 'قاعدة البيانات المتجهة', description: 'Manage the RAG memory (Qdrant)', icon: 'database', url: 'https://qdrant.ph-ye.org/dashboard'},
-        { name: 'واجهة نماذج AI', description: 'Manage local models (Open WebUI)', icon: 'robot', url: 'https://ai-ui.ph-ye.org'},
-    ];
-
-    // --- Social Login State ---
-    socialLogins = signal({
-      google: { clientId: '', clientSecret: '', active: false },
-      facebook: { clientId: '', clientSecret: '', active: false },
-      x: { clientId: '', clientSecret: '', active: false },
-    });
-
-    // --- AI Training State ---
-    trainingStatus = signal<'idle' | 'preparing' | 'running' | 'complete'>('idle');
-    trainingLogs = signal<string[]>([]);
-
-    setTab(tab: AdminTab) {
-      this.activeTab.set(tab);
-    }
-
-    async triggerPanicMode() {
-        const confirmed = await this.confirmationService.confirm(
-            'تفعيل وضع الطوارئ (Panic Mode)',
-            'هل أنت متأكد من تفعيل وضع الحرباء الرقمي؟ سيتم فوراً تحويل الواجهة الرئيسية لعرض موقع تمويهي.'
-        );
-
-        if (confirmed) {
-            const currentUser = this.userService.currentUser();
-            this.logger.logEvent(
-                'CRITICAL: PANIC MODE ACTIVATED',
-                'Digital Chameleon mode has been engaged via Command Center.',
-                currentUser?.name,
-                true // isRoot event
-            );
-            console.log("PANIC MODE ACTIVATED. The 'panic.sh' script would be executed now.");
-        }
-    }
-    
-    saveSocialLogins() {
-      console.log("Saving Social Login Config:", this.socialLogins());
-    }
+  services = signal<Service[]>([
+    { name: 'Gateway', status: 'Online' },
+    { name: 'AI Core', status: 'Online' },
+    { name: 'Database', status: 'Online' },
+    { name: 'Archive Service', status: 'Degraded' },
+    { name: 'Collaboration Suite', status: 'Online' },
+  ]);
   
-    startFineTuning() {
-      this.trainingLogs.set([]); // Clear logs
-      this.logTrainingStep('Initiating fine-tuning process...');
-      this.trainingStatus.set('preparing');
+  serviceStats = computed(() => {
+    const stats = { online: 0, degraded: 0, offline: 0 };
+    this.services().forEach(s => {
+      if (s.status === 'Online') stats.online++;
+      else if (s.status === 'Degraded') stats.degraded++;
+      else if (s.status === 'Offline') stats.offline++;
+    });
+    return stats;
+  });
 
-      setTimeout(() => {
-          this.logTrainingStep('Data preparation complete. Found 50 new valid feedback entries.');
-          this.logTrainingStep('Starting training job on local AI cluster...');
-          this.trainingStatus.set('running');
-          
-          setTimeout(() => {
-              this.logTrainingStep('Training epoch 1/5 complete. Loss: 0.89');
-               setTimeout(() => {
-                this.logTrainingStep('Training epoch 3/5 complete. Loss: 0.52');
-                 setTimeout(() => {
-                  this.logTrainingStep('Training epoch 5/5 complete. Loss: 0.31');
-                  this.logTrainingStep('Model fine-tuning successful! New model version: yemenjpt-v1.2');
-                  this.trainingStatus.set('complete');
-                  setTimeout(() => this.trainingStatus.set('idle'), 5000);
-                }, 4000);
-              }, 4000);
-          }, 2000);
-      }, 2000);
+  investigations = signal<Investigation[]>([
+    { id: 1, title: 'تحقيق: شبكات التهريب', lead: 'أحمد خالد', status: 'Active', lastActivity: 'تحديث قبل 5 دقائق' },
+    { id: 2, title: 'تقرير: حالة التعليم', lead: 'فاطمة علي', status: 'Review', lastActivity: 'تقديم للمراجعة قبل ساعة' },
+  ]);
+
+  team = signal<TeamMember[]>([
+    { name: 'محمد الحريبي', title: 'رئيس المؤسسة', imageUrl: 'assets/team/mohammed-alharibi.jpg', status: 'Online' },
+    { name: 'مازن فارس', title: 'المدير التنفيذي', imageUrl: 'assets/team/mazen-fares.jpg', status: 'Online' },
+    { name: 'الفتح العيسائي', title: 'مدير البرامج', imageUrl: 'assets/team/alfateh-alissai.jpg', status: 'Away' },
+    { name: 'أحمد منعم', title: 'إدارة الإعلام', imageUrl: 'assets/team/ahmed-monem.jpg', status: 'Offline' },
+  ]);
+  
+  showLogsModal = signal(false);
+  logContent = signal('');
+  
+  // --- AI Terminal State ---
+  aiPrompt = signal<string>('ما هي آخر المؤشرات الأمنية في مأرب؟');
+  aiResponse = signal<string>('');
+  isAiLoading = signal(false);
+
+  // --- NEW: Sidebar Navigation State ---
+  activeView = signal<CommandCenterView>('overview');
+  
+  private allLinks = signal<CommandCenterLink[]>([
+    { key: 'overview', name: 'نظرة عامة', icon: 'M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.012-1.244h3.859M12 3v10.5m-4.5-4.5-4.5 4.5M16.5 9l4.5 4.5', allowedRoles: ['super-admin', 'editor-in-chief'] },
+    { key: 'security', name: 'مراقبة الأمان', icon: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.007H12v-.007Z', allowedRoles: ['super-admin'] },
+    { key: 'ai_analytics', name: 'تحليلات الذكاء الاصطناعي', icon: 'M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0V7.5A2.25 2.25 0 0 0 18 5.25h-2.25m-7.5 0h7.5m-7.5 0-1 1.083-1.558 1.685-1.558 1.686M8.25 5.25 9.25 6.333l1.558 1.685 1.558 1.686m-4.455 0L12 13.5m-1.558-1.685 1.558 1.686m0 0 1 1.083 1.558 1.685 1.558 1.686M9 21h6', allowedRoles: ['super-admin'] },
+    { key: 'tasks', name: 'المهام الحرجة', icon: 'M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.235 1.248V16.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 16.5V11.126c0-.414.156-.812.434-1.126M6.75 12h10.5"', allowedRoles: ['super-admin', 'editor-in-chief'] }
+  ]);
+  
+  visibleLinks = computed(() => {
+    const userRole = this.userService.currentUser()?.role;
+    if (!userRole) return [];
+    return this.allLinks().filter(link => link.allowedRoles.includes(userRole));
+  });
+
+  private intervals: any[] = [];
+
+  constructor() {
+    afterNextRender(() => {
+      this.startSimulations();
+    });
+  }
+
+  ngOnDestroy() {
+    this.intervals.forEach(clearInterval);
+  }
+
+  private startSimulations() {
+    // Simulate system metrics fluctuation
+    const metricsInterval = setInterval(() => {
+      this.systemMetrics.update(metrics => 
+        metrics.map(metric => ({
+          ...metric,
+          value: Math.min(100, Math.max(10, metric.value + (Math.random() - 0.5) * 5))
+        }))
+      );
+    }, 2000);
+    this.intervals.push(metricsInterval);
+  }
+
+  // --- NEW Method ---
+  setView(view: CommandCenterView) {
+    this.activeView.set(view);
+  }
+
+  // --- Service Management Simulation ---
+  restartService(serviceName: string) {
+    this.services.update(services =>
+      services.map(s => s.name === serviceName ? { ...s, status: 'Restarting' } : s)
+    );
+    setTimeout(() => {
+      this.services.update(services =>
+        services.map(s => s.name === serviceName ? { ...s, status: 'Online' } : s)
+      );
+    }, 2000);
+  }
+
+  viewLogs(serviceName: string) {
+    this.logContent.set(`[${new Date().toLocaleTimeString()}] INFO: Starting log stream for ${serviceName}...\n[${new Date().toLocaleTimeString()}] INFO: Service is running correctly.\n[${new Date().toLocaleTimeString()}] DEBUG: Connection to database pool successful.`);
+    this.showLogsModal.set(true);
+  }
+  
+  closeLogsModal() {
+    this.showLogsModal.set(false);
+    this.logContent.set('');
+  }
+
+  // --- AI Terminal Simulation ---
+  async askAI() {
+    if (this.isAiLoading() || !this.aiPrompt()) return;
+
+    this.isAiLoading.set(true);
+    this.aiResponse.set('');
+
+    const fullResponse = `بناءً على تحليل المؤشرات الأولية، تم رصد ما يلي في محيط مأرب:\n- **زيادة في حركة الطيران غير المجدول:** تم تسجيل 3 رحلات جوية لطائرات استطلاع في الساعات الست الماضية.\n- **تشويش على الاتصالات:** تقارير متقطعة عن ضعف في شبكات الاتصالات الخلوية في المناطق الشمالية للمحافظة.\n- **نشاط إعلامي:** ارتفاع في استخدام وسوم مرتبطة بالتوتر على منصات التواصل الاجتماعي.\n\n**الاستنتاج الأولي:** هذه المؤشرات قد تشير إلى استعدادات لعملية أمنية أو عسكرية محدودة. يوصى بتكثيف المراقبة والتواصل مع المصادر الميدانية للتحقق.`;
+    const words = fullResponse.split(/(\s+)/); // Split by spaces, keeping them
+
+    for (const word of words) {
+      this.aiResponse.update(r => r + word);
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 20));
     }
 
-    private logTrainingStep(message: string) {
-      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-      this.trainingLogs.update(logs => [...logs, `[${timestamp}] ${message}`]);
-    }
+    this.isAiLoading.set(false);
+  }
 }

@@ -1,158 +1,67 @@
-@if (!showTabs()) {
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 animate-fade-in">
+<div class="h-full flex flex-col">
+  <!-- Combined Tab Bar -->
+  <nav class="flex-shrink-0 border-b border-gray-200">
+    <ul class="flex items-center -mb-px overflow-x-auto">
+      <!-- Main Dashboard Tabs -->
+      @for(tab of dashboardTabs; track tab.key) {
+        <li 
+          (click)="selectTab(tab.key)" 
+          class="cursor-pointer flex items-center gap-2 px-4 py-3 border-b-2 text-sm font-medium flex-shrink-0"
+          [class]="activeTabId() === tab.key ? 'border-ph-blue text-ph-blue font-bold' : 'border-transparent text-gray-500 hover:text-gray-700'">
+          {{ tab.name }}
+        </li>
+      }
+      <!-- Separator -->
+      @if (toolStateService.openTools().length > 0) {
+        <li class="h-6 w-px bg-gray-300 mx-2"></li>
+      }
+      <!-- Open Tool Tabs -->
+      @for(tool of toolStateService.openTools(); track tool.id) {
+        <li 
+          (click)="selectTab(tool.id)" 
+          class="cursor-pointer flex items-center gap-2 px-4 py-3 border-b-2 text-sm font-medium flex-shrink-0" 
+          [class]="activeTabId() === tool.id ? 'border-ph-blue text-ph-blue font-bold' : 'border-transparent text-gray-500 hover:text-gray-700'">
+          <span>{{ tool.name }}</span>
+          <button (click)="closeToolTab(tool.id, $event)" class="text-gray-400 hover:text-gray-600 rounded-full p-0.5 hover:bg-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
 
-    <!-- Main Content -->
-    <div class="xl:col-span-8 space-y-8">
-      <!-- Welcome Header -->
-      <section class="bg-ph-blue text-white p-8 rounded-xl shadow-lg">
-        <h1 class="text-3xl font-bold">مرحباً بعودتك، {{ user()?.name }}</h1>
-        <p class="mt-2 text-gray-200/80">لوحة التحكم الرئيسية الخاصة بك. ابدأ تحقيقاً جديداً أو واصل من حيث توقفت.</p>
-      </section>
-
-      <!-- Quick Actions -->
-      <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">إجراءات سريعة</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          @for (tool of quickActions(); track tool.id) {
-            <div (click)="handleRunTool(tool)" class="bg-base-100 p-6 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all flex items-center gap-4 cursor-pointer">
-              <div class="w-12 h-12 flex items-center justify-center rounded-lg flex-shrink-0" [ngClass]="tool.iconColor.replace('text-', 'bg-').replace('-500', '-100').replace('-600', '-100')">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7" [ngClass]="tool.iconColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="tool.iconSvg" />
-                  </svg>
-              </div>
-              <div>
-                  <h3 class="font-bold text-gray-900">{{ tool.name }}</h3>
-                  <p class="text-xs text-gray-500">ابدأ الآن</p>
-              </div>
-            </div>
-          }
+  <!-- Tab Content -->
+  <div class="flex-grow pt-1 min-h-0">
+    @switch (activeTabId()) {
+      @case('canvas') {
+        <div class="h-full flex flex-col gap-8 animate-fade-in">
+          <section class="bg-ph-blue text-white p-6 rounded-xl shadow-lg flex-shrink-0">
+            <h1 class="text-3xl font-bold">لوحة التحقيقات</h1>
+            <p class="mt-1 text-gray-200/80">
+              مساحة عملك المرئية. قم بسحب الأدوات وربطها، أو اطلب من المساعد الذكي بناء سير عمل لك.
+            </p>
+          </section>
+          <section class="flex-grow min-h-0">
+            <app-investigation-canvas></app-investigation-canvas>
+          </section>
         </div>
-      </section>
-
-      <!-- Explore Tools -->
-      <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">استكشف كل الأدوات</h2>
-        <p class="text-gray-500 mb-6">
-          هنا تجد جميع الأدوات المتاحة لك. استخدم البحث في الشريط العلوي للعثور على أداة محددة.
-        </p>
-
-        @if(visibleTools().length > 0) {
-          <div class="space-y-8">
-            @for (category of categories; track category) {
-              @if(categorizedTools()[category]?.length > 0) {
-                <section>
-                  <h3 class="text-xl font-bold mb-4 text-gray-700 border-b-2 border-ph-yellow pb-2">{{ category }}</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @for (tool of categorizedTools()[category]; track tool.id) {
-                      <app-tool-card [tool]="tool" [userRole]="user()?.role" (toggleStatus)="handleToolToggle($event)" (toggleFavorite)="handleToggleFavorite($event)" (runTool)="handleRunTool($event)" (viewDetails)="showToolDetails($event)"></app-tool-card>
-                    }
-                  </div>
-                </section>
+      }
+      @case('ai-core') { <app-ai-core></app-ai-core> }
+      @case('violations-observatory') { <app-violations-observatory></app-violations-observatory> }
+      @case('training') { <app-training-portal></app-training-portal> }
+      @case('tech-support') { <app-tech-support-portal></app-tech-support-portal> }
+      
+      @default {
+        @switch (activeTabId()) {
+            @case('ai-assistant') { <app-ai-core></app-ai-core> }
+            @case('searxng') { <app-searxng></app-searxng> }
+            @default {
+              @if (getToolById(activeTabId()); as tool) {
+                <app-placeholder [pageTitle]="tool.name"></app-placeholder>
               }
             }
-          </div>
-        } @else {
-           <div class="text-center py-16 bg-base-200 rounded-lg">
-                <p class="text-gray-500">لا توجد أدوات تطابق بحثك.</p>
-           </div>
-        }
-      </section>
-    </div>
-
-    <!-- Right Sidebar -->
-    <div class="xl:col-span-4 space-y-8">
-      <!-- Favorite Tools -->
-      <section class="bg-base-100 p-6 rounded-xl shadow-lg">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">أدواتي المفضلة</h2>
-        @if (favoriteTools().length > 0) {
-          <div class="space-y-3">
-            @for(tool of favoriteTools(); track tool.id) {
-              <div (click)="handleRunTool(tool)" class="bg-base-200 hover:bg-gray-200 p-3 rounded-lg flex justify-between items-center transition-colors cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0" [ngClass]="tool.iconColor.replace('text-', 'bg-').replace('-500', '-100').replace('-600', '-100')">
-                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5" [ngClass]="tool.iconColor"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="tool.iconSvg" /></svg>
-                    </div>
-                    <p class="font-semibold text-sm text-gray-900">{{ tool.name }}</p>
-                </div>
-                <button (click)="handleToggleFavorite(tool.id); $event.stopPropagation()" class="text-ph-yellow">
-                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.312l-4.12 3.535 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.12-3.535c-.887-.767-.415-2.219.749-2.312l5.404-.434 2.082-5.006Z" clip-rule="evenodd" /></svg>
-                </button>
-              </div>
-            }
-          </div>
-        } @else {
-          <p class="text-center text-sm text-gray-500 py-4">أضف أدواتك المفضلة للوصول السريع.</p>
-        }
-      </section>
-
-      <!-- System Status -->
-      <section class="bg-base-100 p-6 rounded-xl shadow-lg">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">حالة النظام</h2>
-        <ul class="space-y-3">
-          @for(service of systemStatus(); track service.name) {
-            <li class="flex items-center justify-between">
-              <span class="text-sm font-semibold text-gray-700">{{ service.name }}</span>
-              <div class="flex items-center">
-                <span class="w-2.5 h-2.5 me-2 rounded-full" [ngClass]="{'bg-green-500': service.status === 'Online', 'bg-yellow-500': service.status === 'Degraded', 'bg-red-500': service.status === 'Offline'}"></span>
-                <span class="text-sm font-bold" [ngClass]="{'text-green-600': service.status === 'Online', 'text-yellow-600': service.status === 'Degraded', 'text-red-600': service.status === 'Offline'}">{{ service.status }}</span>
-              </div>
-            </li>
-          }
-        </ul>
-      </section>
-
-      <!-- Recent Activity -->
-      <section class="bg-base-100 p-6 rounded-xl shadow-lg">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">آخر النشاطات</h2>
-        <ul class="space-y-4">
-            @for(item of recentActivity(); track item.time) {
-                <li class="flex items-start gap-3">
-                    <img [src]="item.avatar" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-                    <div>
-                      <p class="text-sm text-gray-600">
-                          <span class="font-semibold text-gray-800">{{ item.user }}</span>
-                          {{ item.action }}
-                      </p>
-                       <p class="text-xs text-gray-400 mt-1">{{ item.time }}</p>
-                    </div>
-                </li>
-            }
-        </ul>
-      </section>
-    </div>
-  </div>
-} @else {
-  <div class="h-full flex flex-col">
-    <!-- Tab Bar -->
-    <nav class="flex-shrink-0 border-b border-gray-200">
-      <ul class="flex items-center -mb-px overflow-x-auto">
-        @for(tool of toolStateService.openTools(); track tool.id) {
-          <li (click)="selectTab(tool.id)" class="cursor-pointer flex items-center gap-2 px-4 py-2 border-b-2 text-sm font-medium flex-shrink-0" [ngClass]="toolStateService.activeToolId() === tool.id ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'">
-            {{ tool.name }}
-            <button (click)="closeTab(tool.id, $event)" class="text-gray-400 hover:text-gray-600 rounded-full p-0.5 hover:bg-gray-200">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </li>
-        }
-      </ul>
-    </nav>
-
-    <!-- Tab Content -->
-    <div class="flex-grow pt-1 min-h-0">
-      @switch (toolStateService.activeToolId()) {
-        @case('ai-assistant') { <app-ai-core></app-ai-core> }
-        @case('searxng') { <app-searxng></app-searxng> }
-        @default {
-          @if (toolStateService.activeToolId(); as toolId) {
-            <app-placeholder [pageTitle]="getToolById(toolId)?.name ?? 'أداة غير معروفة'"></app-placeholder>
-          }
         }
       }
-    </div>
+    }
   </div>
-}
-
-<!-- Tool Detail Modal -->
-@if(selectedToolForDetail(); as tool) {
-  <app-tool-detail-modal [tool]="tool" (close)="closeToolDetails()" (runTool)="handleRunTool($event)"></app-tool-detail-modal>
-}
+</div>

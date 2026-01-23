@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal, effect, Renderer2, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { PlaceholderComponent } from './components/placeholder/placeholder.component';
 import { HomeComponent } from './components/home/home.component';
@@ -17,6 +16,7 @@ import { DisclaimerComponent } from './components/disclaimer/disclaimer.componen
 
 // New Dashboard
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DashboardLayoutComponent } from './components/dashboard-layout/dashboard-layout.component';
 
 // Role-based components
 import { JournalistWorkspaceComponent } from './components/journalist-workspace/journalist-workspace.component';
@@ -51,6 +51,7 @@ import { TechSupportPublicComponent } from './components/tech-support-public/tec
 import { NewsPublicComponent } from './components/news-public/news-public.component';
 import { ProjectsPublicComponent } from './components/projects-public/projects-public.component';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
+import { PlatformOverviewComponent } from './components/platform-overview/platform-overview.component';
 
 // New Admin components
 import { ThemeManagementComponent } from './components/theme-management/theme-management.component';
@@ -71,7 +72,6 @@ import { ThemeService } from './services/theme.service';
   standalone: true,
   imports: [
     CommonModule, 
-    SidebarComponent, 
     HeaderComponent, 
     PlaceholderComponent,
     HomeComponent,
@@ -84,6 +84,8 @@ import { ThemeService } from './services/theme.service';
     TermsOfServiceComponent,
     CookiePolicyComponent,
     DisclaimerComponent,
+    // New Dashboard Layout
+    DashboardLayoutComponent,
     // New Dashboard
     DashboardComponent,
     // Role Dashboards
@@ -119,6 +121,7 @@ import { ThemeService } from './services/theme.service';
     NewsPublicComponent,
     ProjectsPublicComponent,
     LoginModalComponent,
+    PlatformOverviewComponent,
     // Newly added admin components
     ThemeManagementComponent,
     NewsletterManagementComponent
@@ -134,7 +137,6 @@ export class AppComponent {
   trialService = inject(TrialService);
 
   currentPage = signal<string>('home'); // Default to home page
-  isSidebarOpen = signal<boolean>(false);
   showOnboarding = signal<boolean>(false);
   
   showGeminiAssist = signal(false);
@@ -181,13 +183,9 @@ export class AppComponent {
   }
   
   private getDefaultPageForRole(role: UserRole | undefined): string {
-    if (!role) return 'home';
-    switch (role) {
-      case 'investigative-journalist': return 'workspace';
-      case 'editor-in-chief': return 'editorial';
-      case 'super-admin': return 'command-center';
-      default: return 'dashboard';
-    }
+    // Post-login, all users are directed to the main dashboard.
+    // The concept of a role-specific default page is now handled by the NavRail component.
+    return 'dashboard';
   }
 
   handleNavigation(pageKey: string) {
@@ -202,11 +200,6 @@ export class AppComponent {
         return;
     }
     this.currentPage.set(pageKey);
-    this.isSidebarOpen.set(false); // Close sidebar on navigation
-  }
-
-  toggleSidebar() {
-    this.isSidebarOpen.update(value => !value);
   }
   
   toggleGeminiAssist() {

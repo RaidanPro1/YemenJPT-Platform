@@ -1,12 +1,6 @@
-import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, afterNextRender } from '@angular/core';
+import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, afterNextRender, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface Slide {
-  imageUrl: string;
-  title: string;
-  subtitle: string;
-  actionText: string;
-}
+import { ContentService } from '../../services/content.service';
 
 @Component({
   selector: 'app-projects-public',
@@ -17,27 +11,19 @@ interface Slide {
 })
 export class ProjectsPublicComponent implements OnDestroy {
   login = output<void>();
+  private contentService = inject(ContentService);
+  
+  projects = this.contentService.projects;
 
-  slides = signal<Slide[]>([
-    {
-      imageUrl: 'assets/images/about/slider-1.jpg',
-      title: 'مشاريعنا',
-      subtitle: 'مبادرات استراتيجية لدعم وتمكين الصحافة والصحفيين في اليمن.',
-      actionText: 'استكشف المشاريع',
-    },
-    {
-      imageUrl: 'assets/images/projects/yemenjpt.jpg',
-      title: 'مشروع منصة YemenJPT',
-      subtitle: 'بيئة عمل رقمية سيادية ومؤمنة، مصممة خصيصاً لتمكين الصحافة الاستقصائية في اليمن.',
-      actionText: 'اعرف المزيد عن المنصة',
-    },
-    {
-      imageUrl: 'assets/images/projects/training.jpg',
-      title: 'مشروع برامج التدريب والتطوير',
-      subtitle: 'دورات تدريبية متخصصة لرفع كفاءة الصحفيين اليمنيين في مجالات حيوية.',
-      actionText: 'عرض برامج التدريب',
-    },
-  ]);
+  slides = computed(() => 
+    this.projects().slice(0, 3).map(project => ({
+      imageUrl: project.imageUrl,
+      title: project.title,
+      subtitle: project.description.substring(0, 100) + '...',
+      actionText: 'اعرف المزيد',
+    }))
+  );
+  
   currentSlide = signal(0);
   private intervalId: any;
 

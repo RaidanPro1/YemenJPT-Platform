@@ -13,7 +13,7 @@ export class CrmComponent {
   private sanitizer: DomSanitizer = inject(DomSanitizer);
   
   // This URL points to the public domain managed by Cloudflare Tunnel.
-  crmUrl = signal<string>('https://crm.ph-ye.org'); 
+  crmUrl = signal<string>('http://localhost:8085'); 
   safeUrl: SafeResourceUrl;
   isLoading = signal(true);
 

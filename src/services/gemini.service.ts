@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { GoogleGenAI, Content, GenerateContentResponse, Part, Tool as GeminiTool } from '@google/genai';
+import { GoogleGenAI, Content, GenerateContentResponse, Part, Tool as GeminiTool, Type, GenerateContentParameters } from '@google/genai';
 import { SettingsService } from './settings.service';
 import { TranslationService } from './translation.service'; // Import translation service
 
@@ -72,7 +72,7 @@ export class GeminiService {
   
   // --- Public Methods with Provider-Switching Logic ---
 
-  async getChatResponse(history: Content[], newMessage: string, tools?: GeminiTool[]): Promise<GenerateContentResponse> {
+  async getChatResponse(history: Content[], newMessage: string, tools?: GeminiTool[], systemInstruction?: string): Promise<GenerateContentResponse> {
     if (this.settingsService.aiProvider() === 'local') {
       return this.getLocalChatResponse(newMessage);
     }
@@ -87,11 +87,13 @@ export class GeminiService {
 
     try {
       const contents: Content[] = [...history, { role: 'user', parts: [{ text: newMessage }] }];
-      // FIX: The 'tools' property must be nested inside a 'config' object.
       const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents,
-        config: tools ? { tools } : undefined,
+        config: { 
+          tools: tools,
+          systemInstruction: systemInstruction
+        },
       });
       return response;
     } catch (e) {
@@ -164,6 +166,44 @@ export class GeminiService {
       return `(Translated) ${text}`;
     } else {
       return `(مترجم) ${text}`;
+    }
+  }
+  
+  async generateStructuredResponse(prompt: string, schema: GenerateContentParameters['config']['responseSchema'], systemInstruction: string): Promise<any> {
+    if (this.settingsService.aiProvider() === 'local') {
+      await simulateDelay(1500);
+      if (prompt.includes('بصمة') || prompt.includes('sherlock')) {
+        return { toolIds: ['sherlock-maigret', 'social-analyzer'] };
+      }
+      if (prompt.includes('ارشف')) {
+        return { toolIds: ['searxng', 'archivebox'] };
+      }
+      return { toolIds: ['searxng'] };
+    }
+
+    const ai = this.getAiInstance();
+    if (!ai) {
+      throw new Error(this.translationService.translate('gemini_not_configured'));
+    }
+
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          systemInstruction,
+          responseMimeType: "application/json",
+          responseSchema: schema,
+        }
+      });
+      
+      const jsonText = response.text.trim();
+      const cleanedJson = jsonText.replace(/^```json\s*/, '').replace(/```$/, '');
+      return JSON.parse(cleanedJson);
+
+    } catch (e) {
+      console.error("Gemini structured response error:", e);
+      throw new Error(this.translationService.translate('gemini_error'));
     }
   }
 }

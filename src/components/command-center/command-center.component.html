@@ -1,126 +1,187 @@
-<div class="h-full flex flex-col space-y-6 animate-fade-in">
-  <!-- Header -->
-  <header>
-    <h1 class="text-3xl font-bold text-gray-900">مركز القيادة (ROOT)</h1>
-    <p class="text-gray-500 mt-1">
-      لوحة تحكم شاملة لإدارة صحة النظام، الأمان، البنية التحتية، والذكاء الاصطناعي.
-    </p>
-  </header>
-  
-  <!-- Tabs Navigation -->
-  <div class="border-b border-gray-200">
-    <nav class="-mb-px flex space-i-6 overflow-x-auto" aria-label="Tabs">
-      <button (click)="setTab('overview')" [class]="activeTab() === 'overview' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.012-1.244h3.859M12 3v10.5m-4.5-4.5-4.5 4.5M16.5 9l4.5 4.5" /></svg>
-        نظرة عامة وصحة النظام
-      </button>
-      <button (click)="setTab('platform')" [class]="activeTab() === 'platform' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
-         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m-6 0h6M5.25 9h13.5" /></svg>
-        إدارة المنصة
-      </button>
-      <button (click)="setTab('content')" [class]="activeTab() === 'content' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M12 15v5.25A2.25 2.25 0 0 0 14.25 22.5h5.25a2.25 2.25 0 0 0 2.25-2.25V15M12 15H9.75a2.25 2.25 0 0 1-2.25-2.25V5.25A2.25 2.25 0 0 1 9.75 3h5.25a2.25 2.25 0 0 1 2.25 2.25V15" /></svg>
-        المحتوى والمظهر
-      </button>
-       <button (click)="setTab('ai')" [class]="activeTab() === 'ai' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 15v-1.5M12 4.5v-1.5m0 18v-1.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 18.75h3M10.5 5.25h3M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18Z" /></svg>
-        إدارة النواة المعرفية (AI)
-      </button>
-      <button (click)="setTab('infra')" [class]="activeTab() === 'infra' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5 3 11.25l3.75 3.75M17.25 7.5 21 11.25l-3.75 3.75M13.5 19.5 10.5 4.5" /></svg>
-        البنية التحتية والأتمتة
-      </button>
+<div class="flex flex-col md:flex-row gap-8">
+
+  <!-- Sidebar Navigation -->
+  <aside class="w-full md:w-64 flex-shrink-0 bg-base-100 p-4 rounded-xl shadow-lg">
+    <h2 class="text-xl font-bold mb-4 border-b pb-2">لوحة القيادة</h2>
+    <nav class="space-y-2">
+      @for (link of visibleLinks(); track link.key) {
+        <button 
+          (click)="setView(link.key)"
+          class="w-full flex items-center p-3 rounded-lg text-sm font-semibold transition-colors"
+          [class]="activeView() === link.key ? 'bg-ph-blue text-white' : 'text-gray-700 hover:bg-gray-100'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 me-3">
+            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="link.icon" />
+          </svg>
+          {{ link.name }}
+        </button>
+      }
     </nav>
-  </div>
-  
-  <!-- Tab Content -->
-  <div class="flex-grow min-h-0 overflow-y-auto pr-2">
-    @switch (activeTab()) {
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-grow min-w-0">
+    @switch (activeView()) {
       @case ('overview') {
-        <div class="space-y-6">
-          <app-system-stats></app-system-stats>
-          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div class="xl:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-              <h2 class="text-xl font-bold mb-4">سجل الأمان (آخر الأحداث)</h2>
-              <div class="overflow-x-auto max-h-72">
-                  <table class="w-full text-sm text-right text-gray-500">
-                      <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
-                          <tr><th class="py-3 px-6">الوقت</th><th class="py-3 px-6">المستوى</th><th class="py-3 px-6">الحدث</th><th class="py-3 px-6">التفاصيل</th></tr>
-                      </thead>
-                      <tbody>
-                          @for (log of logs(); track log.id) {
-                              <tr class="bg-white border-b hover:bg-gray-50"><td class="py-2 px-6 font-mono text-xs">{{ log.timestamp }}</td><td class="py-2 px-6"><span class="text-xs font-bold px-2 py-1 rounded-full" [ngClass]="{'bg-red-100 text-red-800': log.level === 'Critical', 'bg-yellow-100 text-yellow-800': log.level === 'Warning', 'bg-blue-100 text-blue-800': log.level === 'Info'}">{{ log.level }}</span></td><td class="py-2 px-6 font-semibold">{{ log.event }}</td><td class="py-2 px-6">{{ log.details }}</td></tr>
-                          }
-                      </tbody>
-                  </table>
-              </div>
+        <div class="space-y-8 animate-fade-in">
+          <!-- Header -->
+          <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 class="text-3xl md:text-4xl font-extrabold text-ph-blue">نظرة عامة</h1>
+              <p class="mt-2 text-lg text-gray-600">نظرة شاملة ولحظية على عمليات وأداء المنصة.</p>
             </div>
-            <div class="bg-red-50 p-6 rounded-xl border-2 border-dashed border-red-400 text-center">
-              <h3 class="font-bold text-lg text-red-800">وضع الطوارئ (Panic Mode)</h3>
-              <p class="text-sm text-red-700 my-3">سيقوم "وضع الحرباء الرقمي" بتحويل الواجهة الرئيسية لعرض موقع تمويهي.</p>
-              <button (click)="triggerPanicMode()" class="w-full px-4 py-3 font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-lg flex items-center justify-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126Z" /></svg>
-                  تفعيل
-              </button>
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              <span class="font-semibold text-green-700">جميع الأنظمة تعمل</span>
             </div>
-          </div>
-        </div>
-      }
-      @case ('platform') {
-        <div class="space-y-6">
-          <app-tool-management></app-tool-management>
-          <app-user-management></app-user-management>
-        </div>
-      }
-      @case ('content') {
-        <div class="space-y-6">
-            <app-theme-management></app-theme-management>
-            <app-seo-management></app-seo-management>
-            <app-content-management></app-content-management>
-            <app-newsletter-management></app-newsletter-management>
-        </div>
-      }
-      @case ('ai') {
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-base-100 p-6 rounded-xl shadow space-y-6">
-              <div>
-                <h3 class="text-xl font-bold">مزود الذكاء الاصطناعي</h3>
-                <fieldset class="mt-4"><div class="flex gap-4"><label class="flex-1 relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm" [class.border-ph-blue]="settingsService.aiProvider() === 'google'"><input type="radio" name="ai-provider" value="google" [checked]="settingsService.aiProvider() === 'google'" (change)="settingsService.aiProvider.set('google')" class="sr-only"><span class="text-sm font-medium">Google Gemini</span></label><label class="flex-1 relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm" [class.border-ph-blue]="settingsService.aiProvider() === 'local'"><input type="radio" name="ai-provider" value="local" [checked]="settingsService.aiProvider() === 'local'" (change)="settingsService.aiProvider.set('local')" class="sr-only"><span class="text-sm font-medium">Local AI (Ollama)</span></label></div></fieldset>
+          </header>
+
+          <!-- System Health Dashboard -->
+          <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @for(metric of systemMetrics(); track metric.name) {
+              <div class="bg-base-100 p-6 rounded-xl shadow-lg">
+                <h3 class="font-bold text-gray-800">{{ metric.name }}</h3>
+                <p class="text-4xl font-bold my-2">{{ metric.value.toFixed(0) }}<span class="text-xl">{{ metric.unit }}</span></p>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="h-3 rounded-full transition-all duration-500" [class]="metric.color" [style.width.%]="metric.value"></div>
+                </div>
               </div>
-              <div>
-                <h3 class="text-xl font-bold">التحكم في ميزات AI</h3>
-                <div class="space-y-3 p-4 mt-4 border rounded-lg bg-base-200/50"><div class="flex items-center justify-between"><h4 class="font-semibold text-sm">المساعد الذكي (Chatbot)</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isChatbotEnabled()" (change)="settingsService.isChatbotEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div><hr><div class="flex items-center justify-between"><h4 class="font-semibold text-sm">تحليل الصور</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isImageAnalysisEnabled()" (change)="settingsService.isImageAnalysisEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div></div>
+            }
+          </section>
+
+          <!-- Main Grid: AI Terminal & Service Management -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- AI Interaction Terminal (takes 2/3 width) -->
+            <section class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow-lg flex flex-col h-[500px]">
+              <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-ph-blue"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5 3 11.25l3.75 3.75M17.25 7.5 21 11.25l-3.75 3.75M13.5 19.5 10.5 4.5" /></svg>
+                <span>محطة التفاعل مع الذكاء الاصطناعي</span>
+              </h2>
+              <div class="flex-grow bg-gray-900 text-white font-mono text-sm rounded-lg p-4 overflow-y-auto">
+                <p class="text-green-400">$ system prompt: AI ready for analysis.</p>
+                @if (aiResponse()) {
+                  <p><span class="text-green-400">$ </span>{{ aiResponse() }}<span class="animate-pulse">_</span></p>
+                }
               </div>
-            </div>
-            <div class="bg-base-100 p-6 rounded-xl shadow">
-               <h3 class="text-xl font-bold mb-4">تدريب وتطوير نماذج AI</h3>
-                <button (click)="startFineTuning()" class="px-4 py-2 text-white bg-ph-blue rounded-lg hover:bg-ph-blue-dark disabled:bg-gray-400" [disabled]="trainingStatus() !== 'idle'">
-                  @if (trainingStatus() === 'idle') { <span>بدء عملية تدريب جديدة</span> } @else { <span>التدريب قيد التنفيذ...</span> }
+              <div class="mt-4 flex items-center gap-2">
+                <input 
+                  [(ngModel)]="aiPrompt"
+                  (keyup.enter)="askAI()"
+                  type="text" 
+                  placeholder="أدخل استفسارك هنا..."
+                  class="flex-grow p-3 rounded-lg border border-gray-300 bg-gray-50 focus:ring-ph-blue focus:border-ph-blue font-mono">
+                <button (click)="askAI()" [disabled]="isAiLoading()" class="px-6 py-3 font-bold text-white rounded-lg bg-ph-blue hover:bg-ph-blue-dark disabled:bg-gray-400 flex items-center justify-center w-32">
+                  @if(isAiLoading()) {
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  } @else {
+                    <span>تحليل</span>
+                  }
                 </button>
-                 @if (trainingLogs().length > 0) {
-                  <div class="mt-4 p-3 bg-base-200 rounded-lg">
-                    <h4 class="font-semibold mb-2 text-sm">سجل التدريب:</h4>
-                    <div class="max-h-32 overflow-y-auto bg-gray-900 text-white font-mono text-xs rounded p-3 space-y-1">
-                      @for(log of trainingLogs(); track log) { <p>{{ log }}</p> }
+              </div>
+            </section>
+
+            <!-- Service Management Panel -->
+            <aside class="bg-base-100 p-6 rounded-xl shadow-lg h-[500px] flex flex-col">
+              <h2 class="text-2xl font-bold text-gray-800 mb-4">إدارة الخدمات</h2>
+              <div class="flex items-center justify-around mb-4 text-center">
+                <div><p class="text-2xl font-bold text-green-600">{{ serviceStats().online }}</p><p class="text-xs font-semibold text-gray-500">Online</p></div>
+                <div><p class="text-2xl font-bold text-yellow-600">{{ serviceStats().degraded }}</p><p class="text-xs font-semibold text-gray-500">Degraded</p></div>
+                <div><p class="text-2xl font-bold text-red-600">{{ serviceStats().offline }}</p><p class="text-xs font-semibold text-gray-500">Offline</p></div>
+              </div>
+              <div class="flex-grow overflow-y-auto pr-2 space-y-3">
+                @for(service of services(); track service.name) {
+                  <div class="bg-base-200 p-3 rounded-lg flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                      <span class="w-3 h-3 rounded-full" [ngClass]="{'bg-green-500': service.status === 'Online', 'bg-yellow-500': service.status === 'Degraded', 'bg-red-500': service.status === 'Offline', 'bg-blue-500 animate-pulse': service.status === 'Restarting'}"></span>
+                      <span class="font-semibold text-sm">{{ service.name }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button (click)="viewLogs(service.name)" class="text-xs font-medium text-gray-500 hover:underline">Logs</button>
+                      <button (click)="restartService(service.name)" class="text-xs font-medium text-blue-600 hover:underline" [disabled]="service.status === 'Restarting'">Restart</button>
                     </div>
                   </div>
                 }
-            </div>
-            <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-                <app-ai-feedback-management></app-ai-feedback-management>
-            </div>
+              </div>
+            </aside>
+          </div>
+          
+          <!-- Lower Grid: Investigations & Team -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Live Investigations -->
+            <section class="bg-base-100 p-6 rounded-xl shadow-lg">
+              <h2 class="text-2xl font-bold text-gray-800 mb-4">تحقيقات جارية</h2>
+              <div class="space-y-4">
+                @for(inv of investigations(); track inv.id) {
+                  <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="flex justify-between items-center">
+                      <p class="font-bold text-ph-blue">{{ inv.title }}</p>
+                      <span class="text-xs font-bold px-3 py-1 rounded-full" [ngClass]="{'bg-blue-100 text-blue-800': inv.status === 'Active', 'bg-yellow-100 text-yellow-800': inv.status === 'Review'}">{{ inv.status }}</span>
+                    </div>
+                    <div class="flex justify-between items-baseline mt-2">
+                      <p class="text-sm">المسؤول: <span class="font-semibold">{{ inv.lead }}</span></p>
+                      <p class="text-xs text-gray-500">{{ inv.lastActivity }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <!-- Team Status -->
+            <section class="bg-base-100 p-6 rounded-xl shadow-lg">
+              <h2 class="text-2xl font-bold text-gray-800 mb-4">حالة الفريق</h2>
+              <div class="grid grid-cols-2 gap-4">
+                @for(member of team(); track member.name) {
+                  <div class="bg-base-200 p-4 rounded-lg flex items-center gap-4">
+                    <div class="relative">
+                      <img [src]="member.imageUrl" alt="{{member.name}}" class="w-12 h-12 rounded-full object-cover">
+                      <span class="absolute bottom-0 end-0 block h-3 w-3 rounded-full ring-2 ring-base-200" [ngClass]="{'bg-green-500': member.status === 'Online', 'bg-yellow-500': member.status === 'Away', 'bg-gray-400': member.status === 'Offline'}"></span>
+                    </div>
+                    <div>
+                      <p class="font-bold text-sm">{{ member.name }}</p>
+                      <p class="text-xs text-gray-500">{{ member.title }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
         </div>
       }
-      @case ('infra') {
-        <div class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <app-security-management></app-security-management>
-                <app-api-key-management></app-api-key-management>
-            </div>
-            <app-automation></app-automation>
-            <app-social-bot-management></app-social-bot-management>
+      @case ('security') {
+        <div class="animate-fade-in bg-base-100 p-6 rounded-xl shadow-lg h-full">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">مراقبة الأمان</h2>
+            <p class="text-gray-500">هنا يتم عرض سجلات الأمان، تنبيهات جدار الحماية، ومحاولات الدخول الفاشلة.</p>
+        </div>
+      }
+       @case ('ai_analytics') {
+        <div class="animate-fade-in bg-base-100 p-6 rounded-xl shadow-lg h-full">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">تحليلات الذكاء الاصطناعي</h2>
+            <p class="text-gray-500">رسوم بيانية توضح استخدام نماذج الذكاء الاصطناعي، متوسط وقت الاستجابة، ونسبة التقييمات الإيجابية.</p>
+        </div>
+      }
+       @case ('tasks') {
+        <div class="animate-fade-in bg-base-100 p-6 rounded-xl shadow-lg h-full">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">المهام الحرجة</h2>
+            <p class="text-gray-500">قائمة بالمهام ذات الأولوية القصوى التي تتطلب تدخلاً فورياً من الإدارة.</p>
         </div>
       }
     }
   </div>
 </div>
+
+<!-- Logs Modal -->
+@if (showLogsModal()) {
+  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center animate-fade-in" (click)="closeLogsModal()">
+    <div class="bg-base-100 rounded-xl shadow-xl w-full max-w-3xl h-3/4 flex flex-col p-4 m-4" (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center pb-3 border-b">
+        <h3 class="font-bold text-xl">عرض السجلات</h3>
+        <button (click)="closeLogsModal()" class="p-1 rounded-full hover:bg-gray-200">&times;</button>
+      </div>
+      <div class="flex-grow bg-gray-900 text-white font-mono text-xs rounded-lg p-4 overflow-y-auto mt-4">
+        <pre>{{ logContent() }}</pre>
+      </div>
+    </div>
+  </div>
+}

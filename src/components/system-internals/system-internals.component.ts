@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../services/user.service';
+import { UserService, UserRole } from '../../services/user.service';
 
 interface Service {
   name: string;
@@ -34,7 +34,7 @@ export class SystemInternalsComponent {
       name: 'الخدمات الأساسية',
       color: 'indigo',
       services: [
-        { name: 'YemenJPT App', description: 'واجهة المستخدم الرئيسية للمنصة', url: 'https://ph-ye.org', icon: '💻' },
+        { name: 'YemenJPT App', description: 'واجهة المستخدم الرئيسية للمنصة', url: 'http://localhost:8080', icon: '💻' },
         { name: 'PostgreSQL DB', description: 'قاعدة البيانات الأساسية للمنصة', url: '', icon: '🗃️' },
         { name: 'Ollama (Local AI)', description: 'محرك الذكاء الاصطناعي المحلي', url: '', icon: '🧠' },
       ],
@@ -43,18 +43,18 @@ export class SystemInternalsComponent {
       name: 'خدمات الإدارة',
       color: 'yellow',
       services: [
-        { name: 'Portainer', description: 'إدارة حاويات Docker', url: 'https://sys.ph-ye.org', icon: '🐳' },
-        { name: 'Glances', description: 'مراقبة أداء الخادم اللحظي', url: 'https://glances.ph-ye.org', icon: '📊' },
-        { name: 'Uptime Kuma', description: 'مراقبة حالة عمل الخدمات', url: 'https://status.ph-ye.org', icon: '❤️‍🩹' },
+        { name: 'Portainer', description: 'إدارة حاويات Docker', url: 'http://localhost:9000', icon: '🐳' },
+        { name: 'Glances', description: 'مراقبة أداء الخادم اللحظي', url: 'http://localhost:61208', icon: '📊' },
+        { name: 'Uptime Kuma', description: 'مراقبة حالة عمل الخدمات', url: 'http://localhost:3001', icon: '❤️‍🩹' },
       ],
     },
     {
       name: 'أدوات متخصصة',
       color: 'purple',
       services: [
-        { name: 'n8n (Automation)', description: 'أتمتة سير العمل', url: 'https://auto.ph-ye.org', icon: '🤖' },
-        { name: 'Gitea (Code)', description: 'مستودع الكود الخاص', url: 'https://git.ph-ye.org', icon: '📁' },
-        { name: 'SearXNG, Spiderfoot, ...etc', description: 'مجموعة أدوات التقصي المفتوح المصدر', url: 'https://portal.ph-ye.org', icon: '🔍' },
+        { name: 'n8n (Automation)', description: 'أتمتة سير العمل', url: 'http://localhost:5678', icon: '🤖' },
+        { name: 'Gitea (Code)', description: 'مستودع الكود الخاص', url: 'http://localhost:3002', icon: '📁' },
+        { name: 'SearXNG, Spiderfoot, ...etc', description: 'مجموعة أدوات التقصي المفتوح المصدر', url: '', icon: '🔍' },
       ],
     },
   ]);

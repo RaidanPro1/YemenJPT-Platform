@@ -1,21 +1,11 @@
-import { Component, ChangeDetectionStrategy, signal, OnDestroy, afterNextRender } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnDestroy, afterNextRender, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ContentService } from '../../services/content.service';
 
 interface Slide {
   imageUrl: string;
   title: string;
   subtitle: string;
-}
-
-interface TeamMember {
-  name: string;
-  title: string;
-  imageUrl: string;
-}
-
-interface Partner {
-  name: string;
-  logoUrl: string;
 }
 
 @Component({
@@ -26,6 +16,7 @@ interface Partner {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutUsComponent implements OnDestroy {
+  private contentService = inject(ContentService);
   
   slides = signal<Slide[]>([
     {
@@ -36,58 +27,23 @@ export class AboutUsComponent implements OnDestroy {
     {
       imageUrl: 'assets/images/about/slider-2.jpg',
       title: 'رؤيتنا',
-      subtitle: 'صحافة مهنية حرة أولويتها الإنسان.',
+      subtitle: this.contentService.aboutContent().vision,
     },
     {
       imageUrl: 'assets/images/about/slider-3.jpg',
       title: 'رسالتنا',
-      subtitle: 'أن نصبح المؤسسة الأولى في تعزيز حرية الصحافة والدفاع عن الإنسان أولاً وأخيراً.',
+      subtitle: this.contentService.aboutContent().mission,
     },
   ]);
   currentSlide = signal(0);
   private intervalId: any;
 
-  team = signal<TeamMember[]>([
-    { name: 'محمد الحريبي', title: 'رئيس المؤسسة', imageUrl: 'assets/team/mohammed-alharibi.jpg' },
-    { name: 'مازن فارس', title: 'المدير التنفيذي', imageUrl: 'assets/team/mazen-fares.jpg' },
-    { name: 'الفتح العيسائي', title: 'مدير البرامج', imageUrl: 'assets/team/alfateh-alissai.jpg' },
-    { name: 'مكين العوجري', title: 'مدير وحدة المالية', imageUrl: 'assets/team/makeen-alawjari.jpg' },
-    { name: 'رانيا عبدالله', title: 'وحدة العمليات', imageUrl: 'assets/team/rania-abdullah.jpg' },
-    { name: 'أبرار مصطفى', title: 'العلاقات العامة', imageUrl: 'assets/team/abrar-mustafa.jpg' },
-    { name: 'أحمد منعم', title: 'إدارة الإعلام', imageUrl: 'assets/team/ahmed-monem.jpg' },
-    { name: 'محمد الصلاحي', title: 'مدير وحدة الرصد', imageUrl: 'assets/team/mohammed-alsalahi.jpg' },
-    { name: 'إيهاب العبسي', title: 'متابعة وتقييم', imageUrl: 'assets/team/ehab-alabsi.jpg' },
-    { name: 'نعمة البرحي', title: 'الموارد البشرية', imageUrl: 'assets/team/naama-albarhi.png' },
-  ]);
-
-  advisors = signal<TeamMember[]>([
-    { name: 'أ. زكريا الكمالي', title: 'عضو الهيئة الاستشارية', imageUrl: 'assets/advisors/zakaria-alkamali.jpg' },
-    { name: 'د. منصور القدسي', title: 'عضو الهيئة الاستشارية', imageUrl: 'assets/advisors/mansour-alqudsi.jpg' },
-    { name: 'أ. وداد البدوي', title: 'عضو الهيئة الاستشارية', imageUrl: 'assets/advisors/wedad-albadawi.jpg' },
-    { name: 'أ. سعيد الصوفي', title: 'عضو الهيئة الاستشارية', imageUrl: 'assets/advisors/saeed-alsoufi.jpg' },
-    { name: 'أ. بسام غبر', title: 'عضو الهيئة الاستشارية', imageUrl: 'assets/advisors/bassam-ghobber.jpg' },
-  ]);
-
-  partners = signal<Partner[]>([
-    { name: 'YoopYupFact', logoUrl: 'assets/logos/partners/yoopyupfact.png' },
-    { name: 'Qarar Foundation', logoUrl: 'assets/logos/partners/qarar.png' },
-    { name: 'Arnyada Foundation', logoUrl: 'assets/logos/partners/arnyada.png' },
-    { name: 'Wahaj Youth Bloc', logoUrl: 'assets/logos/partners/wahaj.png' },
-    { name: 'Alef Center', logoUrl: 'assets/logos/partners/alef.png' },
-  ]);
-
-  objectives = [
-      'إيجاد مساحات نقاش عملية ومهنية للصحفيات والصحفيين.',
-      'توفير حاضنة أعمال صحفية لتحسين جودة حياتهم.',
-      'الدفاع عن حرية الصحافة والسعي لتطوير العمل الصحفي.',
-      'تقديم صحافة مهنية متطورة تخدم الإنسان أولاً وأخيراً.',
-      'الارتقاء بقدرات الصحفيات والصحفيين في مختلف المجالات.',
-      'تفعيل القدرات التقييمية لتطوير المادة الإعلامية.',
-      'خلق آليات شراكة وتشبيك مع الجامعات.',
-      'المساهمة في رصد الانتهاكات ضد الصحفيين.',
-      'ربط المجتمع الصحفي اليمني بنظرائه في الدول العربية والعالم.'
-  ];
-
+  // Data from ContentService
+  team = this.contentService.team;
+  advisors = this.contentService.advisors;
+  partners = this.contentService.partners;
+  aboutContent = this.contentService.aboutContent;
+  
   constructor() {
     afterNextRender(() => {
       this.startAutoSlider();

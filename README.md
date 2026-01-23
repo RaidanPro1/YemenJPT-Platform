@@ -1,4 +1,4 @@
-# 🇾🇪 YemenJPT Digital Platform (V18.1 - Complete Stack Edition)
+# 🇾🇪 YemenJPT Digital Platform (V18.2 - CPU Compatible Edition)
 
 **YemenJPT (Yemen Journalist Pre-trained Transformer)** is a self-hosted, integrated digital ecosystem designed specifically to empower journalists and media organizations in Yemen. The platform enhances press freedom by providing a secure, sovereign environment and a comprehensive suite of tools for Open Source Intelligence (OSINT), information verification, data analysis, and collaborative journalistic work.
 
@@ -31,6 +31,7 @@ The application is built on a modern, containerized architecture designed for se
 -   **Gateway**: **Cloudflare Tunnel** acts as the single, secure entry point. It connects the internal services to the Cloudflare network without exposing any public ports on the server.
 -   **Orchestration**: The entire stack is managed via **Docker Compose**, defining all services, volumes, and networks in a single, declarative file.
 -   **Application**: An **Angular** frontend (`yemenjpt_app`) and a **Node.js** backend (`backend`) provide the main user interface and API layer.
+-   **AI Services**: **Ollama** and **Whisper** run on the server's CPU, providing local AI capabilities. Performance will vary based on the server's CPU resources.
 -   **Databases**: **PostgreSQL** and **MariaDB** serve as robust, persistent data stores for the various platform services.
 -   **Identity**: **Keycloak** acts as a central Identity and Access Management (IAM) provider for Single Sign-On (SSO).
 -   **Internal Proxy & Decoy**: A dedicated **Nginx** container (`internal_proxy`) is the key component of the "Digital Chameleon" panic mode, allowing it to dynamically switch traffic between the real frontend and a harmless decoy site.
@@ -44,7 +45,7 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
 
 ### 3.1. Prerequisites
 
-1.  **Server**: A fresh Ubuntu 24.04 LTS server with root access.
+1.  **Server**: A fresh Ubuntu 24.04 LTS server with root access. A server without a dedicated GPU is sufficient.
 2.  **Domain Name**: A domain you own (e.g., `ph-ye.org`).
 3.  **Cloudflare Account**: A free Cloudflare account managing your domain's DNS. You need to have a Cloudflare Tunnel configured.
 4.  **Git**: `git` command-line tool installed (`sudo apt install git`).
@@ -76,7 +77,7 @@ This guide is for deploying the platform on a fresh **Ubuntu 24.04 LTS** server.
     The script will:
     -   Install Docker and Docker Compose.
     -   Create all necessary data directories under `/opt/presshouse`.
-    -   Copy all configuration files to `/opt/presshouse`.
+    -   Copy all configuration files and the backend source code to `/opt/presshouse`.
     -   Copy the `panic.sh` and `secure.sh` scripts and make them executable.
     -   Launch all services via Docker Compose.
     -   Configure the firewall (UFW) to only allow SSH traffic.
@@ -141,7 +142,7 @@ All operational commands should be run from the main application directory.
 ## 🔍 6. Troubleshooting
 
 -   **Problem: Services are not starting or are in a restart loop.**
-    -   **Solution**: Check the logs (`sudo docker compose -f /opt/presshouse/docker-compose.yml logs -f <service_name>`). Common issues include incorrect passwords in the `.env` file or resource allocation problems.
+    -   **Solution**: Check the logs (`sudo docker compose -f /opt/presshouse/docker-compose.yml logs -f <service_name>`). Common issues include incorrect passwords in the `.env` file or services failing their healthchecks. Wait for the databases to become healthy first.
 -   **Problem: Domains are not accessible.**
     -   **Solution**:
         1.  Verify your domain's nameservers are pointing to Cloudflare.
@@ -149,3 +150,78 @@ All operational commands should be run from the main application directory.
         3.  Check the `cloudflared` service logs for token errors: `sudo docker logs ph-gateway-tunnel`.
 -   **Problem: A specific service is not working (e.g., `chat.your-domain.com`).**
     -   **Solution**: Check the logs for that specific service (e.g., `sudo docker logs ph-mattermost`). The issue is often related to incorrect database credentials defined in the `.env` file.
+---
+
+## 🧠 7. Model Context Protocol (MCP) Implementation
+
+The core of YemenJPT's intelligence is the **Model Context Protocol (MCP)**, a "Chat-to-Action" orchestration layer implemented within the Angular frontend. It enables the AI to understand user requests in natural language and trigger the appropriate specialized tools on the platform.
+
+### 7.1. Architectural Flow
+
+The MCP follows this client-side workflow:
+
+1.  **User Input**: A journalist types a command into the "AI Core" chat interface (e.g., *"Find social media accounts for 'user123' and then archive the results"*).
+
+2.  **Context Assembly (Frontend)**: Before sending the prompt to the AI (Google Gemini), the Angular application dynamically assembles a rich context:
+    *   **System Prompt**: A detailed instruction set is generated, defining the AI's role as an OSINT assistant, its personality, and the rules for tool usage. This can be configured by admins in the LLMOps dashboard.
+    *   **Tool Manifest**: The application filters the master list of 35+ tools based on the current user's role (RBAC). A manifest of allowed tools, including their IDs, names, and descriptions, is generated.
+    *   **Function Definition**: This manifest is converted into a formal `function_declaration` that is sent to the Gemini API. The primary function defined is `run_tool(toolId: string)`.
+
+3.  **AI Deliberation (Gemini)**: The Gemini model receives the user's prompt along with the system prompt and the list of available tools it can "call." It understands that its primary job is not to answer directly but to orchestrate. Based on the user's request, it determines that the `Sherlock` tool is the most appropriate and decides to call `run_tool(toolId: 'sherlock-maigret')`.
+
+4.  **Function Call Response**: Instead of returning a text answer, the Gemini API returns a `functionCall` object in its response, instructing the frontend to execute the specified function with the given arguments.
+
+5.  **Frontend Execution**: The Angular application receives the `functionCall` response.
+    *   It identifies the requested `toolId`.
+    *   It logs the action to the **Audit Log** for security and oversight.
+    *   It uses its internal state management to "run" the tool, which involves opening the `Sherlock` tool's interface as a new tab on the main dashboard. This simulates an asynchronous background task.
+    *   It provides feedback in the chat interface, such as *"Understood. Opening the Sherlock tool..."*.
+
+### 7.2. Code Example: Tool Definition (Angular/TypeScript)
+
+The MCP tool definition is generated dynamically in `src/components/ai-core/ai-core.component.ts`. The following `computed` signal creates the schema that is sent to the Gemini API on every request.
+
+```typescript
+// src/components/ai-core/ai-core.component.ts
+
+import { Tool as GeminiTool, Type } from '@google/genai';
+
+// ...
+
+export class AiCoreComponent {
+  // ... other component code
+
+  // Computed signal to generate tool schema for Gemini
+  geminiTools = computed((): GeminiTool[] | undefined => {
+    // 1. Get a list of tools the current user is allowed to access.
+    const allowedTools = this.getAllToolsForAI();
+    if (!allowedTools.length) return undefined;
+
+    // 2. Define the 'run_tool' function the AI can call.
+    return [{
+        functionDeclarations: [
+            {
+                name: 'run_tool',
+                description: 'Runs a specialized tool available on the YemenJPT platform. Use this to open tools for analysis, investigation, or other tasks when requested by the user.',
+                parameters: {
+                    type: Type.OBJECT,
+                    properties: {
+                        toolId: {
+                            type: Type.STRING,
+                            description: 'The unique ID of the tool to run.',
+                            // 3. Dynamically populate the list of allowed tool IDs.
+                            enum: allowedTools.map(t => t.id)
+                        }
+                    },
+                    required: ['toolId'],
+                },
+            },
+        ],
+    }];
+  });
+
+  // ... rest of component
+}
+```
+
+This implementation creates a powerful, context-aware, and secure orchestration system directly within the client, fulfilling the core vision of the YemenJPT platform.

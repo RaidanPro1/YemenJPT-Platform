@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================
-# 🇾🇪 YemenJPT & Press House Ecosystem (V18.1 - Complete Stack Edition)
+# 🇾🇪 YemenJPT & Press House Ecosystem (V18.2 - CPU Compatible Edition)
 # ============================================================
 
 set -e # Exit immediately if a command exits with a non-zero status.
@@ -17,7 +17,7 @@ REPO_DIR=$(cd "$(dirname "$0")" && pwd)
 BASE_DIR="/opt/presshouse"
 
 print_header() {
-    echo -e "${GREEN}>>> Initializing YemenJPT Platform Automated Installation (V18.1)...${NC}"
+    echo -e "${GREEN}>>> Initializing YemenJPT Platform Automated Installation (V18.2)...${NC}"
     echo ""
 }
 
@@ -29,7 +29,7 @@ check_root() {
 }
 
 check_env() {
-    echo -e "${BLUE}⚙️ [1/7] Verifying environment configuration...${NC}"
+    echo -e "${BLUE}⚙️ [1/6] Verifying environment configuration...${NC}"
     if [ ! -f "${REPO_DIR}/.env" ]; then
         echo -e "${RED}❌ CRITICAL: .env file not found. Please copy .env.example to .env and fill in your details.${NC}"
         exit 1
@@ -37,7 +37,7 @@ check_env() {
 
     export $(cat "${REPO_DIR}/.env" | sed 's/#.*//g' | xargs)
 
-    local required_vars=(DOMAIN CLOUDFLARE_TUNNEL_TOKEN UNIFIED_PASS)
+    local required_vars=(DOMAIN UNIFIED_PASS)
     for var in "${required_vars[@]}"; do
         if [ -z "${!var}" ]; then
             echo -e "${RED}❌ CRITICAL: Required variable '$var' is not set in the .env file. Installation aborted.${NC}"
@@ -48,10 +48,10 @@ check_env() {
 }
 
 prepare_system() {
-    echo -e "${BLUE}🛠️ [2/7] Preparing server and installing dependencies...${NC}"
+    echo -e "${BLUE}🛠️ [2/6] Preparing server and installing dependencies...${NC}"
     export DEBIAN_FRONTEND=noninteractive
     apt-get update > /dev/null
-    apt-get install -y curl git docker-ce docker-ce-cli containerd.io docker-compose-plugin ufw > /dev/null || {
+    apt-get install -y curl git docker-ce docker-ce-cli containerd.io docker-compose-plugin > /dev/null || {
         echo "   -> Dependency installation failed, trying with Docker's official script..."
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh get-docker.sh
@@ -62,7 +62,7 @@ prepare_system() {
 }
 
 create_directories() {
-    echo -e "${BLUE}📂 [3/7] Creating persistent data directories...${NC}"
+    echo -e "${BLUE}📂 [3/6] Creating persistent data directories...${NC}"
     mkdir -p "${BASE_DIR}/data/postgres"
     mkdir -p "${BASE_DIR}/data/mariadb"
     mkdir -p "${BASE_DIR}/data/ollama"
@@ -82,22 +82,19 @@ create_directories() {
     mkdir -p "${BASE_DIR}/data/vaultwarden"
     mkdir -p "${BASE_DIR}/data/n8n"
     mkdir -p "${BASE_DIR}/data/gitea"
-    mkdir -p "${BASE_DIR}/cloudflare"
     mkdir -p "${BASE_DIR}/internal_proxy"
     mkdir -p "${BASE_DIR}/frontend/dist"
     mkdir -p "${BASE_DIR}/decoy"
+    mkdir -p "${BASE_DIR}/backend"
     echo "   ✅ All data directories created in ${BASE_DIR}."
 }
 
 generate_configs() {
-    echo -e "${BLUE}📝 [4/7] Generating dynamic configurations...${NC}"
+    echo -e "${BLUE}📝 [4/6] Generating dynamic configurations...${NC}"
 
     # Copy primary docker-compose and .env
     cp "${REPO_DIR}/docker-compose.yml" "${BASE_DIR}/docker-compose.yml"
     cp "${REPO_DIR}/.env" "${BASE_DIR}/.env"
-
-    # Copy Cloudflare and Nginx proxy configs
-    cp "${REPO_DIR}/cloudflare/config.yml" "${BASE_DIR}/cloudflare/config.yml"
     
     # Copy Dashy dashboard configurations
     cp "${REPO_DIR}/dashy-admin.yml" "${BASE_DIR}/dashy-admin.yml"
@@ -108,6 +105,9 @@ generate_configs() {
     cp "${REPO_DIR}/panic.sh" "${BASE_DIR}/panic.sh"
     cp "${REPO_DIR}/secure.sh" "${BASE_DIR}/secure.sh"
     chmod +x "${BASE_DIR}/panic.sh" "${BASE_DIR}/secure.sh"
+
+    # Copy backend source code for building
+    cp -r "${REPO_DIR}/backend/." "${BASE_DIR}/backend/"
     
     # Create default Nginx config for the internal proxy
     cat > "${BASE_DIR}/internal_proxy/nginx.conf" << EOL
@@ -115,6 +115,14 @@ events {}
 http {
     server {
         listen 80;
+
+        # --- Security Headers ---
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://i.pravatar.cc https://picsum.photos https://www.svgrepo.com; connect-src 'self' https://generativelanguage.googleapis.com;" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+
         location / {
             proxy_pass http://yemenjpt_app:80;
             proxy_set_header Host \$host;
@@ -127,6 +135,8 @@ http {
             proxy_pass http://backend:3000/;
             proxy_set_header Host \$host;
             proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
         }
     }
 }
@@ -157,7 +167,7 @@ EOL
 }
 
 launch_services() {
-    echo -e "${BLUE}🚀 [5/7] Launching all platform services via Docker Compose...${NC}"
+    echo -e "${BLUE}🚀 [5/6] Launching all platform services via Docker Compose...${NC}"
     echo "   (This may take several minutes on the first run as images are downloaded)"
     
     cd "${BASE_DIR}"
@@ -165,42 +175,35 @@ launch_services() {
     echo "   ✅ Services are starting in the background."
 }
 
-configure_firewall() {
-    echo -e "${BLUE}🛡️ [6/7] Activating security firewall (UFW)...${NC}"
-    ufw allow 22/tcp > /dev/null # Allow only SSH
-    ufw --force enable > /dev/null
-    echo "   ✅ Firewall configured to ALLOW port 22/tcp and DENY all other incoming traffic."
-}
-
 print_summary() {
     echo -e "${GREEN}======================================================================="
-    echo -e "✅ YemenJPT Platform Installation Completed Successfully!"
+    echo -e "✅ YemenJPT Platform Installation for localhost Completed!"
     echo -e "=======================================================================${NC}"
-    echo "All services are running securely behind a Cloudflare Tunnel."
-    echo "No ports are open on this server except for SSH."
+    echo "All services are running and exposed on localhost ports."
     echo ""
-    echo "--- User-Facing Portals ---"
-    echo "🔗 Main App:           https://ai.${DOMAIN}"
-    echo "🔗 Journalist Portal:  https://portal.${DOMAIN}"
-    echo "🔗 Admin Portal:       https://sys.${DOMAIN}"
-    echo "🔗 Verifier Portal:    https://verifier.${DOMAIN}"
+    echo "--- Main Application ---"
+    echo "🔗 Main App:           http://localhost:8080"
     echo ""
     echo "--- Core Services ---"
-    echo "🔗 AI Interface:       https://ai-ui.${DOMAIN}"
-    echo "🔗 Team Chat:          https://chat.${DOMAIN}"
-    echo "🔗 Secure Files:       https://files.${DOMAIN}"
-    echo "🔗 Identity Provider:  https://auth.${DOMAIN}"
-    echo "🔗 Public CMS:         https://cms.${DOMAIN}"
+    echo "🔗 AI Interface:       http://localhost:8081 (Open WebUI)"
+    echo "🔗 Team Chat:          http://localhost:8065 (Mattermost)"
+    echo "🔗 Secure Files:       http://localhost:8082 (Nextcloud)"
+    echo "🔗 Secure Search:      http://localhost:8888 (SearXNG)"
+    echo "🔗 Identity Provider:  http://localhost:8180 (Keycloak)"
+    echo "🔗 Public CMS:         http://localhost:8084 (TYPO3)"
+    echo "🔗 CRM:                http://localhost:8085 (CiviCRM)"
     echo ""
     echo "--- Admin & Management ---"
-    echo "🔗 Container Manager:  https://portainer.${DOMAIN}"
-    echo "🔗 System Monitoring:  https://glances.${DOMAIN}"
-    echo "🔗 Service Status:     https://status.${DOMAIN}"
+    echo "🔗 Container Manager:  http://localhost:9000 (Portainer)"
+    echo "🔗 System Monitoring:  http://localhost:61208 (Glances)"
+    echo "🔗 Service Status:     http://localhost:3001 (Uptime Kuma)"
+    echo "🔗 Code Repository:    http://localhost:3002 (Gitea)"
+    echo "🔗 AI Feedback:        http://localhost:3006 (Langfuse)"
+    echo "🔗 Automation:         http://localhost:5678 (n8n)"
     echo ""
     echo -e "${GREEN}-----------------------------------------------------------------------"
-    echo "💡 To see live logs, run: 'cd ${BASE_DIR} && docker compose logs -f'"
-    echo "💡 To stop all services, run: 'cd ${BASE_DIR} && docker compose down'"
-    echo "💡 To activate panic mode, run: '${BASE_DIR}/panic.sh'"
+    echo "💡 To see live logs, run: 'cd ${BASE_DIR} && sudo docker compose logs -f'"
+    echo "💡 To stop all services, run: 'cd ${BASE_DIR} && sudo docker compose down'"
     echo "=======================================================================${NC}"
 }
 
@@ -213,7 +216,6 @@ main() {
     create_directories
     generate_configs
     launch_services
-    configure_firewall
     print_summary
 }
 

@@ -38,55 +38,18 @@
   <section id="projects-grid" class="py-16 md:py-24">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-        
-        <!-- Project Card 1 -->
-        <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden flex flex-col">
-          <img src="assets/images/projects/yemenjpt.jpg" alt="Project image" class="w-full h-56 object-cover">
-          <div class="p-6 flex flex-col flex-grow">
-            <h3 class="font-bold text-xl text-ph-blue mb-3">منصة YemenJPT</h3>
-            <p class="text-gray-600 flex-grow mb-4">
-              بيئة عمل رقمية سيادية ومؤمنة، مصممة خصيصاً لتمكين الصحافة الاستقصائية في اليمن. أدوات للتقصي، التحقق، والتحليل في مكان واحد.
-            </p>
-            <a href="javascript:void(0)" class="mt-auto font-semibold text-ph-blue hover:underline">اعرف المزيد</a>
+        @for(project of projects(); track project.id) {
+          <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden flex flex-col group">
+            <img [src]="project.imageUrl" alt="{{project.title}}" class="w-full h-56 object-cover">
+            <div class="p-6 flex flex-col flex-grow">
+              <h3 class="font-bold text-xl text-ph-blue mb-3 group-hover:underline">{{project.title}}</h3>
+              <p class="text-gray-600 flex-grow mb-4 line-clamp-4">{{project.description}}</p>
+              <a href="javascript:void(0)" class="mt-auto font-semibold text-ph-blue hover:underline">اعرف المزيد</a>
+            </div>
           </div>
-        </div>
-
-        <!-- Project Card 2 -->
-        <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden flex flex-col">
-          <img src="assets/images/projects/training.jpg" alt="Project image" class="w-full h-56 object-cover">
-          <div class="p-6 flex flex-col flex-grow">
-            <h3 class="font-bold text-xl text-ph-blue mb-3">برامج التدريب والتطوير</h3>
-            <p class="text-gray-600 flex-grow mb-4">
-              دورات تدريبية متخصصة في الصحافة الاستقصائية، صحافة البيانات، الأمان الرقمي، وأخلاقيات المهنة لرفع كفاءة الصحفيين اليمنيين.
-            </p>
-            <a href="javascript:void(0)" class="mt-auto font-semibold text-ph-blue hover:underline">اعرف المزيد</a>
-          </div>
-        </div>
-
-        <!-- Project Card 3 -->
-        <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden flex flex-col">
-          <img src="assets/images/projects/legal-support.jpg" alt="Project image" class="w-full h-56 object-cover">
-          <div class="p-6 flex flex-col flex-grow">
-            <h3 class="font-bold text-xl text-ph-blue mb-3">وحدة دعم الصحفيين</h3>
-            <p class="text-gray-600 flex-grow mb-4">
-              تقديم المشورة والدعم القانوني والتقني للصحفيين الذين يواجهون تهديدات أو ملاحقات بسبب عملهم، بالتعاون مع شبكة من الخبراء.
-            </p>
-            <a href="javascript:void(0)" class="mt-auto font-semibold text-ph-blue hover:underline">اعرف المزيد</a>
-          </div>
-        </div>
-        
-         <!-- Project Card 4 -->
-        <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden flex flex-col">
-          <img src="assets/images/projects/observatory.jpg" alt="Project image" class="w-full h-56 object-cover">
-          <div class="p-6 flex flex-col flex-grow">
-            <h3 class="font-bold text-xl text-ph-blue mb-3">مرصد الانتهاكات الصحفية</h3>
-            <p class="text-gray-600 flex-grow mb-4">
-              رصد وتوثيق الانتهاكات ضد الصحفيين والمؤسسات الإعلامية، وإصدار تقارير دورية لرفع الوعي وحشد الدعم.
-            </p>
-            <a href="javascript:void(0)" class="mt-auto font-semibold text-ph-blue hover:underline">اعرف المزيد</a>
-          </div>
-        </div>
-
+        } @empty {
+           <p class="text-gray-500 text-center md:col-span-2 lg:col-span-3">لا توجد مشاريع متاحة حالياً.</p>
+        }
       </div>
     </div>
   </section>

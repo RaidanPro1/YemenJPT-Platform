@@ -9,6 +9,7 @@ import { Content, GenerateContentResponse, Tool as GeminiTool, Type } from '@goo
 import { TranslationService } from '../../services/translation.service';
 import { ToolStateService } from '../../services/tool-state.service';
 import { ToolService } from '../../services/tool.service';
+import { LoggerService } from '../../services/logger.service';
 
 interface Message {
   id: number;
@@ -16,6 +17,12 @@ interface Message {
   from: 'user' | 'ai';
   translatedText?: string;
   isTranslating?: boolean;
+}
+
+interface SystemInstruction {
+  id: string;
+  name: string;
+  instruction: string;
 }
 
 type AiCoreTab = 'assistant' | 'transcription' | 'imageAnalysis' | 'quickSummary';
@@ -38,6 +45,7 @@ export class AiCoreComponent {
   private translationService = inject(TranslationService);
   private toolStateService = inject(ToolStateService);
   private toolService = inject(ToolService);
+  private logger = inject(LoggerService);
   
   user = this.userService.currentUser;
 
@@ -80,30 +88,40 @@ export class AiCoreComponent {
   enableDiarization = signal(false); // Speaker separation
   transcriptionStatusText = signal('');
 
-  // Computed signal to generate tool schema for Gemini
-  geminiTools = computed((): GeminiTool[] | undefined => {
-    const user = this.user();
-    if (!user || this.currentAiProvider() === 'local') return undefined;
+  // System Instructions
+  systemInstructions: SystemInstruction[] = [
+    { id: 'neutral', name: 'مساعد محايد', instruction: 'You are a helpful and neutral assistant for journalists.' },
+    { id: 'investigative', name: 'تركيز استقصائي', instruction: 'You are an investigative assistant. Be critical, ask clarifying questions, focus on evidence and potential leads, and suggest next steps for the investigation.' },
+    { id: 'data', name: 'محلل بيانات', instruction: 'You are a data analyst assistant. Focus on finding patterns, interpreting data, and suggesting visualizations. Be precise and factual.' },
+  ];
+  selectedInstructionId = signal<string>('neutral');
 
-    const allowedTools = this.toolService.tools().filter(tool => {
-        if (!tool.isActive || tool.id === 'ai-assistant') return false; // Don't offer inactive tools or the assistant itself
+  private getAllToolsForAI = computed(() => {
+    const user = this.user();
+    if (!user) return [];
+    return this.toolService.tools().filter(tool => {
+        if (!tool.isActive || tool.id === 'ai-assistant') return false;
         if (user.role === 'super-admin') return true;
         return tool.allowedRoles.includes(user.role);
     });
+  });
 
-    if (allowedTools.length === 0) return undefined;
+  // Computed signal to generate tool schema for Gemini
+  geminiTools = computed((): GeminiTool[] | undefined => {
+    const allowedTools = this.getAllToolsForAI();
+    if (!allowedTools.length || this.currentAiProvider() === 'local') return undefined;
 
     return [{
         functionDeclarations: [
             {
                 name: 'run_tool',
-                description: 'Runs a specific tool available on the YemenJPT platform. Use this to open tools for analysis, investigation, or other tasks when the user asks for it.',
+                description: 'تشغيل أداة متخصصة متاحة على منصة YemenJPT. استخدم هذه الوظيفة لفتح الأدوات للتحليل أو التحقيق أو مهام أخرى عندما يطلبها المستخدم.',
                 parameters: {
                     type: Type.OBJECT,
                     properties: {
                         toolId: {
                             type: Type.STRING,
-                            description: 'The unique ID of the tool to run.',
+                            description: 'المعرف الفريد للأداة المراد تشغيلها.',
                             enum: allowedTools.map(t => t.id)
                         }
                     },
@@ -112,6 +130,28 @@ export class AiCoreComponent {
             },
         ],
     }];
+  });
+
+  private systemInstruction = computed(() => {
+    if (this.currentAiProvider() === 'local') return undefined;
+
+    const selectedPersonality = this.systemInstructions.find(i => i.id === this.selectedInstructionId())?.instruction 
+                                || 'You are a helpful and neutral assistant for journalists.';
+
+    const toolsList = this.getAllToolsForAI().map(t => `- ${t.name} (id: ${t.id}): ${t.description}`).join('\n');
+    
+    return `${selectedPersonality} You are also an expert OSINT assistant named YemenJPT, integrated within a larger platform.
+Your primary function is to help journalists by running tools. When a user's request directly matches a tool's capability, you MUST call the 'run_tool' function with the appropriate toolId. Do not answer the question yourself if a tool can do it. Be direct and concise.
+
+Here are the available tools:
+${toolsList}
+
+Example:
+User: "أريد البحث عن حسابات المستخدم 'testuser' على وسائل التواصل الاجتماعي"
+You MUST call: run_tool(toolId='sherlock-maigret')
+
+User: "أريد حفظ نسخة من هذا الرابط"
+You MUST call: run_tool(toolId='archivebox')`;
   });
   
   constructor() {
@@ -154,7 +194,7 @@ export class AiCoreComponent {
     }));
 
     try {
-      const response = await this.geminiService.getChatResponse(history, userMessageText, this.geminiTools());
+      const response = await this.geminiService.getChatResponse(history, userMessageText, this.geminiTools(), this.systemInstruction());
       let hasContent = false;
 
       // Handle function calls by checking the response parts
@@ -165,12 +205,17 @@ export class AiCoreComponent {
           const call = part.functionCall;
           if (call && call.name === 'run_tool') {
             const { toolId } = call.args;
-            // FIX: Add type guard to ensure toolId is a string before using it.
             if (typeof toolId === 'string') {
               const toolToRun = this.toolService.tools().find(t => t.id === toolId);
               
               if (toolToRun) {
                 this.toolStateService.runTool(toolId);
+                this.logger.logEvent(
+                  'AI Tool Execution',
+                  `AI triggered tool: ${toolToRun.name} (ID: ${toolId}) in response to prompt: "${userMessageText}"`,
+                  this.user()?.name ?? 'Unknown',
+                  this.user()?.role === 'super-admin'
+                );
                 const toolRunMessage: Message = { 
                   id: Date.now(), 
                   text: `جاري فتح أداة: ${toolToRun.name}...`, 

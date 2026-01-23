@@ -1,137 +1,62 @@
-<div class="space-y-12 animate-fade-in">
+<div class="space-y-8 animate-fade-in">
   <header>
     <h1 class="text-3xl font-bold text-gray-900">التحكم الإداري</h1>
     <p class="text-gray-500 mt-1">إدارة شاملة لمنصة YemenJPT، من هنا يمكنك التحكم في الأدوات، المستخدمين، وحالة النظام.</p>
   </header>
 
-  <!-- Section 1: System & Infrastructure -->
-  <section>
-    <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">النظام والبنية التحتية</h2>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-        <h3 class="text-xl font-bold mb-4">المراقبة اللحظية للنظام</h3>
-        <app-system-stats></app-system-stats>
-      </div>
-      <div class="bg-base-100 p-6 rounded-xl shadow">
-        <h3 class="text-xl font-bold mb-4">إعدادات الأمان</h3>
-        <app-security-management></app-security-management>
-      </div>
+  <!-- Tabs -->
+  <div class="border-b border-gray-200">
+    <nav class="-mb-px flex space-i-6" aria-label="Tabs">
+      <button (click)="activeTab.set('general')" [class]="activeTab() === 'general' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">عام</button>
+      <button (click)="activeTab.set('users')" [class]="activeTab() === 'users' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">المستخدمون</button>
+      <button (click)="activeTab.set('tools')" [class]="activeTab() === 'tools' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">الأدوات</button>
       @if (isRoot()) {
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-          <h3 class="text-xl font-bold mb-4">مفاتيح API</h3>
-          <app-api-key-management></app-api-key-management>
-        </div>
-        <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-          <h3 class="text-xl font-bold mb-4">تسجيل الدخول الاجتماعي (OAuth)</h3>
-          <p class="text-gray-500 text-sm mb-4">إدارة مفاتيح API الخاصة بخدمات تسجيل الدخول الاجتماعي. يتم تخزين هذه البيانات بشكل آمن في ملف .env على الخادم.</p>
-          <form (submit)="$event.preventDefault(); saveSocialLogins()">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between p-3 border rounded-lg">
-                <h4 class="font-semibold flex items-center gap-2"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Google</h4>
-                <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [(ngModel)]="socialLogins().google.active" name="google-active" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>
-              </div>
-              <div class="flex items-center justify-between p-3 border rounded-lg">
-                <h4 class="font-semibold flex items-center gap-2"><img src="https://www.svgrepo.com/show/513008/twitter-154.svg" class="w-5 h-5" alt="X"> X (Twitter)</h4>
-                <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [(ngModel)]="socialLogins().x.active" name="x-active" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>
-              </div>
-              <div class="flex items-center justify-between p-3 border rounded-lg">
-                <h4 class="font-semibold flex items-center gap-2"><img src="https://www.svgrepo.com/show/448224/facebook.svg" class="w-5 h-5" alt="Facebook"> Facebook</h4>
-                <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [(ngModel)]="socialLogins().facebook.active" name="fb-active" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>
-              </div>
-              <div class="flex justify-end">
-                <button type="submit" class="px-5 py-2 font-semibold text-white bg-ph-blue rounded-lg hover:bg-ph-blue-dark">حفظ الإعدادات</button>
-              </div>
-            </div>
-          </form>
-        </div>
+        <button (click)="activeTab.set('ai')" [class]="activeTab() === 'ai' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة الذكاء الاصطناعي</button>
+        <button (click)="activeTab.set('email')" [class]="activeTab() === 'email' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة البريد</button>
+        <button (click)="activeTab.set('logs')" [class]="activeTab() === 'logs' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">سجل التدقيق</button>
       }
-    </div>
-  </section>
+    </nav>
+  </div>
 
-  <!-- Section 2: AI Core -->
-  <section>
-     <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">النواة المعرفية (AI Core)</h2>
-     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-          <app-ai-feedback-management></app-ai-feedback-management>
-        </div>
-        <div class="bg-base-100 p-6 rounded-xl shadow space-y-6">
-            <div>
-              <h3 class="text-xl font-bold text-gray-900">مزود الذكاء الاصطناعي العام</h3>
-              <p class="text-gray-500 mt-1 text-sm">اختر المصدر الذي ستعتمد عليه جميع أدوات الذكاء الاصطناعي في المنصة.</p>
-              <fieldset class="mt-4">
-                <div class="flex gap-4">
-                  <label for="ai-google" class="flex-1 relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none" [class.border-ph-blue]="settingsService.aiProvider() === 'google'"><input type="radio" name="ai-provider" id="ai-google" value="google" [checked]="settingsService.aiProvider() === 'google'" (change)="settingsService.aiProvider.set('google')" class="sr-only"><span class="block text-sm font-medium text-gray-900">Google Gemini</span></label>
-                  <label for="ai-local" class="flex-1 relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none" [class.border-ph-blue]="settingsService.aiProvider() === 'local'"><input type="radio" name="ai-provider" id="ai-local" value="local" [checked]="settingsService.aiProvider() === 'local'" (change)="settingsService.aiProvider.set('local')" class="sr-only"><span class="block text-sm font-medium text-gray-900">Local AI (Ollama)</span></label>
-                </div>
-              </fieldset>
-            </div>
-             <div>
-              <h3 class="text-xl font-bold text-gray-900">التحكم في ميزات المنصة</h3>
-              <p class="text-gray-500 mt-1 text-sm">تفعيل أو تعطيل الميزات للمستخدمين (دور الصحفي).</p>
-               <div class="space-y-3 p-4 mt-4 border rounded-lg bg-base-200/50">
-                  <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">المساعد الذكي (Chatbot)</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isChatbotEnabled()" (change)="settingsService.isChatbotEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
-                  <hr>
-                  <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">تحليل الصور</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isImageAnalysisEnabled()" (change)="settingsService.isImageAnalysisEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
-                  <hr>
-                  <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">تصدير البيانات</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isDataExportEnabled()" (change)="settingsService.isDataExportEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
-               </div>
-            </div>
-        </div>
-         @if(isRoot()) {
+  <!-- Tab Content -->
+  <div class="pt-4">
+    @switch (activeTab()) {
+      @case ('general') {
+        <section>
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">النظام والبنية التحتية</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-               <h3 class="text-xl font-bold text-gray-900 mb-4">تدريب وتطوير نماذج AI</h3>
-                <button (click)="startFineTuning()" class="px-4 py-2 text-white bg-ph-blue rounded-lg hover:bg-ph-blue-dark disabled:bg-gray-400" [disabled]="trainingStatus() !== 'idle'">
-                  @if (trainingStatus() === 'idle') { <span>بدء عملية تدريب جديدة</span> } @else { <span>التدريب قيد التنفيذ...</span> }
-                </button>
-                 @if (trainingLogs().length > 0) {
-                  <div class="mt-4 p-3 bg-base-200 rounded-lg">
-                    <h4 class="font-semibold mb-2 text-sm">سجل التدريب:</h4>
-                    <div class="max-h-32 overflow-y-auto bg-gray-900 text-white font-mono text-xs rounded p-3 space-y-1">
-                      @for(log of trainingLogs(); track log) { <p>{{ log }}</p> }
-                    </div>
-                  </div>
-                }
+              <h3 class="text-xl font-bold mb-4">المراقبة اللحظية للنظام</h3>
+              <app-system-stats></app-system-stats>
             </div>
-         }
-     </div>
-  </section>
-
-  <!-- Section 3: Content & Features -->
-  <section>
-    <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">المحتوى والميزات</h2>
-    <div class="bg-base-100 p-6 rounded-xl shadow mb-8">
-      <app-tool-management></app-tool-management>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-           <app-content-management></app-content-management>
-        </div>
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-           <app-seo-management></app-seo-management>
-        </div>
-        @if(isRoot()){
-          <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-              <app-theme-management></app-theme-management>
+            <div class="bg-base-100 p-6 rounded-xl shadow">
+              <h3 class="text-xl font-bold mb-4">إعدادات الأمان</h3>
+              <app-security-management></app-security-management>
+            </div>
+            @if (isRoot()) {
+              <div class="bg-base-100 p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4">مفاتيح API</h3>
+                <app-api-key-management></app-api-key-management>
+              </div>
+            }
           </div>
-          <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-              <app-newsletter-management></app-newsletter-management>
-          </div>
-        }
-    </div>
-  </section>
-  
-  <!-- Section 4: Automation & Development -->
-  <section>
-      <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">الأتمتة والتطوير</h2>
-       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-           <app-automation></app-automation>
-        </div>
-        <div class="bg-base-100 p-6 rounded-xl shadow">
-            <app-social-bot-management></app-social-bot-management>
-        </div>
-    </div>
-  </section>
-
+        </section>
+      }
+      @case ('users') {
+        <app-user-management (navigate)="$event"></app-user-management>
+      }
+      @case ('tools') {
+        <app-tool-management></app-tool-management>
+      }
+      @case ('ai') {
+        <app-ai-management></app-ai-management>
+      }
+       @case ('email') {
+        <app-email-management></app-email-management>
+      }
+      @case ('logs') {
+        <app-audit-log></app-audit-log>
+      }
+    }
+  </div>
 </div>

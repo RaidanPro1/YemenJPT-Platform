@@ -1,13 +1,6 @@
-import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, afterNextRender } from '@angular/core';
+import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, afterNextRender, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface Slide {
-  imageUrl: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  actionText: string;
-}
+import { ContentService } from '../../services/content.service';
 
 @Component({
   selector: 'app-news-public',
@@ -18,30 +11,21 @@ interface Slide {
 })
 export class NewsPublicComponent implements OnDestroy {
   login = output<void>();
+  private contentService = inject(ContentService);
+  
+  news = this.contentService.news;
 
-  slides = signal<Slide[]>([
-    {
-      imageUrl: 'assets/images/news/investigation.jpg',
-      category: 'تحقيق استقصائي',
-      title: 'تحقيق: شبكات التهريب عبر السواحل وأثرها على الاقتصاد المحلي',
-      subtitle: 'يكشف هذا التحقيق الذي استمر ستة أشهر عن شبكات معقدة لتهريب الأسلحة والوقود عبر السواحل اليمنية...',
+  // Use the latest news articles for the slider
+  slides = computed(() => 
+    this.news().slice(0, 3).map(article => ({
+      imageUrl: article.imageUrl,
+      category: article.category,
+      title: article.title,
+      subtitle: article.summary,
       actionText: 'اقرأ المزيد',
-    },
-    {
-      imageUrl: 'assets/images/news/education.jpg',
-      category: 'تقرير',
-      title: 'تأثير انقطاع الإنترنت على قطاع التعليم في اليمن',
-      subtitle: 'تقرير يسلط الضوء على التحديات التي يواجهها الطلاب والمعلمون بسبب ضعف البنية التحتية للاتصالات.',
-      actionText: 'اقرأ المزيد',
-    },
-    {
-      imageUrl: 'assets/images/news/training.jpg',
-      category: 'خبر',
-      title: 'بيت الصحافة يختتم دورة تدريبية حول الأمان الرقمي للصحفيين',
-      subtitle: 'شارك في الدورة 20 صحفياً وصحفية من مختلف المحافظات اليمنية لتعزيز مهاراتهم في حماية أنفسهم رقمياً.',
-      actionText: 'اقرأ المزيد',
-    },
-  ]);
+    }))
+  );
+
   currentSlide = signal(0);
   private intervalId: any;
 

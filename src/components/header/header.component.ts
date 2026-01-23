@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, output, input, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, output, input, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchService } from '../../services/search.service';
 import { User, UserRole, getRoleDisplayName } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
+import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 
 interface PortalLink {
   key: string;
@@ -23,7 +24,7 @@ interface PublicNavLink {
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
   searchService = inject(SearchService);
   notificationService = inject(NotificationService);
   
@@ -38,6 +39,9 @@ export class HeaderComponent {
   isDropdownOpen = signal(false);
   isNotificationDropdownOpen = signal(false);
   isPortalDropdownOpen = signal(false);
+
+  private searchSubject = new Subject<string>();
+  private searchSubscription: Subscription;
   
   portalLinks: PortalLink[] = [
     { key: 'project-management', name: 'إدارة المشاريع', icon: 'briefcase', allowedRoles: ['editor-in-chief', 'super-admin'] },
@@ -49,6 +53,7 @@ export class HeaderComponent {
   publicNavLinks: PublicNavLink[] = [
     { key: 'home', name: 'الرئيسية' },
     { key: 'about', name: 'من نحن' },
+    { key: 'platform-overview', name: 'عن المنصة' },
     { key: 'news-public', name: 'الأخبار' },
     { key: 'projects-public', name: 'المشاريع' },
     { key: 'violations-observatory-public', name: 'مرصد الانتهاكات' },
@@ -59,6 +64,21 @@ export class HeaderComponent {
   // Use the centralized role display name function
   getRoleDisplayName = getRoleDisplayName;
 
+  constructor() {
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // wait 300ms after the last keystroke before emitting
+      distinctUntilChanged() // only emit if the value has changed
+    ).subscribe(searchTerm => {
+      this.searchService.searchTerm.set(searchTerm);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
   isRoleSufficient(allowedRoles: UserRole[]): boolean {
     const currentRole = this.user()?.role;
     if (!currentRole) return false;
@@ -67,7 +87,7 @@ export class HeaderComponent {
 
   handleSearch(event: Event) {
     const inputElement = event.target as HTMLInputElement;
-    this.searchService.searchTerm.set(inputElement.value);
+    this.searchSubject.next(inputElement.value);
   }
 
   onToggleSidebar() {

@@ -1,25 +1,17 @@
 # ======================================================================
-# 🇾🇪 YemenJPT & Press House Ecosystem - Docker Compose File (V18.1 - Complete Stack Edition)
+# 🇾🇪 YemenJPT & Press House Ecosystem - Docker Compose File (V18.2 - CPU Compatible Edition)
 # ======================================================================
 # هذا الملف يطبق استراتيجية "العقل الرقمي" مع قاعدة بيانات متجهات،
 # حلقة تعلم نشط، والتحكم الكامل للمستخدم الروت.
-# يتضمن هذا الإصدار جميع الخدمات المرجعية في لوحات المعلومات.
+# يتضمن هذا الإصدار جميع الخدمات المرجعية في لوحات المعلومات وهو متوافق مع الخوادم التي لا تحتوي على GPU.
 # ======================================================================
 
 version: '3.8'
 
 services:
   # ----------------------------------------------------------------------
-  # 1. GATEWAY & CORE INFRASTRUCTURE
+  # 1. CORE INFRASTRUCTURE
   # ----------------------------------------------------------------------
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: ph-gateway-tunnel
-    restart: always
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-
   postgres:
     image: postgres:15-alpine
     container_name: ph-postgres
@@ -30,15 +22,26 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - "./data/postgres:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mariadb:
     image: mariadb:10.11
     container_name: ph-mariadb
     restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     volumes:
       - "./data/mariadb:/var/lib/mysql"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-p${MARIADB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ----------------------------------------------------------------------
   # 2. SYSTEM MANAGEMENT & MONITORING
@@ -47,6 +50,8 @@ services:
     image: portainer/portainer-ce:latest
     container_name: ph-portainer
     restart: always
+    ports:
+      - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/portainer:/data
@@ -55,6 +60,8 @@ services:
     image: nicolargo/glances:latest-full
     container_name: ph-glances
     restart: always
+    ports:
+      - "61208:61208"
     pid: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -63,6 +70,8 @@ services:
     image: louislam/uptime-kuma:1
     container_name: ph-uptime-kuma
     restart: always
+    ports:
+      - "3001:3001"
     volumes:
       - ./data/uptime-kuma:/app/data
 
@@ -73,6 +82,8 @@ services:
     image: quay.io/keycloak/keycloak:latest
     container_name: ph-keycloak
     restart: always
+    ports:
+      - "8180:8080"
     command: start-dev
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER}
@@ -82,12 +93,16 @@ services:
       - KC_DB_URL_DATABASE=keycloak_db
       - KC_DB_USERNAME=${POSTGRES_USER}
       - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
-    depends_on: [postgres]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: ph-vaultwarden
     restart: always
+    ports:
+      - "8070:80"
     volumes:
       - ./data/vaultwarden:/data
 
@@ -95,6 +110,8 @@ services:
     image: n8nio/n8n:latest
     container_name: ph-n8n
     restart: always
+    ports:
+      - "5678:5678"
     volumes:
       - ./data/n8n:/home/node/.n8n
 
@@ -102,6 +119,8 @@ services:
     image: gitea/gitea:latest
     container_name: ph-gitea
     restart: always
+    ports:
+      - "3002:3000"
     environment:
       - USER_UID=1000
       - USER_GID=1000
@@ -112,24 +131,34 @@ services:
       - GITEA__database__PASSWD=${POSTGRES_PASSWORD}
     volumes:
       - ./data/gitea:/data
-    depends_on: [postgres]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # ----------------------------------------------------------------------
-  # 4. THE DIGITAL MIND - AI STACK
+  # 4. THE DIGITAL MIND - AI STACK (CPU MODE)
   # ----------------------------------------------------------------------
   ollama:
     image: ollama/ollama
     container_name: ph-ollama-engine
     restart: always
-    deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
     volumes:
       - "./data/ollama:/root/.ollama"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: ph-yemenjpt-ui
     restart: always
-    depends_on: [ollama]
+    ports:
+      - "8081:8080"
+    depends_on:
+      ollama:
+        condition: service_healthy
     environment:
       - 'OLLAMA_BASE_URL=http://ollama:11434'
     volumes:
@@ -139,6 +168,9 @@ services:
     image: qdrant/qdrant:latest
     container_name: ph-vector-db
     restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
     volumes:
       - "./data/qdrant:/qdrant/storage"
 
@@ -146,27 +178,42 @@ services:
     image: ghcr.io/langfuse/langfuse:latest
     container_name: ph-langfuse-server
     restart: always
-    depends_on: [postgres]
+    ports:
+      - "3003:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/langfuse_db
       - NODE_ENV=production
       - SALT=${UNIFIED_PASS}
       - LANGFUSE_SECRET_KEY=${UNIFIED_PASS}
     command: "start"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/public/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   langfuse-ui:
     image: ghcr.io/langfuse/langfuse-ui:latest
     container_name: ph-langfuse-ui
     restart: always
-    depends_on: [langfuse-server]
+    ports:
+      - "3006:3000"
+    depends_on:
+      langfuse-server:
+        condition: service_healthy
     environment:
-      - LANGFUSE_PUBLIC_HOST=https://feedback.${DOMAIN}
-      - NEXT_PUBLIC_LANGFUSE_PUBLIC_HOST=https://feedback.${DOMAIN}
+      - LANGFUSE_PUBLIC_HOST=http://localhost:3003
+      - NEXT_PUBLIC_LANGFUSE_PUBLIC_HOST=http://localhost:3003
 
   libretranslate:
     image: libretranslate/libretranslate:latest
     container_name: ph-libretranslate
     restart: always
+    ports:
+      - "5000:5000"
     volumes:
       - "./data/libretranslate:/app/local/"
     environment:
@@ -176,7 +223,8 @@ services:
     image: anashel/whisper-webui:latest
     container_name: ph-whisper-ui
     restart: always
-    deploy: { resources: { reservations: { devices: [{ driver: nvidia, count: all, capabilities: [gpu] }] } } }
+    ports:
+      - "7861:80"
 
   # ----------------------------------------------------------------------
   # 5. COMMUNICATION & WORKFLOW
@@ -185,18 +233,24 @@ services:
     image: mattermost/mattermost-team-edition
     container_name: ph-mattermost
     restart: always
+    ports:
+      - "8065:8065"
     volumes:
       - "./data/mattermost/config:/mattermost/config"
       - "./data/mattermost/data:/mattermost/data"
       - "./data/mattermost/logs:/mattermost/logs"
     environment:
       - MM_SQLSETTINGS_DATASOURCE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mattermost_db?sslmode=disable
-    depends_on: [postgres]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   nextcloud:
     image: nextcloud:apache
     container_name: ph-nextcloud
     restart: always
+    ports:
+      - "8082:80"
     volumes:
       - "./data/nextcloud:/var/www/html"
     environment:
@@ -204,13 +258,17 @@ services:
       - POSTGRES_DB=nextcloud_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    depends_on: [postgres]
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   webtop:
     image: lscr.io/linuxserver/webtop:latest
     container_name: ph-secure-browser
-    security_opt: [seccomp:unconfined]
+    security_opt: ["seccomp:unconfined"]
     restart: always
+    ports:
+      - "3004:3000"
     environment:
       - PUID=1000
       - PGID=1000
@@ -225,36 +283,50 @@ services:
     image: searxng/searxng
     container_name: ph-searxng
     restart: always
+    ports:
+      - "8888:8080"
     volumes: ["./data/searxng:/etc/searxng"]
 
   spiderfoot:
     image: smicallef/spiderfoot:latest
     container_name: ph-spiderfoot
     restart: always
+    ports:
+      - "5001:5001"
     volumes: ["./data/spiderfoot:/var/lib/spiderfoot"]
   
   social-analyzer:
     image: qeeqbox/social-analyzer:latest
     container_name: ph-social-analyzer
     restart: always
+    ports:
+      - "8083:8080"
 
   changedetection:
     image: dgtlmoon/changedetection.io
     container_name: ph-changedetection
     restart: always
+    ports:
+      - "5002:5000"
     volumes: ["./data/changedetection:/datastore"]
 
   archivebox:
     image: archivebox/archivebox:latest
     container_name: ph-archivebox
     restart: always
+    ports:
+      - "8000:8000"
     volumes: ["./data/archivebox:/data"]
 
   meedan-check:
     image: anashel/meedan-check:latest # Simplified image for deployment
     container_name: ph-meedan-check
     restart: always
-    depends_on: [postgres]
+    ports:
+      - "3005:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/meedan_db?sslmode=disable
   
@@ -265,6 +337,8 @@ services:
     image: typo3/cms-base-distribution:11.5
     container_name: ph-typo3
     restart: always
+    ports:
+      - "8084:80"
     environment:
       - TYPO3_DB_HOST=mariadb
       - TYPO3_DB_PORT=3306
@@ -273,13 +347,19 @@ services:
       - TYPO3_DB_PASSWORD=${TYPO3_DB_PASS}
       - TYPO3_ADMIN_USER=${TYPO3_ADMIN_USER}
       - TYPO3_ADMIN_PASSWORD=${UNIFIED_PASS}
-    depends_on: [mariadb]
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
   crm:
     image: mjvar/civicrm-docker-d9:5.41.0 # CiviCRM on Drupal 9
     container_name: ph-crm
     restart: always
-    depends_on: [mariadb]
+    ports:
+      - "8085:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
     volumes:
       - "./data/civicrm_files:/var/www/html/web/sites/default/files"
     environment:
@@ -301,26 +381,32 @@ services:
     container_name: ph-portal-journalist
     volumes: ["./dashy-journalist.yml:/app/public/conf.yml"]
     restart: always
-    environment: [DOMAIN=${DOMAIN}]
+    environment:
+      - DOMAIN=${DOMAIN}
   
   ph-portal-admin:
     image: lissy93/dashy:latest
     container_name: ph-portal-admin
     volumes: ["./dashy-admin.yml:/app/public/conf.yml"]
     restart: always
-    environment: [DOMAIN=${DOMAIN}, ADMIN_API_KEY=${ADMIN_API_KEY}]
+    environment:
+      - DOMAIN=${DOMAIN}
+      - ADMIN_API_KEY=${ADMIN_API_KEY}
 
   ph-portal-verifier:
     image: lissy93/dashy:latest
     container_name: ph-portal-verifier
     volumes: ["./dashy-verifier.yml:/app/public/conf.yml"]
     restart: always
-    environment: [DOMAIN=${DOMAIN}]
+    environment:
+      - DOMAIN=${DOMAIN}
 
   internal_proxy:
     image: nginx:alpine
     container_name: ph-internal-proxy
     restart: always
+    ports:
+      - "8080:80"
     volumes: ["./internal_proxy/nginx.conf:/etc/nginx/nginx.conf:ro"]
 
   yemenjpt_app:
