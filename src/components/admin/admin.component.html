@@ -11,7 +11,8 @@
       <button (click)="activeTab.set('users')" [class]="activeTab() === 'users' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">المستخدمون</button>
       <button (click)="activeTab.set('tools')" [class]="activeTab() === 'tools' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">الأدوات</button>
       @if (isRoot()) {
-        <button (click)="activeTab.set('ai')" [class]="activeTab() === 'ai' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة الذكاء الاصطناعي</button>
+        <button (click)="activeTab.set('haqiqa')" [class]="activeTab() === 'haqiqa' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة "حقيقة"</button>
+        <button (click)="activeTab.set('ai-ops')" [class]="activeTab() === 'ai-ops' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">عمليات الذكاء الاصطناعي</button>
         <button (click)="activeTab.set('email')" [class]="activeTab() === 'email' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة البريد</button>
         <button (click)="activeTab.set('logs')" [class]="activeTab() === 'logs' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">سجل التدقيق</button>
       }
@@ -48,7 +49,10 @@
       @case ('tools') {
         <app-tool-management></app-tool-management>
       }
-      @case ('ai') {
+      @case ('haqiqa') {
+        <app-haqiqa-management></app-haqiqa-management>
+      }
+      @case ('ai-ops') {
         <app-ai-management></app-ai-management>
       }
        @case ('email') {

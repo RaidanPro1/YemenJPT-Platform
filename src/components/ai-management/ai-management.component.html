@@ -1,5 +1,5 @@
 <section class="space-y-8">
-  <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-ph-yellow pb-2">النواة المعرفية (AI Core)</h2>
+  <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-ph-yellow pb-2">لوحة عمليات الذكاء الاصطناعي (AI Ops)</h2>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div class="bg-base-100 p-6 rounded-xl shadow space-y-6">
           <div>
@@ -12,43 +12,22 @@
               </div>
             </fieldset>
           </div>
-           <div>
-            <h3 class="text-xl font-bold text-gray-900">التحكم في ميزات المنصة</h3>
-            <p class="text-gray-500 mt-1 text-sm">تفعيل أو تعطيل الميزات للمستخدمين (دور الصحفي).</p>
-             <div class="space-y-3 p-4 mt-4 border rounded-lg bg-base-200/50">
-                <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">المساعد الذكي (Chatbot)</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isChatbotEnabled()" (change)="settingsService.isChatbotEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
-                <hr>
-                <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">تحليل الصور</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isImageAnalysisEnabled()" (change)="settingsService.isImageAnalysisEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
-                <hr>
-                <div class="flex items-center justify-between"><h4 class="font-semibold text-gray-800 text-sm">تصدير البيانات</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" [checked]="settingsService.isDataExportEnabled()" (change)="settingsService.isDataExportEnabled.set($any($event.target).checked)" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ph-blue"></div></label></div>
+           <div class="pt-6 border-t">
+            <h3 class="text-xl font-bold text-gray-900">مختبر هندسة الأوامر (Prompt Engineering)</h3>
+             <p class="text-gray-500 mt-1 text-sm">اختبار وتحديث الأوامر الأساسية للنظام (System Prompts) مباشرة.</p>
+            <textarea class="mt-4 w-full p-2 border rounded-md bg-gray-50 font-mono text-sm" rows="8">You are an expert OSINT assistant named YemenJPT, integrated within a larger platform. Your primary function is to help journalists by running tools...</textarea>
+             <div class="flex justify-end mt-2">
+                <button class="px-4 py-2 text-sm text-white bg-ph-blue rounded-lg">تحديث الأمر الأساسي</button>
              </div>
           </div>
       </div>
        <div class="bg-base-100 p-6 rounded-xl shadow space-y-6">
-        <h3 class="text-xl font-bold text-gray-900">هندسة الأوامر (System Prompt)</h3>
-        <textarea class="w-full p-2 border rounded-md bg-gray-50 font-mono text-sm" rows="10">You are an expert OSINT assistant named YemenJPT, integrated within a larger platform. Your primary function is to help journalists by running tools...</textarea>
-        
-        <h3 class="text-xl font-bold text-gray-900">ضبط المعلمات (Parameters)</h3>
-        <div class="space-y-4">
-          <div>
-            <label class="flex justify-between text-sm font-medium">Temperature: <span class="font-bold">{{ temperature().toFixed(2) }}</span></label>
-            <input type="range" min="0" max="1" [step]="0.01" [(ngModel)]="temperature" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-          </div>
-          <div>
-            <label class="flex justify-between text-sm font-medium">Top-P: <span class="font-bold">{{ topP().toFixed(2) }}</span></label>
-            <input type="range" min="0" max="1" [step]="0.01" [(ngModel)]="topP" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-          </div>
-          <div>
-            <label class="flex justify-between text-sm font-medium">Top-K: <span class="font-bold">{{ topK() }}</span></label>
-            <input type="range" min="1" max="100" [step]="1" [(ngModel)]="topK" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-          </div>
-        </div>
-      </div>
-      <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
-         <h3 class="text-xl font-bold text-gray-900 mb-4">تدريب وتطوير نماذج AI (Fine-Tuning)</h3>
-         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <h3 class="text-xl font-bold text-gray-900">مركز تدريب النماذج (Model Tuning Hub)</h3>
+         <p class="text-gray-500 mt-1 text-sm">استخدم التغذية الراجعة من المستخدمين لتحسين أداء النماذج المحلية.</p>
+
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start pt-4 border-t">
             <div>
-              <p class="text-sm text-gray-600 mb-2">ارفع مجموعة بيانات التدريب (JSONL أو CSV) لتحسين أداء النموذج المحلي.</p>
+              <p class="text-sm text-gray-600 mb-2">ارفع بيانات التدريب (False Positives) أو بيانات اللهجات اليمنية الجديدة.</p>
                <label for="dataset-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
                     <svg class="w-8 h-8 mb-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>

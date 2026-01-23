@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, output, signal, OnDestroy, afterNextRender, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContentService } from '../../services/content.service';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-projects-public',
@@ -12,6 +13,7 @@ import { ContentService } from '../../services/content.service';
 export class ProjectsPublicComponent implements OnDestroy {
   login = output<void>();
   private contentService = inject(ContentService);
+  settingsService = inject(SettingsService);
   
   projects = this.contentService.projects;
 

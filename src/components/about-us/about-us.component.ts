@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, OnDestroy, afterNextRender, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContentService } from '../../services/content.service';
+import { SettingsService } from '../../services/settings.service';
 
 interface Slide {
   imageUrl: string;
@@ -17,6 +18,7 @@ interface Slide {
 })
 export class AboutUsComponent implements OnDestroy {
   private contentService = inject(ContentService);
+  settingsService = inject(SettingsService);
   
   slides = signal<Slide[]>([
     {

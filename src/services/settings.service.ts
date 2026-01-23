@@ -18,6 +18,13 @@ export class SettingsService {
   isSearchGroundingEnabled = signal<boolean>(true);
   isQuickSummaryEnabled = signal<boolean>(true);
 
+  // --- "Haqiqa" Module Feature Flags ---
+  isHaqiqaDeepfakeDetectionEnabled = signal<boolean>(true);
+  isHaqiqaForensicAnalysisEnabled = signal<boolean>(true);
+
+  // --- Low Bandwidth Mode ---
+  isLowBandwidthMode = signal<boolean>(false);
+
   // --- New Feature Flags ---
   isOnboardingEnabled = signal<boolean>(true);
   isDataExportEnabled = signal<boolean>(true);

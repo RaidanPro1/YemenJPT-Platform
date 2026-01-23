@@ -59,6 +59,7 @@ import { NewsletterManagementComponent } from './components/newsletter-managemen
 import { AiManagementComponent } from './components/ai-management/ai-management.component';
 import { EmailManagementComponent } from './components/email-management/email-management.component';
 import { AuditLogComponent } from './components/audit-log/audit-log.component';
+import { HaqiqaManagementComponent } from './components/haqiqa-management/haqiqa-management.component';
 
 import { UserService, UserRole } from './services/user.service';
 import { SeoService } from './services/seo.service';
@@ -131,6 +132,7 @@ import { ThemeService } from './services/theme.service';
     AiManagementComponent,
     EmailManagementComponent,
     AuditLogComponent,
+    HaqiqaManagementComponent,
   ],
 })
 export class AppComponent {

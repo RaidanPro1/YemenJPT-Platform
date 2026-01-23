@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, output, signal, OnDestroy, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContentService, Stat } from '../../services/content.service';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import { ContentService, Stat } from '../../services/content.service';
 })
 export class HomeComponent implements OnDestroy {
   private contentService = inject(ContentService);
+  settingsService = inject(SettingsService);
   
   login = output<void>();
   navigate = output<string>();

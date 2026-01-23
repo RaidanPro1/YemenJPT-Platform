@@ -20,6 +20,7 @@ import { AiManagementComponent } from '../ai-management/ai-management.component'
 import { EmailManagementComponent } from '../email-management/email-management.component';
 import { AuditLogComponent } from '../audit-log/audit-log.component';
 import { UserManagementComponent } from '../user-management/user-management.component';
+import { HaqiqaManagementComponent } from '../haqiqa-management/haqiqa-management.component';
 
 
 @Component({
@@ -42,7 +43,8 @@ import { UserManagementComponent } from '../user-management/user-management.comp
     AiManagementComponent,
     EmailManagementComponent,
     AuditLogComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    HaqiqaManagementComponent
   ],
   templateUrl: './admin.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,6 +54,6 @@ export class AdminComponent {
   userService = inject(UserService);
 
   isRoot = computed(() => this.userService.currentUser()?.role === 'super-admin');
-  activeTab = signal<'general' | 'users' | 'tools' | 'ai' | 'email' | 'logs'>('general');
+  activeTab = signal<'general' | 'users' | 'tools' | 'haqiqa' | 'ai-ops' | 'email' | 'logs'>('general');
 
 }

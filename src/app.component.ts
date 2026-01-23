@@ -43,6 +43,7 @@ import { TechSupportPortalComponent } from './components/tech-support-portal/tec
 import { NewsroomComponent } from './components/newsroom/newsroom.component';
 import { GeminiCodeAssistComponent } from './components/gemini-code-assist/gemini-code-assist.component';
 import { WebrtcCallComponent } from './components/webrtc-call/webrtc-call.component';
+import { ForensicLabComponent } from './components/forensic-lab/forensic-lab.component';
 
 // New public portal pages
 import { ViolationsObservatoryPublicComponent } from './components/violations-observatory-public/violations-observatory-public.component';
@@ -56,6 +57,10 @@ import { PlatformOverviewComponent } from './components/platform-overview/platfo
 // New Admin components
 import { ThemeManagementComponent } from './components/theme-management/theme-management.component';
 import { NewsletterManagementComponent } from './components/newsletter-management/newsletter-management.component';
+import { AiManagementComponent } from './components/ai-management/ai-management.component';
+import { EmailManagementComponent } from './components/email-management/email-management.component';
+import { AuditLogComponent } from './components/audit-log/audit-log.component';
+import { HaqiqaManagementComponent } from './components/haqiqa-management/haqiqa-management.component';
 
 import { UserService, UserRole } from './services/user.service';
 import { SeoService } from './services/seo.service';
@@ -114,6 +119,7 @@ import { ThemeService } from './services/theme.service';
     NewsroomComponent,
     GeminiCodeAssistComponent,
     WebrtcCallComponent,
+    ForensicLabComponent,
     // New Public Portal Pages
     ViolationsObservatoryPublicComponent,
     TrainingPortalPublicComponent,
@@ -124,7 +130,11 @@ import { ThemeService } from './services/theme.service';
     PlatformOverviewComponent,
     // Newly added admin components
     ThemeManagementComponent,
-    NewsletterManagementComponent
+    NewsletterManagementComponent,
+    AiManagementComponent,
+    EmailManagementComponent,
+    AuditLogComponent,
+    HaqiqaManagementComponent,
   ],
 })
 export class AppComponent {

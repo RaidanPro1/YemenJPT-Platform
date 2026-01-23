@@ -59,6 +59,7 @@ export class ProjectManagementPortalComponent {
 
   user = this.userService.currentUser;
   activeTab = signal<'overview' | 'calendar' | 'resources' | 'reports'>('overview');
+  filterStatus = signal<'all' | 'On Track' | 'At Risk' | 'Off Track'>('all');
 
   teamMembers: TeamMember[] = [
     { name: 'محمد الحريبي', avatar: 'assets/team/mohammed-alharibi.jpg' },
@@ -73,6 +74,14 @@ export class ProjectManagementPortalComponent {
     { id: 3, name: 'تدريب الصحفيين - الدفعة 3', status: 'On Track', progress: 100, dueDate: '2024-07-20', budget: { total: 20000, spent: 19500 }, team: [this.teamMembers[1]] },
     { id: 4, name: 'تطوير المنصة الرقمية - المرحلة 2', status: 'On Track', progress: 75, dueDate: '2024-10-30', budget: { total: 120000, spent: 80000 }, team: [this.teamMembers[0], this.teamMembers[3]], milestones: [{name: 'إطلاق نسخة تجريبية', date: '2024-09-30'}, {name: 'جمع الملاحظات', date: '2024-10-15'}] },
   ]);
+  
+  filteredProjects = computed(() => {
+    const status = this.filterStatus();
+    if (status === 'all') {
+      return this.projects();
+    }
+    return this.projects().filter(p => p.status === status);
+  });
 
   recentActivities = signal<Activity[]>([
     { user: this.teamMembers[1], action: 'أكمل مهمة', target: 'تحديد الموقع الجغرافي للفيديو', project: 'تحقيق انتهاكات 2024', timestamp: 'منذ ساعتين' },
@@ -183,6 +192,10 @@ export class ProjectManagementPortalComponent {
 
   setTab(tab: 'overview' | 'calendar' | 'resources' | 'reports') {
     this.activeTab.set(tab);
+  }
+
+  setFilterStatus(status: 'all' | 'On Track' | 'At Risk' | 'Off Track') {
+    this.filterStatus.set(status);
   }
 
   handleToolToggle(toolId: string) {

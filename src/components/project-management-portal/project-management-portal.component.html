@@ -55,9 +55,17 @@
 
           <!-- Projects List -->
           <div class="bg-base-100 p-6 rounded-xl shadow">
-            <h2 class="text-xl font-bold mb-4">نظرة عامة على المشاريع</h2>
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">نظرة عامة على المشاريع</h2>
+              <div class="flex items-center gap-1 p-1 bg-base-200 rounded-lg">
+                <button (click)="setFilterStatus('all')" [class]="filterStatus() === 'all' ? 'bg-white shadow' : 'text-gray-500'" class="px-3 py-1 text-sm font-semibold rounded-md transition-colors">الكل</button>
+                <button (click)="setFilterStatus('On Track')" [class]="filterStatus() === 'On Track' ? 'bg-white shadow' : 'text-gray-500'" class="px-3 py-1 text-sm font-semibold rounded-md transition-colors">في المسار</button>
+                <button (click)="setFilterStatus('At Risk')" [class]="filterStatus() === 'At Risk' ? 'bg-white shadow' : 'text-gray-500'" class="px-3 py-1 text-sm font-semibold rounded-md transition-colors">في خطر</button>
+                <button (click)="setFilterStatus('Off Track')" [class]="filterStatus() === 'Off Track' ? 'bg-white shadow' : 'text-gray-500'" class="px-3 py-1 text-sm font-semibold rounded-md transition-colors">خارج المسار</button>
+              </div>
+            </div>
             <div class="space-y-4">
-              @for(project of projects(); track project.id) {
+              @for(project of filteredProjects(); track project.id) {
                 <div>
                   <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-1">
                     <span class="text-base font-medium text-ph-blue">{{ project.name }}</span>
@@ -73,6 +81,10 @@
                     <div class="bg-ph-blue h-4 rounded-full" [style.width.%]="project.progress"></div>
                     <span class="absolute inset-0 text-white text-xs font-bold flex items-center justify-center">{{ project.progress }}%</span>
                   </div>
+                </div>
+              } @empty {
+                <div class="text-center py-8 text-gray-500">
+                  <p>لا توجد مشاريع تطابق هذا الفلتر.</p>
                 </div>
               }
             </div>

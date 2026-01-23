@@ -6,22 +6,10 @@ interface Article {
   title: string;
   author: string;
   submittedAt: string;
+  avatar: string;
 }
 
 type ArticleStatus = 'ideas' | 'inProgress' | 'review' | 'published';
-
-interface NewsroomService {
-  name: string;
-  status: 'Online' | 'Degraded' | 'Offline';
-  url: string;
-}
-
-interface TeamActivity {
-  member: string;
-  avatar: string;
-  task: string;
-  status: 'review' | 'inProgress';
-}
 
 
 @Component({
@@ -35,17 +23,18 @@ export class EditorialHubComponent {
 
   articles = signal<{ [key in ArticleStatus]: Article[] }>({
     ideas: [
-      { id: 1, title: 'تحليل اقتصادي لتأثير الحرب على العملة', author: 'فريق الاقتصاد', submittedAt: '' },
+      { id: 1, title: 'تحليل اقتصادي لتأثير الحرب على العملة', author: 'فريق الاقتصاد', submittedAt: '', avatar: 'https://i.pravatar.cc/150?u=econ' },
+      { id: 6, title: 'مقترح: قصة حول صيد الأسماك في الساحل الغربي', author: 'قسم الأخبار', submittedAt: '', avatar: 'https://i.pravatar.cc/150?u=news' },
     ],
     inProgress: [
-      { id: 2, title: 'تحقيق: شبكات التهريب عبر السواحل', author: 'أحمد خالد', submittedAt: '' },
+      { id: 2, title: 'تحقيق: شبكات التهريب عبر السواحل', author: 'أحمد خالد', submittedAt: '', avatar: 'https://i.pravatar.cc/150?u=ahmed' },
     ],
     review: [
-      { id: 3, title: 'تقرير: حالة التعليم في المناطق النائية', author: 'فاطمة علي', submittedAt: '2024-07-21' },
+      { id: 3, title: 'تقرير: حالة التعليم في المناطق النائية', author: 'فاطمة علي', submittedAt: '2024-07-21', avatar: 'https://i.pravatar.cc/150?u=fatima' },
     ],
     published: [
-       { id: 4, title: 'خبر: افتتاح مشروع مياه جديد في تعز', author: 'قسم الأخبار', submittedAt: '' },
-       { id: 5, title: 'بيان إدانة لاستهداف الصحفيين في مأرب', author: 'بيت الصحافة', submittedAt: '' },
+       { id: 4, title: 'خبر: افتتاح مشروع مياه جديد في تعز', author: 'قسم الأخبار', submittedAt: '', avatar: 'https://i.pravatar.cc/150?u=news' },
+       { id: 5, title: 'بيان إدانة لاستهداف الصحفيين في مأرب', author: 'بيت الصحافة', submittedAt: '', avatar: 'assets/logo.png' },
     ]
   });
 
@@ -53,20 +42,7 @@ export class EditorialHubComponent {
   articlesInReviewCount = computed(() => this.articles().review.length);
   publishedThisWeekCount = computed(() => this.articles().published.length); // Simplified for demo
   ideasCount = computed(() => this.articles().ideas.length);
-
-  newsroomServices = signal<NewsroomService[]>([
-    { name: 'منصة النشر (Ghost)', status: 'Online', url: 'http://localhost:2368/ghost' },
-    { name: 'نظام الإدارة (TYPO3)', status: 'Online', url: 'http://localhost:8080/typo3' },
-    { name: 'منصة التعاون (Chat)', status: 'Degraded', url: 'https://chat.ph-ye.org' },
-    { name: 'إدارة المهام (Superdesk)', status: 'Online', url: '#' },
-  ]);
-
-  teamActivity = signal<TeamActivity[]>([
-    { member: 'أحمد خالد', avatar: 'https://i.pravatar.cc/150?u=ahmed', task: 'تحقيق شبكات التهريب', status: 'inProgress' },
-    { member: 'فاطمة علي', avatar: 'https://i.pravatar.cc/150?u=fatima', task: 'تقرير حالة التعليم', status: 'review' },
-    { member: 'خالد عبدالله', avatar: 'https://i.pravatar.cc/150?u=khaled', task: 'مراجعة وثائق المناقصات', status: 'inProgress' },
-  ]);
-
+  
   draggedArticleId = signal<number | null>(null);
   dragOverStatus = signal<ArticleStatus | null>(null);
 

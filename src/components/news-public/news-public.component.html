@@ -20,7 +20,11 @@
               class="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
               [class.opacity-100]="currentSlide() === i"
               [class.opacity-0]="currentSlide() !== i">
-              <img [src]="slide.imageUrl" class="w-full h-full object-cover" alt="{{slide.title}}">
+              @if (!settingsService.isLowBandwidthMode()) {
+                <img [src]="slide.imageUrl" class="w-full h-full object-cover" alt="{{slide.title}}">
+              } @else {
+                <div class="w-full h-full bg-gray-700"></div>
+              }
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
               <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
                 <span class="text-sm font-bold uppercase tracking-wider bg-ph-blue/80 px-2 py-1 rounded">{{slide.category}}</span>
@@ -51,7 +55,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @for(article of news(); track article.id) {
           <div class="bg-base-100 rounded-lg shadow-md overflow-hidden group">
-            <img [src]="article.imageUrl" alt="{{article.title}}" class="w-full h-48 object-cover">
+             @if (!settingsService.isLowBandwidthMode()) {
+              <img [src]="article.imageUrl" alt="{{article.title}}" class="w-full h-48 object-cover">
+            } @else {
+              <div class="w-full h-48 bg-gray-200"></div>
+            }
             <div class="p-6">
               <p class="text-sm text-gray-500">{{ article.category }} - {{ article.date }}</p>
               <h4 class="font-bold text-lg my-2 group-hover:text-ph-blue transition-colors">{{ article.title }}</h4>

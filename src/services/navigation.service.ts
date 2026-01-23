@@ -26,6 +26,7 @@ export class NavigationService {
     { key: 'role-home', name: 'مساحة عملي', icon: 'home-role-icon', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
     { key: 'dashboard', name: 'كل الأدوات', icon: 'squares-2x2', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
     { key: 'ai-core', name: 'النواة المعرفية', icon: 'sparkles', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
+    { key: 'forensic-lab', name: 'المختبر الجنائي', icon: 'beaker', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
     { key: 'collaboration', name: 'التعاون', icon: 'users', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },
     { key: 'admin', name: 'التحكم الإداري', icon: 'shield-check', allowedRoles: ['editor-in-chief', 'super-admin'] },
     { key: 'settings', name: 'الإعدادات', icon: 'cog-6-tooth', allowedRoles: ['investigative-journalist', 'editor-in-chief', 'super-admin'] },

@@ -60,10 +60,11 @@ export class CommandCenterComponent implements OnDestroy {
 
   services = signal<Service[]>([
     { name: 'Gateway', status: 'Online' },
-    { name: 'AI Core', status: 'Online' },
-    { name: 'Database', status: 'Online' },
-    { name: 'Archive Service', status: 'Degraded' },
-    { name: 'Collaboration Suite', status: 'Online' },
+    { name: 'AI Core (Ollama)', status: 'Online' },
+    { name: 'Database (Postgres)', status: 'Online' },
+    { name: 'Archive Service (MinIO)', status: 'Degraded' },
+    { name: 'Task Queue (Redis)', status: 'Online' },
+    { name: 'OSINT Worker (Celery)', status: 'Online' },
   ]);
   
   serviceStats = computed(() => {
@@ -74,6 +75,17 @@ export class CommandCenterComponent implements OnDestroy {
       else if (s.status === 'Offline') stats.offline++;
     });
     return stats;
+  });
+
+  costData = signal({
+    gemini: { daily: 45, monthly: 850 },
+    local: { daily: 15, monthly: 300 },
+    dailyBudget: 100
+  });
+
+  dailySpendPercentage = computed(() => {
+    const totalDaily = this.costData().gemini.daily + this.costData().local.daily;
+    return Math.min(100, (totalDaily / this.costData().dailyBudget) * 100);
   });
 
   investigations = signal<Investigation[]>([

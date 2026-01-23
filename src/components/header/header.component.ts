@@ -4,6 +4,7 @@ import { SearchService } from '../../services/search.service';
 import { User, UserRole, getRoleDisplayName } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { SettingsService } from '../../services/settings.service';
 
 interface PortalLink {
   key: string;
@@ -27,6 +28,7 @@ interface PublicNavLink {
 export class HeaderComponent implements OnDestroy {
   searchService = inject(SearchService);
   notificationService = inject(NotificationService);
+  settingsService = inject(SettingsService);
   
   isAuthenticated = input.required<boolean>();
   user = input<User | null>();
@@ -148,6 +150,10 @@ export class HeaderComponent implements OnDestroy {
 
   markAllNotificationsAsRead() {
     this.notificationService.markAllAsRead();
+  }
+
+  toggleLowBandwidthMode() {
+    this.settingsService.isLowBandwidthMode.update(v => !v);
   }
 
   timeAgo(date: Date): string {
